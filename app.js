@@ -16,71 +16,14 @@ function setLogs(arr){localStorage.setItem(LOG_KEY,JSON.stringify(arr.slice(-500
 function addLog(action,detail){const logs=getLogs();logs.push({at:new Date().toISOString(),user:currentUser?currentUser.id:"?",action,detail:detail||""});setLogs(logs)}
 function packAll(){return{products:getProducts(),submissions:getSubs(),users:getUsers(),logs:getLogs(),updatedAt:new Date().toISOString()}}
 function applyAll(data){if(!data||typeof data!=="object")return;if(Array.isArray(data.products))setProducts(data.products);if(Array.isArray(data.submissions))setSubs(data.submissions);if(data.users&&typeof data.users==="object")setUsers(data.users);if(Array.isArray(data.logs))setLogs(data.logs);if(data.updatedAt)_lastCloudAt=data.updatedAt}
-
-const firebaseConfig={
-  apiKey:"AIzaSyCj0zqo31QoCw2ggpOl2Aewu8u95azL6jQ",
-  authDomain:"borluulalt-f9d70.firebaseapp.com",
-  databaseURL:"https://borluulalt-f9d70-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId:"borluulalt-f9d70",
-  storageBucket:"borluulalt-f9d70.firebasestorage.app",
-  messagingSenderId:"855180069212",
-  appId:"1:855180069212:web:851496c0ded1b428121999"
-};
+const firebaseConfig={apiKey:"AIzaSyCj0zqo31QoCw2ggpOl2Aewu8u95azL6jQ",authDomain:"borluulalt-f9d70.firebaseapp.com",databaseURL:"https://borluulalt-f9d70-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"borluulalt-f9d70",storageBucket:"borluulalt-f9d70.firebasestorage.app",messagingSenderId:"855180069212",appId:"1:855180069212:web:851496c0ded1b428121999"};
 let _fbReady=false,_fbDb=null;
-function initFirebase(){
-  if(_fbReady)return true;
-  try{
-    if(typeof firebase==="undefined"){console.warn("Firebase SDK not loaded");return false;}
-    if(!firebase.apps||!firebase.apps.length)firebase.initializeApp(firebaseConfig);
-    _fbDb=firebase.database();
-    _fbReady=true;
-    return true;
-  }catch(e){console.warn(e);return false;}
-}
+function initFirebase(){if(_fbReady)return true;try{if(typeof firebase==="undefined"){console.warn("Firebase SDK not loaded");return false;}if(!firebase.apps||!firebase.apps.length)firebase.initializeApp(firebaseConfig);_fbDb=firebase.database();_fbReady=true;return true;}catch(e){console.warn(e);return false;}}
 function syncEnabled(){return true}
-async function cloudPull(){
-  if(!initFirebase()){updateSyncBadge("err");window._lastSyncError="Firebase ачаалаагүй";return false;}
-  try{
-    const snap=await _fbDb.ref("borluulalt").once("value");
-    const data=snap.val();
-    if(data)applyAll(data);
-    updateSyncBadge("ok");
-    window._lastSyncError=null;
-    return true;
-  }catch(e){
-    console.warn(e);
-    updateSyncBadge("err");
-    window._lastSyncError=String(e.message||e);
-    return false;
-  }
-}
-async function cloudPush(){
-  if(!initFirebase()||_syncBusy)return false;
-  _syncBusy=true;updateSyncBadge("busy");
-  try{
-    const payload=packAll();
-    await _fbDb.ref("borluulalt").set(payload);
-    _lastCloudAt=payload.updatedAt;
-    updateSyncBadge("ok");
-    window._lastSyncError=null;
-    return true;
-  }catch(e){
-    console.warn(e);
-    updateSyncBadge("err");
-    window._lastSyncError=String(e.message||e);
-    return false;
-  }finally{_syncBusy=false}
-}
+async function cloudPull(){if(!initFirebase()){updateSyncBadge("err");window._lastSyncError="Firebase ачаалаагүй";return false;}try{const snap=await _fbDb.ref("borluulalt").once("value");const data=snap.val();if(data)applyAll(data);updateSyncBadge("ok");window._lastSyncError=null;return true;}catch(e){console.warn(e);updateSyncBadge("err");window._lastSyncError=String(e.message||e);return false;}}
+async function cloudPush(){if(!initFirebase()||_syncBusy)return false;_syncBusy=true;updateSyncBadge("busy");try{const payload=packAll();await _fbDb.ref("borluulalt").set(payload);_lastCloudAt=payload.updatedAt;updateSyncBadge("ok");window._lastSyncError=null;return true;}catch(e){console.warn(e);updateSyncBadge("err");window._lastSyncError=String(e.message||e);return false;}finally{_syncBusy=false}}
 async function afterLocalWrite(){await cloudPush()}
-function updateSyncBadge(state){
-  const el=document.getElementById("syncBadge");
-  if(!el)return;
-  if(state==="busy"){el.textContent="☁️ ...";el.className="sync-badge busy";return}
-  if(state==="err"){el.textContent="☁️ Алдаа";el.className="sync-badge err";return}
-  const t=_lastCloudAt?new Date(_lastCloudAt).toLocaleTimeString("mn-MN"):"";
-  el.textContent="☁️ Синктэй"+(t?" · "+t:"");
-  el.className="sync-badge ok";
-}
+function updateSyncBadge(state){const el=document.getElementById("syncBadge");if(!el)return;if(state==="busy"){el.textContent="☁️ ...";el.className="sync-badge busy";return}if(state==="err"){el.textContent="☁️ Алдаа";el.className="sync-badge err";return}const t=_lastCloudAt?new Date(_lastCloudAt).toLocaleTimeString("mn-MN"):"";el.textContent="☁️ Синктэй"+(t?" · "+t:"");el.className="sync-badge ok"}
 function showAlert(id,msg,type){const el=document.getElementById(id);if(!el)return;el.innerHTML=`<div class="alert alert-${type}">${msg}</div>`;if(type==="success")setTimeout(()=>{el.innerHTML=""},4000)}
 function updateLoginHint(){const users=getUsers();const emps=Object.keys(users).filter(id=>users[id].role==="employee");const sups=Object.keys(users).filter(id=>users[id].role==="supervisor");const el=document.getElementById("loginHint");if(!el)return;el.innerHTML=`<strong>ID:</strong> Ажилчид ${emps.map(id=>`<code>${id}</code>`).join(" ")} · Ахлах ${sups.map(id=>`<code>${id}</code>`).join(" ")}`}
 async function init(){if(!localStorage.getItem(STORAGE_KEY))setProducts(DEFAULT_PRODUCTS);else getProducts();if(!localStorage.getItem(USERS_KEY))setUsers(DEFAULT_USERS);updateSyncBadge("busy");await cloudPull();updateLoginHint();const s=localStorage.getItem("lastLoginId");if(s)document.getElementById("loginId").value=s;const fd=document.getElementById("formDate");if(fd)fd.valueAsDate=new Date();document.getElementById("loginId").addEventListener("keyup",e=>{if(e.key==="Enter")doLogin()});const pin=document.getElementById("loginPin");if(pin)pin.addEventListener("keyup",e=>{if(e.key==="Enter")doLogin()});setInterval(async()=>{if(!currentUser)return;await cloudPull();if(currentUser.role==="supervisor")loadSupervisorData();else{buildSalesTable();updateRecon()}},30000)}
@@ -99,3 +42,4 @@ function showTab(name){const tabs=["overview","submissions","reports","stock","p
 function loadSupervisorData(){renderOverview(getSubs());renderSubmissionsList(getSubs())}
 function renderOverview(all){let totalSold=0,totalIncome=0,totalDiff=0;const empSet=new Set();all.forEach(s=>{empSet.add(s.employeeId);s.items.forEach(it=>{totalSold+=it.sold||0;totalIncome+=it.income||0});totalDiff+=(s.diff!=null?s.diff:0)});const products=getActiveProducts();const totalStock=products.reduce((a,p)=>a+(p.stock||0),0);document.getElementById("overallSummary").innerHTML=`<div class="summary-item"><div class="label">Илгээлт</div><div class="value">${all.length}</div></div><div class="summary-item"><div class="label">Ажилчин</div><div class="value">${empSet.size}</div></div><div class="summary-item"><div class="label">Борлуулсан</div><div class="value">${totalSold}</div></div><div class="summary-item"><div class="label">Орлого</div><div class="value">${totalIncome.toLocaleString()}₮</div></div><div class="summary-item"><div class="label">Сан</div><div class="value">${totalStock}</div></div><div class="summary-item"><div class="label">Зөрүү</div><div class="value ${totalDiff>=0?"diff-over":"diff-short"}">${(totalDiff>=0?"+":"")+totalDiff.toLocaleString()}</div></div>`;const low=products.filter(p=>(p.stock||0)<=LOW_STOCK);document.getElementById("lowStockWarn").innerHTML=low.length?`<div class="alert alert-warn">⚠️ Бага нөөц: ${low.map(p=>p.name+" ("+p.stock+")").join(", ")}</div>`:"";const totals={};products.forEach(p=>totals[p.id]={name:p.name,sold:0,income:0,price:p.price,stock:p.stock||0});all.forEach(s=>s.items.forEach(it=>{if(totals[it.id]){totals[it.id].sold+=it.sold||0;totals[it.id].income+=it.income||0}}));const tbody=document.getElementById("productTotalsBody");tbody.innerHTML="";let ts=0,ti=0;products.forEach(p=>{const t=totals[p.id];ts+=t.sold;ti+=t.income;const sc=t.stock<=LOW_STOCK?"stock-low":"stock-ok";tbody.innerHTML+=`<tr><td>${p.id}</td><td class="product-name">${t.name}</td><td class="price-col">${(t.price||0).toLocaleString()}</td><td class="${sc}">${t.stock}</td><td>${t.sold}</td><td>${t.income.toLocaleString()}₮</td></tr>`});tbody.innerHTML+=`<tr style="font-weight:700;background:#e8f0fe"><td colspan="4">НИЙТ</td><td>${ts}</td><td>${ti.toLocaleString()}₮</td></tr>`}
 function renderSubmissionsList(all){const list=document.getElementById("submissionsList");if(!all.length){list.innerHTML=`<div class="alert alert-info">Илгээлт байхгүй</div>`;document.getElementById("selectedSubmissionDetail").classList.add("hidden");return}all=all.slice().sort((a,b)=>new Date(b.submittedAt)-new Date(a.submittedAt));_sortedSubs=all;list.innerHTML=all.map((s,idx)=>{const calc=s.calcTotal!=null?s.calcTotal:(s.items||[]).reduce((a,i)=>a+(i.income||0),0);const diff=s.diff!=null?s.diff:((s.cashAmount||0)+(s.cardTotal||0)-calc);return `<div class="sub-item ${s.locked?"locked":""}" onclick="showSubmissionDetail(${idx})"><strong>${s.employeeName}</strong> (${s.employeeId}) — ${s.date} (${s.shift||"—"})${s.location?" · "+s.location:""}${s.locked?" 🔒":""}<br><small>${new Date(s.submittedAt).toLocaleString("mn-MN")} | ${calc.toLocaleString()}₮ | <span class="${Math.abs(diff)<0.01?"diff-ok":(diff>0?"diff-over":"diff-short")}">${Math.abs(diff)<0.01?"✓":(diff>0?"+":"")+diff.toLocaleString()}</span></small></div>`}).join("")}
+init();
