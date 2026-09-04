@@ -17,8 +17,65 @@ function getSubs(){return JSON.parse(localStorage.getItem("submissions")||"[]")}
 function setSubs(arr){localStorage.setItem("submissions",JSON.stringify(arr))}
 function packAll(){return{products:getProducts(),submissions:getSubs(),users:getUsers(),updatedAt:new Date().toISOString()}}
 function applyAll(data){if(!data||typeof data!=="object")return;if(Array.isArray(data.products))setProducts(data.products);if(Array.isArray(data.submissions))setSubs(data.submissions);if(data.users&&typeof data.users==="object")setUsers(data.users);if(data.updatedAt)_lastCloudAt=data.updatedAt}
-async function cloudPull(){if(!syncEnabled())return false;try{const res=await fetch(pantryUrl(),{method:"GET",headers:{"Content-Type":"application/json"}});if(res.status===404){await cloudPush();return true}if(!res.ok)throw new Error("HTTP "+res.status);const data=await res.json();applyAll(data);updateSyncBadge("ok");return true}catch(e){console.warn("cloudPull",e);updateSyncBadge("err");return false}}
-async function cloudPush(){if(!syncEnabled()||_syncBusy)return false;_syncBusy=true;updateSyncBadge("busy");try{const payload=packAll();let res=await fetch(pantryUrl(),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});if(!res.ok){res=await fetch(pantryUrl(),{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})}if(!res.ok){const create=await fetch(pantryUrl(),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});if(!create.ok)throw new Error("push failed "+res.status)}_lastCloudAt=payload.updatedAt;updateSyncBadge("ok");return true}catch(e){console.warn("cloudPush",e);updateSyncBadge("err");return false}finally{_syncBusy=false}}
+async function cloudPull(){
+  if(!syncEnabled()) return false;
+  try{
+    const res=await fetch(pantryUrl(),{method:"GET",headers:{"Content-Type":"application/json"}});
+    if(res.status===429){updateSyncBadge("err");throw new Error("Хэт олон хүсэлт (429). 10 сек хүлээнэ үү.");}
+    if(!res.ok){
+      const text=await res.text().catch(()=>"");
+      console.warn("cloudPull status",res.status,text);
+      const pushed=await cloudPush();
+      if(pushed){updateSyncBadge("ok");return true;}
+      throw new Error("GET "+res.status+(text?": "+text.slice(0,120):"")+". Pantry ID шалгана уу.");
+    }
+    const data=await res.json();
+    const payload=(data&&(data.products||data.submissions||data.users))?data:(data&&data.data?data.data:data);
+    applyAll(payload);
+    updateSyncBadge("ok");
+    return true;
+  }catch(e){
+    console.warn("cloudPull",e);
+    updateSyncBadge("err");
+    window._lastSyncError=String(e.message||e);
+    return false;
+  }
+}
+async function cloudPush(){
+  if(!syncEnabled()||_syncBusy) return false;
+  _syncBusy=true;
+  updateSyncBadge("busy");
+  try{
+    const payload=packAll();
+    let res=await fetch(pantryUrl(),{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(payload)
+    });
+    if(res.status===429) throw new Error("Хэт олон хүсэлт (429). 10 сек хүлээнэ үү.");
+    if(!res.ok){
+      const err1=await res.text().catch(()=>"");
+      res=await fetch(pantryUrl(),{
+        method:"PUT",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(payload)
+      });
+      if(!res.ok){
+        const err2=await res.text().catch(()=>"");
+        throw new Error("Илгээхэд алдаа "+res.status+". "+(err2||err1||"").slice(0,150)+" Pantry ID зөв эсэхийг шалгана уу.");
+      }
+    }
+    _lastCloudAt=payload.updatedAt;
+    updateSyncBadge("ok");
+    window._lastSyncError=null;
+    return true;
+  }catch(e){
+    console.warn("cloudPush",e);
+    updateSyncBadge("err");
+    window._lastSyncError=String(e.message||e);
+    return false;
+  }finally{_syncBusy=false;}
+}
 async function afterLocalWrite(){if(syncEnabled())await cloudPush()}
 function updateSyncBadge(state){const el=document.getElementById("syncBadge");if(!el)return;if(!syncEnabled()){el.textContent="☁️ Синк унтраалттай";el.className="sync-badge off";return}if(state==="busy"){el.textContent="☁️ Илгээж байна...";el.className="sync-badge busy";return}if(state==="err"){el.textContent="☁️ Синк алдаа";el.className="sync-badge err";return}const t=_lastCloudAt?new Date(_lastCloudAt).toLocaleTimeString("mn-MN"):"";el.textContent="☁️ Синктэй"+(t?" · "+t:"");el.className="sync-badge ok"}
 function showAlert(id,msg,type){const el=document.getElementById(id);if(!el)return;el.innerHTML=`<div class="alert alert-${type}">${msg}</div>`;if(type==="success")setTimeout(()=>{el.innerHTML=""},4000)}
