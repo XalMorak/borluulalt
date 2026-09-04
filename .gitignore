@@ -1,0 +1,5 @@
+borluulalt.db
+__pycache__/
+*.pyc
+.DS_Store
+.node_modules/
