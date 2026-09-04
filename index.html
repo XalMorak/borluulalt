@@ -17,8 +17,7 @@
     .btn:hover{background:#16213e}
     .btn-success{background:#27ae60}.btn-secondary{background:#7f8c8d}
     .btn-outline{background:#fff;color:#0f3460;border:2px solid #0f3460}
-    .btn-warning{background:#f39c12}.btn-danger{background:#c0392b}
-    .btn-sm{padding:6px 14px;font-size:.85rem}
+    .btn-warning{background:#f39c12}.btn-danger{background:#c0392b}.btn-sm{padding:6px 14px;font-size:.85rem}
     .header-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px;font-size:.95rem}
     .header-info label{font-weight:600;color:#555}
     .header-info input,.header-info select{width:100%;padding:8px 10px;border:1px solid #ccc;border-radius:6px;margin-top:4px}
@@ -37,7 +36,7 @@
     .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:12px}
     .summary-item{background:#fff;padding:12px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.08);text-align:center}
     .summary-item .label{font-size:.85rem;color:#666}
-    .summary-item .value{font-size:1.3rem;font-weight:700;color:#0f3460}
+    .summary-item .value{font-size:1.25rem;font-weight:700;color:#0f3460}
     .hidden{display:none!important}
     .alert{padding:12px 16px;border-radius:8px;margin:12px 0;font-weight:500}
     .alert-success{background:#d4edda;color:#155724}
@@ -59,6 +58,12 @@
     .form-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin:12px 0}
     .form-row label{font-weight:600;font-size:.85rem;color:#555;display:block}
     .form-row input{padding:8px 10px;border:1px solid #ccc;border-radius:6px}
+    .recon-box{background:#f8fafc;border:2px solid #0f3460;border-radius:10px;padding:16px;margin-top:20px}
+    .recon-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+    .recon-item{background:#fff;padding:12px;border-radius:8px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+    .recon-item .label{font-size:.8rem;color:#666;margin-bottom:4px}
+    .recon-item .value{font-size:1.2rem;font-weight:700}
+    .diff-ok{color:#27ae60}.diff-over{color:#2980b9}.diff-short{color:#c0392b}
   </style>
 </head>
 <body>
@@ -95,10 +100,19 @@
         </div>
         <div style="overflow-x:auto"><table><thead><tr><th>№</th><th>Бараа</th><th>Үнэ</th><th>Сан</th><th>Өмнөх</th><th>Дараах</th><th>Борлуулсан</th><th>Орлого</th></tr></thead><tbody id="salesBody"></tbody></table></div>
         <div class="footer-fields">
-          <div><label>Бэлэн мөнгө</label><input type="number" id="cashAmount" min="0" value="0"></div>
+          <div><label>Бэлэн мөнгө</label><input type="number" id="cashAmount" min="0" value="0" oninput="updateRecon()"></div>
           <div><label>ПОС</label><input type="text" id="posNumber"></div>
-          <div><label>Карт</label><input type="number" id="cardTotal" min="0" value="0"></div>
+          <div><label>Карт</label><input type="number" id="cardTotal" min="0" value="0" oninput="updateRecon()"></div>
           <div><label>Үлдэгдэл</label><input type="number" id="cashBalance" min="0" value="0"></div>
+        </div>
+        <div class="recon-box" id="reconBox">
+          <h3 style="margin-bottom:12px">📊 Тооцооны нэгтгэл</h3>
+          <div class="recon-grid">
+            <div class="recon-item"><div class="label">Бодсон нийт орлого</div><div class="value" id="reconCalcTotal">0 ₮</div></div>
+            <div class="recon-item"><div class="label">Бэлэн + Карт</div><div class="value" id="reconCollected">0 ₮</div></div>
+            <div class="recon-item"><div class="label">Зөрүү</div><div class="value" id="reconDiff">0 ₮</div></div>
+            <div class="recon-item"><div class="label">Төлөв</div><div class="value" id="reconStatus">—</div></div>
+          </div>
         </div>
         <div style="margin-top:20px;text-align:center">
           <button class="btn btn-success" onclick="saveSubmission()">Хадгалах</button>
@@ -137,6 +151,7 @@
         </div>
         <div id="tabPrices" class="hidden">
           <h3>Нэгж үнэ</h3>
+          <p style="color:#666;margin-bottom:10px;font-size:.9rem">Үнэ зөвхөн энд хадгалагдана. Код шинэчлэгдэхэд өөрчлөгдөхгүй.</p>
           <div style="overflow-x:auto"><table><thead><tr><th>№</th><th>Бараа</th><th>Үнэ (₮)</th></tr></thead><tbody id="pricesBody"></tbody></table></div>
           <div style="text-align:center;margin-top:12px"><button class="btn btn-success" onclick="savePrices()">Хадгалах</button></div>
           <div id="priceAlert"></div>
