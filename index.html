@@ -1,1 +1,142 @@
-PLACEHOLDER_WILL_FAIL
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ажилтны борлуулалтын хуудас</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);min-height:100vh;color:#333;padding:20px}
+    .container{max-width:1100px;margin:0 auto}
+    .card{background:#fff;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.3);padding:28px;margin-bottom:24px}
+    h1,h2,h3{color:#1a1a2e;margin-bottom:16px}
+    h1{font-size:1.6rem;text-align:center}
+    .login-box{max-width:420px;margin:80px auto;text-align:center}
+    .login-box input{width:100%;padding:14px 16px;font-size:1.1rem;border:2px solid #ddd;border-radius:8px;margin:12px 0;text-align:center;letter-spacing:1px}
+    .login-box input:focus{outline:none;border-color:#0f3460}
+    .btn{background:#0f3460;color:#fff;border:none;padding:12px 28px;font-size:1rem;border-radius:8px;cursor:pointer;transition:background .2s;margin:6px 4px}
+    .btn:hover{background:#16213e}
+    .btn-success{background:#27ae60}.btn-success:hover{background:#219a52}
+    .btn-secondary{background:#7f8c8d}.btn-secondary:hover{background:#6c7a7a}
+    .btn-outline{background:#fff;color:#0f3460;border:2px solid #0f3460}.btn-outline:hover{background:#eef5ff}
+    .btn-warning{background:#f39c12}.btn-warning:hover{background:#d68910}
+    .btn-sm{padding:6px 14px;font-size:.85rem}
+    .header-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px;font-size:.95rem}
+    .header-info label{font-weight:600;color:#555}
+    .header-info input,.header-info select{width:100%;padding:8px 10px;border:1px solid #ccc;border-radius:6px;margin-top:4px}
+    table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.9rem}
+    th,td{border:1px solid #ddd;padding:8px 6px;text-align:center}
+    th{background:#0f3460;color:#fff;font-weight:600;position:sticky;top:0}
+    tr:nth-child(even){background:#f8f9fa}tr:hover{background:#eef5ff}
+    input[type=number]{width:80px;padding:6px;border:1px solid #ccc;border-radius:4px;text-align:center}
+    .footer-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+    .footer-fields label{font-weight:600;display:block;margin-bottom:4px;color:#555}
+    .footer-fields input{width:100%;padding:10px;border:1px solid #ccc;border-radius:6px}
+    .role-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.8rem;font-weight:600;margin-left:8px}
+    .role-emp{background:#3498db;color:#fff}.role-sup{background:#e74c3c;color:#fff}
+    .user-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+    .summary-box{background:#f0f7ff;border-left:5px solid #0f3460;padding:16px;margin:16px 0;border-radius:0 8px 8px 0}
+    .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:12px}
+    .summary-item{background:#fff;padding:12px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.08);text-align:center}
+    .summary-item .label{font-size:.85rem;color:#666}
+    .summary-item .value{font-size:1.35rem;font-weight:700;color:#0f3460}
+    .hidden{display:none!important}
+    .alert{padding:12px 16px;border-radius:8px;margin:12px 0;font-weight:500}
+    .alert-success{background:#d4edda;color:#155724}
+    .alert-info{background:#d1ecf1;color:#0c5460}
+    .alert-error{background:#f8d7da;color:#721c24}
+    .tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+    .tab-btn{padding:10px 18px;border:2px solid #0f3460;background:#fff;color:#0f3460;border-radius:8px;cursor:pointer;font-weight:600}
+    .tab-btn.active{background:#0f3460;color:#fff}
+    .submissions-list{max-height:420px;overflow-y:auto}
+    .sub-item{border:1px solid #e0e0e0;border-radius:8px;padding:12px;margin-bottom:10px;cursor:pointer;transition:background .15s}
+    .sub-item:hover{background:#f5f9ff}
+    .sub-item.selected{border-color:#0f3460;background:#eef5ff}
+    .product-name{text-align:left;font-weight:500;padding-left:8px!important}
+    code{background:#eee;padding:2px 6px;border-radius:4px;font-size:.9em}
+    .price-col{color:#27ae60;font-weight:600}
+    .edit-panel{background:#fffbf0;border:2px solid #f39c12;border-radius:8px;padding:16px;margin-top:16px}
+    @media(max-width:700px){.header-info,.footer-fields{grid-template-columns:1fr}table{font-size:.8rem}input[type=number]{width:60px}}
+  </style>
+</head>
+<body>
+<div class="container">
+  <div id="loginSection" class="card login-box">
+    <h1>🍺 Ажилтны борлуулалтын хуудас</h1>
+    <p style="color:#666;margin:12px 0 20px">Зөвхөн ID-аар нэвтэрнэ үү (нууц үг хэрэггүй)</p>
+    <input type="text" id="loginId" placeholder="ID оруулна уу (жишээ: emp001)" autofocus>
+    <br>
+    <button class="btn" onclick="doLogin()">Нэвтрэх</button>
+    <div id="loginAlert"></div>
+    <div style="margin-top:24px;text-align:left;font-size:.85rem;color:#555;background:#f8f9fa;padding:14px;border-radius:8px">
+      <strong>Жишээ ID:</strong><br>
+      • Ажилчид: <code>emp001</code>, <code>emp002</code>, <code>emp003</code><br>
+      • Ахлах: <code>sup001</code>
+    </div>
+  </div>
+  <div id="appSection" class="hidden">
+    <div class="card">
+      <div class="user-bar">
+        <div><strong id="userNameDisplay"></strong><span id="roleBadge" class="role-badge"></span></div>
+        <div>
+          <button class="btn btn-outline" onclick="exportData()">⬇️ Экспорт</button>
+          <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">⬆️ Импорт</button>
+          <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
+          <button class="btn btn-secondary" onclick="doLogout()">Гарах</button>
+        </div>
+      </div>
+      <div id="employeeView" class="hidden">
+        <h2>Борлуулалтын хуудас бөглөх</h2>
+        <div class="header-info">
+          <div><label>Огноо:</label><input type="date" id="formDate"></div>
+          <div><label>Ажилтны нэр:</label><input type="text" id="empName" readonly></div>
+          <div><label>Шалгасан ажилтны нэр:</label><input type="text" id="checkerName" placeholder="Шалгасан хүн"></div>
+          <div><label>Хүлээн авсан ажилтны нэр:</label><input type="text" id="receiverName" placeholder="Хүлээн авсан хүн"></div>
+          <div><label>Ээлж:</label><select id="shiftType"><option value="өглөө">Өглөө</option><option value="орой">Орой</option></select></div>
+        </div>
+        <div style="overflow-x:auto"><table><thead><tr><th>№</th><th>Барааны нэр</th><th>Нэгж үнэ</th><th>Өмнөх тоо</th><th>Дараах тоо</th><th>Борлуулсан тоо</th><th>Нийт орлого (₮)</th></tr></thead><tbody id="salesBody"></tbody></table></div>
+        <div class="footer-fields">
+          <div><label>Бэлэн мөнгө</label><input type="number" id="cashAmount" min="0" step="0.01" value="0"></div>
+          <div><label>ПОС дугаар</label><input type="text" id="posNumber" placeholder="ПОС дугаар"></div>
+          <div><label>Картын нэгтгэл</label><input type="number" id="cardTotal" min="0" step="0.01" value="0"></div>
+          <div><label>Бэлэн мөнгөний үлдэгдэл</label><input type="number" id="cashBalance" min="0" step="0.01" value="0"></div>
+        </div>
+        <div style="margin-top:24px;text-align:center">
+          <button class="btn btn-success" onclick="saveSubmission()">Хадгалах / Илгээх</button>
+          <button class="btn btn-secondary" onclick="resetForm()">Цэвэрлэх</button>
+        </div>
+        <div id="empAlert"></div>
+      </div>
+      <div id="supervisorView" class="hidden">
+        <h2>Ахлахын хяналт &amp; тооцоо</h2>
+        <div class="tabs">
+          <button class="tab-btn active" id="tabBtnOverview" onclick="showTab('overview')">Нийт тооцоо</button>
+          <button class="tab-btn" id="tabBtnSubs" onclick="showTab('submissions')">Ажилчдын илгээлт</button>
+          <button class="tab-btn" id="tabBtnPrices" onclick="showTab('prices')">Үнийн жагсаалт</button>
+          <button class="btn btn-secondary" style="margin-left:auto" onclick="loadSupervisorData()">🔄 Шинэчлэх</button>
+        </div>
+        <div id="tabOverview">
+          <div class="summary-box"><h3>Нийт борлуулалтын тойм</h3><div class="summary-grid" id="overallSummary"></div></div>
+          <div style="overflow-x:auto"><table><thead><tr><th>№</th><th>Барааны нэр</th><th>Нэгж үнэ</th><th>Нийт борлуулсан</th><th>Нийт орлого</th></tr></thead><tbody id="productTotalsBody"></tbody></table></div>
+        </div>
+        <div id="tabSubmissions" class="hidden">
+          <div class="submissions-list" id="submissionsList"></div>
+          <div id="selectedSubmissionDetail" class="hidden"><h3 style="margin-top:20px">Сонгосон илгээлтийн дэлгэрэнгүй</h3><div id="detailContent"></div></div>
+        </div>
+        <div id="tabPrices" class="hidden">
+          <h3>Барааны нэгж үнэ</h3>
+          <p style="color:#666;margin-bottom:12px">Үнэ өөрчилсний дараа «Хадгалах» дарна уу. Ажилтны орлого автоматаар тооцогдоно.</p>
+          <div style="overflow-x:auto"><table><thead><tr><th>№</th><th>Барааны нэр</th><th>Нэгж үнэ (₮)</th></tr></thead><tbody id="pricesBody"></tbody></table></div>
+          <div style="text-align:center;margin-top:16px">
+            <button class="btn btn-success" onclick="savePrices()">Үнэ хадгалах</button>
+            <button class="btn btn-secondary" onclick="resetDefaultPrices()">Анхны үнэ руу буцаах</button>
+          </div>
+          <div id="priceAlert"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
