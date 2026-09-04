@@ -1,153 +1,149 @@
 <!DOCTYPE html>
 <html lang="mn">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ажилтны борлуулалтын хуудас</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);min-height:100vh;color:#333;padding:20px}
-.container{max-width:1100px;margin:0 auto}
-.card{background:#fff;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.3);padding:28px;margin-bottom:24px}
-h1,h2,h3{color:#1a1a2e;margin-bottom:16px}
-h1{font-size:1.6rem;text-align:center}
-.login-box{max-width:420px;margin:80px auto;text-align:center}
-.login-box input{width:100%;padding:14px 16px;font-size:1.1rem;border:2px solid #ddd;border-radius:8px;margin:12px 0;text-align:center}
-.btn{background:#0f3460;color:#fff;border:none;padding:12px 28px;font-size:1rem;border-radius:8px;cursor:pointer;margin:6px 4px}
-.btn:hover{background:#16213e}
-.btn-success{background:#27ae60}.btn-secondary{background:#7f8c8d}
-.btn-outline{background:#fff;color:#0f3460;border:2px solid #0f3460}
-.btn-warning{background:#f39c12}.btn-sm{padding:6px 14px;font-size:.85rem}
-.header-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px;font-size:.95rem}
-.header-info label{font-weight:600;color:#555}
-.header-info input,.header-info select{width:100%;padding:8px 10px;border:1px solid #ccc;border-radius:6px;margin-top:4px}
-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.9rem}
-th,td{border:1px solid #ddd;padding:8px 6px;text-align:center}
-th{background:#0f3460;color:#fff;font-weight:600}
-tr:nth-child(even){background:#f8f9fa}
-input[type=number]{width:80px;padding:6px;border:1px solid #ccc;border-radius:4px;text-align:center}
-.footer-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
-.footer-fields label{font-weight:600;display:block;margin-bottom:4px;color:#555}
-.footer-fields input{width:100%;padding:10px;border:1px solid #ccc;border-radius:6px}
-.role-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.8rem;font-weight:600;margin-left:8px}
-.role-emp{background:#3498db;color:#fff}.role-sup{background:#e74c3c;color:#fff}
-.user-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
-.summary-box{background:#f0f7ff;border-left:5px solid #0f3460;padding:16px;margin:16px 0;border-radius:0 8px 8px 0}
-.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:12px}
-.summary-item{background:#fff;padding:12px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.08);text-align:center}
-.summary-item .label{font-size:.85rem;color:#666}
-.summary-item .value{font-size:1.3rem;font-weight:700;color:#0f3460}
-.hidden{display:none!important}
-.alert{padding:12px 16px;border-radius:8px;margin:12px 0;font-weight:500}
-.alert-success{background:#d4edda;color:#155724}
-.alert-info{background:#d1ecf1;color:#0c5460}
-.alert-error{background:#f8d7da;color:#721c24}
-.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
-.tab-btn{padding:10px 16px;border:2px solid #0f3460;background:#fff;color:#0f3460;border-radius:8px;cursor:pointer;font-weight:600;font-size:.9rem}
-.tab-btn.active{background:#0f3460;color:#fff}
-.submissions-list{max-height:420px;overflow-y:auto}
-.sub-item{border:1px solid #e0e0e0;border-radius:8px;padding:12px;margin-bottom:10px;cursor:pointer}
-.sub-item:hover{background:#f5f9ff}
-.product-name{text-align:left;font-weight:500;padding-left:8px!important}
-code{background:#eee;padding:2px 6px;border-radius:4px}
-.price-col{color:#27ae60;font-weight:600}
-.stock-low{color:#c0392b;font-weight:700}
-.stock-ok{color:#27ae60;font-weight:600}
-.edit-panel{background:#fffbf0;border:2px solid #f39c12;border-radius:8px;padding:16px;margin-top:16px}
-.stock-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:16px 0;padding:16px;background:#f8f9fa;border-radius:8px}
-.stock-form label{font-weight:600;font-size:.9rem;color:#555}
-.stock-form input,.stock-form select{width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;margin-top:4px}
-.hist-list{max-height:300px;overflow-y:auto;font-size:.85rem}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ажилтны борлуулалтын хуудас</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);min-height:100vh;color:#333;padding:20px}
+    .container{max-width:1100px;margin:0 auto}
+    .card{background:#fff;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.3);padding:28px;margin-bottom:24px}
+    h1,h2,h3{color:#1a1a2e;margin-bottom:16px}
+    h1{font-size:1.6rem;text-align:center}
+    .login-box{max-width:420px;margin:80px auto;text-align:center}
+    .login-box input{width:100%;padding:14px 16px;font-size:1.1rem;border:2px solid #ddd;border-radius:8px;margin:12px 0;text-align:center}
+    .btn{background:#0f3460;color:#fff;border:none;padding:12px 28px;font-size:1rem;border-radius:8px;cursor:pointer;margin:6px 4px}
+    .btn:hover{background:#16213e}
+    .btn-success{background:#27ae60}.btn-secondary{background:#7f8c8d}
+    .btn-outline{background:#fff;color:#0f3460;border:2px solid #0f3460}
+    .btn-warning{background:#f39c12}.btn-danger{background:#c0392b}
+    .btn-sm{padding:6px 14px;font-size:.85rem}
+    .header-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px;font-size:.95rem}
+    .header-info label{font-weight:600;color:#555}
+    .header-info input,.header-info select{width:100%;padding:8px 10px;border:1px solid #ccc;border-radius:6px;margin-top:4px}
+    table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.9rem}
+    th,td{border:1px solid #ddd;padding:8px 6px;text-align:center}
+    th{background:#0f3460;color:#fff;font-weight:600}
+    tr:nth-child(even){background:#f8f9fa}
+    input[type=number]{width:80px;padding:6px;border:1px solid #ccc;border-radius:4px;text-align:center}
+    .footer-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+    .footer-fields label{font-weight:600;display:block;margin-bottom:4px;color:#555}
+    .footer-fields input{width:100%;padding:10px;border:1px solid #ccc;border-radius:6px}
+    .role-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.8rem;font-weight:600;margin-left:8px}
+    .role-emp{background:#3498db;color:#fff}.role-sup{background:#e74c3c;color:#fff}
+    .user-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+    .summary-box{background:#f0f7ff;border-left:5px solid #0f3460;padding:16px;margin:16px 0;border-radius:0 8px 8px 0}
+    .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:12px}
+    .summary-item{background:#fff;padding:12px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.08);text-align:center}
+    .summary-item .label{font-size:.85rem;color:#666}
+    .summary-item .value{font-size:1.3rem;font-weight:700;color:#0f3460}
+    .hidden{display:none!important}
+    .alert{padding:12px 16px;border-radius:8px;margin:12px 0;font-weight:500}
+    .alert-success{background:#d4edda;color:#155724}
+    .alert-info{background:#d1ecf1;color:#0c5460}
+    .alert-error{background:#f8d7da;color:#721c24}
+    .alert-warn{background:#fff3cd;color:#856404}
+    .tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+    .tab-btn{padding:10px 16px;border:2px solid #0f3460;background:#fff;color:#0f3460;border-radius:8px;cursor:pointer;font-weight:600;font-size:.9rem}
+    .tab-btn.active{background:#0f3460;color:#fff}
+    .submissions-list{max-height:420px;overflow-y:auto}
+    .sub-item{border:1px solid #e0e0e0;border-radius:8px;padding:12px;margin-bottom:10px;cursor:pointer}
+    .sub-item:hover{background:#f5f9ff}
+    .product-name{text-align:left;font-weight:500;padding-left:8px!important}
+    code{background:#eee;padding:2px 6px;border-radius:4px}
+    .price-col{color:#27ae60;font-weight:600}
+    .stock-low{color:#c0392b;font-weight:700}
+    .stock-ok{color:#27ae60;font-weight:600}
+    .edit-panel{background:#fffbf0;border:2px solid #f39c12;border-radius:8px;padding:16px;margin-top:16px}
+    .form-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin:12px 0}
+    .form-row label{font-weight:600;font-size:.85rem;color:#555;display:block}
+    .form-row input{padding:8px 10px;border:1px solid #ccc;border-radius:6px}
+  </style>
 </head>
 <body>
 <div class="container">
-<div id="loginSection" class="card login-box">
-  <h1>🍺 Ажилтны борлуулалтын хуудас</h1>
-  <p style="color:#666;margin:12px 0 20px">Зөвхөн ID-аар нэвтэрнэ үү</p>
-  <input type="text" id="loginId" placeholder="ID (жишээ: emp001)" autofocus><br>
-  <button class="btn" onclick="doLogin()">Нэвтрэх</button>
-  <div id="loginAlert"></div>
-  <div style="margin-top:24px;text-align:left;font-size:.85rem;color:#555;background:#f8f9fa;padding:14px;border-radius:8px">
-    <strong>ID:</strong> <code>emp001</code>–<code>emp003</code> ажилтан · <code>sup001</code> ахлах
-  </div>
-</div>
-<div id="appSection" class="hidden">
-<div class="card">
-  <div class="user-bar">
-    <div><strong id="userNameDisplay"></strong><span id="roleBadge" class="role-badge"></span></div>
-    <div>
-      <button class="btn btn-outline" onclick="exportData()">⬇️ Экспорт</button>
-      <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">⬆️ Импорт</button>
-      <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
-      <button class="btn btn-secondary" onclick="doLogout()">Гарах</button>
+  <div id="loginSection" class="card login-box">
+    <h1>🍺 Ажилтны борлуулалтын хуудас</h1>
+    <p style="color:#666;margin:12px 0 20px">Зөвхөн ID-аар нэвтэрнэ үү</p>
+    <input type="text" id="loginId" placeholder="ID (жишээ: emp001)" autofocus><br>
+    <button class="btn" onclick="doLogin()">Нэвтрэх</button>
+    <div id="loginAlert"></div>
+    <div style="margin-top:24px;text-align:left;font-size:.85rem;color:#555;background:#f8f9fa;padding:14px;border-radius:8px">
+      <strong>ID:</strong> <code>emp001</code>–<code>emp003</code> ажилтан · <code>sup001</code> ахлах
     </div>
   </div>
-  <div id="employeeView" class="hidden">
-    <h2>Борлуулалтын хуудас</h2>
-    <div class="header-info">
-      <div><label>Огноо</label><input type="date" id="formDate"></div>
-      <div><label>Ажилтан</label><input type="text" id="empName" readonly></div>
-      <div><label>Шалгасан</label><input type="text" id="checkerName"></div>
-      <div><label>Хүлээн авсан</label><input type="text" id="receiverName"></div>
-      <div><label>Ээлж</label><select id="shiftType"><option value="өглөө">Өглөө</option><option value="орой">Орой</option></select></div>
-    </div>
-    <div style="overflow-x:auto"><table><thead><tr><th>№</th><th>Бараа</th><th>Сан</th><th>Үнэ</th><th>Өмнөх</th><th>Дараах</th><th>Борлуулсан</th><th>Орлого</th></tr></thead><tbody id="salesBody"></tbody></table></div>
-    <div class="footer-fields">
-      <div><label>Бэлэн мөнгө</label><input type="number" id="cashAmount" min="0" step="0.01" value="0"></div>
-      <div><label>ПОС</label><input type="text" id="posNumber"></div>
-      <div><label>Карт</label><input type="number" id="cardTotal" min="0" step="0.01" value="0"></div>
-      <div><label>Үлдэгдэл</label><input type="number" id="cashBalance" min="0" step="0.01" value="0"></div>
-    </div>
-    <div style="margin-top:20px;text-align:center">
-      <button class="btn btn-success" onclick="saveSubmission()">Хадгалах</button>
-      <button class="btn btn-secondary" onclick="resetForm()">Цэвэрлэх</button>
-      <button class="btn btn-outline" onclick="fillPrevFromStock()">Сангаас өмнөх тоо</button>
-    </div>
-    <div id="empAlert"></div>
-  </div>
-  <div id="supervisorView" class="hidden">
-    <h2>Ахлахын хяналт</h2>
-    <div class="tabs">
-      <button class="tab-btn active" id="tabBtnOverview" onclick="showTab('overview')">Нийт тооцоо</button>
-      <button class="tab-btn" id="tabBtnSubs" onclick="showTab('submissions')">Илгээлт</button>
-      <button class="tab-btn" id="tabBtnPrices" onclick="showTab('prices')">Үнэ</button>
-      <button class="tab-btn" id="tabBtnStock" onclick="showTab('stock')">Барааны сан</button>
-      <button class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="loadSupervisorData()">🔄</button>
-    </div>
-    <div id="tabOverview">
-      <div class="summary-box"><h3>Тойм</h3><div class="summary-grid" id="overallSummary"></div></div>
-      <div style="overflow-x:auto"><table><thead><tr><th>№</th><th>Бараа</th><th>Сан</th><th>Үнэ</th><th>Борлуулсан</th><th>Орлого</th></tr></thead><tbody id="productTotalsBody"></tbody></table></div>
-    </div>
-    <div id="tabSubmissions" class="hidden">
-      <div class="submissions-list" id="submissionsList"></div>
-      <div id="selectedSubmissionDetail" class="hidden"><h3 style="margin-top:20px">Дэлгэрэнгүй</h3><div id="detailContent"></div></div>
-    </div>
-    <div id="tabPrices" class="hidden">
-      <h3>Нэгж үнэ</h3>
-      <div style="overflow-x:auto"><table><thead><tr><th>№</th><th>Бараа</th><th>Үнэ (₮)</th></tr></thead><tbody id="pricesBody"></tbody></table></div>
-      <div style="text-align:center;margin-top:12px"><button class="btn btn-success" onclick="savePrices()">Хадгалах</button> <button class="btn btn-secondary" onclick="resetDefaultPrices()">Анхны үнэ</button></div>
-      <div id="priceAlert"></div>
-    </div>
-    <div id="tabStock" class="hidden">
-      <h3>📦 Барааны сангийн удирдлага</h3>
-      <div class="summary-box"><div class="summary-grid" id="stockSummary"></div></div>
-      <div class="stock-form">
-        <div><label>Бараа</label><select id="stockProduct"></select></div>
-        <div><label>Төрөл</label><select id="stockType"><option value="in">Орлого (+)</option><option value="out">Зарлага (−)</option><option value="set">Тохируулах (=)</option></select></div>
-        <div><label>Тоо</label><input type="number" id="stockQty" min="0" value="0"></div>
-        <div><label>Тэмдэглэл</label><input type="text" id="stockNote" placeholder="Жишээ: нийлүүлэгчээс"></div>
+  <div id="appSection" class="hidden">
+    <div class="card">
+      <div class="user-bar">
+        <div><strong id="userNameDisplay"></strong><span id="roleBadge" class="role-badge"></span></div>
+        <div>
+          <button class="btn btn-outline" onclick="exportData()">⬇️ Экспорт</button>
+          <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">⬆️ Импорт</button>
+          <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
+          <button class="btn btn-secondary" onclick="doLogout()">Гарах</button>
+        </div>
       </div>
-      <div style="text-align:center"><button class="btn btn-success" onclick="applyStockChange()">Хэрэгжүүлэх</button></div>
-      <div id="stockAlert"></div>
-      <h3 style="margin-top:24px">Одоогийн нөөц</h3>
-      <div style="overflow-x:auto"><table><thead><tr><th>№</th><th>Бараа</th><th>Нөөц</th><th>Үнэ</th><th>Үнэлгээ</th></tr></thead><tbody id="stockBody"></tbody></table></div>
-      <h3 style="margin-top:24px">Хөдөлгөөний түүх</h3>
-      <div class="hist-list" id="stockHistory"></div>
+      <div id="employeeView" class="hidden">
+        <h2>Борлуулалтын хуудас</h2>
+        <div class="header-info">
+          <div><label>Огноо</label><input type="date" id="formDate"></div>
+          <div><label>Ажилтан</label><input type="text" id="empName" readonly></div>
+          <div><label>Шалгасан</label><input type="text" id="checkerName"></div>
+          <div><label>Хүлээн авсан</label><input type="text" id="receiverName"></div>
+          <div><label>Ээлж</label><select id="shiftType"><option value="өглөө">Өглөө</option><option value="орой">Орой</option></select></div>
+        </div>
+        <div style="overflow-x:auto"><table><thead><tr><th>№</th><th>Бараа</th><th>Үнэ</th><th>Сан</th><th>Өмнөх</th><th>Дараах</th><th>Борлуулсан</th><th>Орлого</th></tr></thead><tbody id="salesBody"></tbody></table></div>
+        <div class="footer-fields">
+          <div><label>Бэлэн мөнгө</label><input type="number" id="cashAmount" min="0" value="0"></div>
+          <div><label>ПОС</label><input type="text" id="posNumber"></div>
+          <div><label>Карт</label><input type="number" id="cardTotal" min="0" value="0"></div>
+          <div><label>Үлдэгдэл</label><input type="number" id="cashBalance" min="0" value="0"></div>
+        </div>
+        <div style="margin-top:20px;text-align:center">
+          <button class="btn btn-success" onclick="saveSubmission()">Хадгалах</button>
+          <button class="btn btn-secondary" onclick="resetForm()">Цэвэрлэх</button>
+        </div>
+        <div id="empAlert"></div>
+      </div>
+      <div id="supervisorView" class="hidden">
+        <h2>Ахлахын хяналт</h2>
+        <div class="tabs">
+          <button class="tab-btn active" id="tabBtnOverview" onclick="showTab('overview')">Нийт тооцоо</button>
+          <button class="tab-btn" id="tabBtnSubs" onclick="showTab('submissions')">Илгээлт</button>
+          <button class="tab-btn" id="tabBtnStock" onclick="showTab('stock')">Барааны сан</button>
+          <button class="tab-btn" id="tabBtnPrices" onclick="showTab('prices')">Үнэ</button>
+          <button class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="loadSupervisorData()">🔄</button>
+        </div>
+        <div id="tabOverview">
+          <div class="summary-box"><h3>Тойм</h3><div class="summary-grid" id="overallSummary"></div></div>
+          <div id="lowStockWarn"></div>
+          <div style="overflow-x:auto"><table><thead><tr><th>№</th><th>Бараа</th><th>Үнэ</th><th>Сан</th><th>Борлуулсан</th><th>Орлого</th></tr></thead><tbody id="productTotalsBody"></tbody></table></div>
+        </div>
+        <div id="tabSubmissions" class="hidden">
+          <div class="submissions-list" id="submissionsList"></div>
+          <div id="selectedSubmissionDetail" class="hidden"><h3 style="margin-top:20px">Дэлгэрэнгүй</h3><div id="detailContent"></div></div>
+        </div>
+        <div id="tabStock" class="hidden">
+          <h3>📦 Барааны сангийн удирдлага</h3>
+          <div class="form-row">
+            <div><label>Нэр</label><input type="text" id="newProdName" placeholder="Шинэ бараа"></div>
+            <div><label>Үнэ</label><input type="number" id="newProdPrice" min="0" value="5000" style="width:100px"></div>
+            <div><label>Анхны нөөц</label><input type="number" id="newProdStock" min="0" value="0" style="width:100px"></div>
+            <button class="btn btn-success btn-sm" onclick="addProduct()">+ Бараа нэмэх</button>
+          </div>
+          <div id="stockAlert"></div>
+          <div style="overflow-x:auto"><table><thead><tr><th>№</th><th>Нэр</th><th>Үнэ</th><th>Сан</th><th>Нөөц нэмэх</th><th>Үйлдэл</th></tr></thead><tbody id="stockBody"></tbody></table></div>
+        </div>
+        <div id="tabPrices" class="hidden">
+          <h3>Нэгж үнэ</h3>
+          <div style="overflow-x:auto"><table><thead><tr><th>№</th><th>Бараа</th><th>Үнэ (₮)</th></tr></thead><tbody id="pricesBody"></tbody></table></div>
+          <div style="text-align:center;margin-top:12px"><button class="btn btn-success" onclick="savePrices()">Хадгалах</button></div>
+          <div id="priceAlert"></div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
-</div>
 </div>
 <script src="app.js"></script>
 </body>
