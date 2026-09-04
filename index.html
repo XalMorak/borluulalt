@@ -64,6 +64,11 @@
     .recon-item .label{font-size:.8rem;color:#666;margin-bottom:4px}
     .recon-item .value{font-size:1.2rem;font-weight:700}
     .diff-ok{color:#27ae60}.diff-over{color:#2980b9}.diff-short{color:#c0392b}
+    .sync-badge{font-size:.8rem;padding:4px 10px;border-radius:12px;margin-left:8px}
+    .sync-badge.ok{background:#d4edda;color:#155724}
+    .sync-badge.err{background:#f8d7da;color:#721c24}
+    .sync-badge.busy{background:#fff3cd;color:#856404}
+    .sync-badge.off{background:#eee;color:#666}
   </style>
 </head>
 <body>
@@ -79,7 +84,11 @@
   <div id="appSection" class="hidden">
     <div class="card">
       <div class="user-bar">
-        <div><strong id="userNameDisplay"></strong><span id="roleBadge" class="role-badge"></span></div>
+        <div>
+          <strong id="userNameDisplay"></strong>
+          <span id="syncBadge" class="sync-badge off"></span>
+          <span id="roleBadge" class="role-badge"></span>
+        </div>
         <div>
           <button class="btn btn-outline" onclick="exportData()">⬇️ Экспорт</button>
           <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">⬆️ Импорт</button>
@@ -126,6 +135,7 @@
           <button class="tab-btn" id="tabBtnStock" onclick="showTab('stock')">Барааны сан</button>
           <button class="tab-btn" id="tabBtnPrices" onclick="showTab('prices')">Үнэ</button>
           <button class="tab-btn" id="tabBtnUsers" onclick="showTab('users')">Нэвтрэх эрх</button>
+          <button class="tab-btn" id="tabBtnSync" onclick="showTab('sync')">☁️ Синк</button>
           <button class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="loadSupervisorData()">🔄</button>
         </div>
         <div id="tabOverview">
@@ -156,8 +166,7 @@
           <div id="priceAlert"></div>
         </div>
         <div id="tabUsers" class="hidden">
-          <h3>🔐 Нэвтрэх эрх тохируулах</h3>
-          <p style="color:#666;margin-bottom:12px;font-size:.9rem">Зөвхөн ID-аар нэвтэрнэ. Нууц үг байхгүй.</p>
+          <h3>🔐 Нэвтрэх эрх</h3>
           <div class="form-row">
             <div><label>ID</label><input type="text" id="newUserId" placeholder="emp004" style="width:120px;text-transform:lowercase"></div>
             <div><label>Нэр</label><input type="text" id="newUserName" placeholder="Ажилтны нэр" style="width:160px"></div>
@@ -166,6 +175,34 @@
           </div>
           <div id="userAlert"></div>
           <div style="overflow-x:auto"><table><thead><tr><th>ID</th><th>Нэр</th><th>Үүрэг</th><th>Үйлдэл</th></tr></thead><tbody id="usersBody"></tbody></table></div>
+        </div>
+        <div id="tabSync" class="hidden">
+          <h3>☁️ Төхөөрөмж хоорондын синк</h3>
+          <p style="color:#666;margin-bottom:12px;font-size:.9rem">
+            Өгөгдөл зөвхөн энэ төхөөрөмжийн хөтөч дээр хадгалагдана.
+            Бүх утас/компьютер ижил өгөгдөл харахын тулд <strong>үнэгүй Pantry ID</strong> холбоно.
+          </p>
+          <div class="summary-box" style="margin-bottom:16px">
+            <strong>1.</strong> <a href="https://getpantry.cloud/" target="_blank" rel="noopener">getpantry.cloud</a> → <em>Create a Pantry</em> (email хэрэггүй)<br>
+            <strong>2.</strong> Гарсан <code>Pantry ID</code>-г доор буулгана<br>
+            <strong>3.</strong> <em>Хадгалах</em> → <strong>бүх төхөөрөмж</strong> дээр ижил ID оруулна
+          </div>
+          <div class="form-row">
+            <div style="flex:1;min-width:220px">
+              <label>Pantry ID</label>
+              <input type="text" id="pantryIdInput" placeholder="a1b2c3d4-...." style="width:100%">
+            </div>
+            <button class="btn btn-success btn-sm" onclick="saveSyncSettings()">Хадгалах + холбох</button>
+            <button class="btn btn-outline btn-sm" onclick="manualPull()">⬇️ Татах</button>
+            <button class="btn btn-outline btn-sm" onclick="manualPush()">⬆️ Илгээх</button>
+            <button class="btn btn-secondary btn-sm" onclick="clearSyncSettings()">Унтраах</button>
+          </div>
+          <p id="syncStatusText" style="margin:12px 0;font-size:.9rem"></p>
+          <div id="syncAlert"></div>
+          <div class="alert alert-info" style="margin-top:16px">
+            💡 Нэг удаа тохируулсны дараа хадгалалт автоматаар cloud руу орно.
+            Бусад төхөөрөмж 45 сек тутамд шинэчлэгдэнэ (эсвэл «⬇️ Татах»).
+          </div>
         </div>
       </div>
     </div>
