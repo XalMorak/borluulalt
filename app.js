@@ -1,241 +1,45 @@
-const PRODUCT_DEFS = [
-  {id:1,name:"Боргио",defaultPrice:5000},
-  {id:2,name:"Нийлэл",defaultPrice:4500},
-  {id:3,name:"Cass",defaultPrice:5500},
-  {id:4,name:"Asahi",defaultPrice:6000},
-  {id:5,name:"Калтенберг",defaultPrice:5000},
-  {id:6,name:"Алтангөвь",defaultPrice:4000},
-  {id:7,name:"Gem",defaultPrice:4500},
-  {id:8,name:"ЕРӨӨ говь Задгай",defaultPrice:3500},
-  {id:9,name:"Krush",defaultPrice:4000},
-  {id:10,name:"Tsingtao",defaultPrice:5500},
-  {id:11,name:"Heineken",defaultPrice:7000},
-  {id:12,name:"terra",defaultPrice:5000},
-  {id:14,name:"Сангур laaz",defaultPrice:3000}
-];
-const USERS = {
-  emp001:{name:"Бат-Эрдэнэ",role:"employee"},
-  emp002:{name:"Сарантуяа",role:"employee"},
-  emp003:{name:"Мөнхбаатар",role:"employee"},
-  sup001:{name:"Ахлах менежер",role:"supervisor"}
-};
-let currentUser = null;
-let _sortedSubs = [];
-let _editingIdx = null;
-
-function getPrices(){
-  const saved = localStorage.getItem("productPrices");
-  if(saved){ try{ return JSON.parse(saved); }catch(e){} }
-  const p = {};
-  PRODUCT_DEFS.forEach(d => p[d.id] = d.defaultPrice);
-  return p;
-}
-function setPrices(obj){ localStorage.setItem("productPrices", JSON.stringify(obj)); }
-function getPrice(id){ return getPrices()[id] || 0; }
-function getSubs(){ return JSON.parse(localStorage.getItem("submissions")||"[]"); }
-function setSubs(arr){ localStorage.setItem("submissions", JSON.stringify(arr)); }
-function showAlert(id,msg,type){
-  const el=document.getElementById(id);
-  if(!el)return;
-  el.innerHTML=`<div class="alert alert-${type}">${msg}</div>`;
-  if(type==="success") setTimeout(()=>{el.innerHTML=""},4000);
-}
-function init(){
-  const s=localStorage.getItem("lastLoginId");
-  if(s) document.getElementById("loginId").value=s;
-  document.getElementById("formDate").valueAsDate=new Date();
-  document.getElementById("loginId").addEventListener("keyup",e=>{ if(e.key==="Enter") doLogin(); });
-}
-function doLogin(){
-  const id=document.getElementById("loginId").value.trim().toLowerCase();
-  if(!USERS[id]){ showAlert("loginAlert","Буруу ID. Жишээ: emp001 эсвэл sup001","error"); return; }
-  currentUser={id,...USERS[id]};
-  localStorage.setItem("lastLoginId",id);
-  showApp();
-}
-function doLogout(){
-  currentUser=null; _editingIdx=null;
-  document.getElementById("loginSection").classList.remove("hidden");
-  document.getElementById("appSection").classList.add("hidden");
-  document.getElementById("loginId").value=localStorage.getItem("lastLoginId")||"";
-  document.getElementById("loginAlert").innerHTML="";
-}
-function showApp(){
-  document.getElementById("loginSection").classList.add("hidden");
-  document.getElementById("appSection").classList.remove("hidden");
-  document.getElementById("userNameDisplay").textContent=currentUser.name+" ("+currentUser.id+")";
-  const badge=document.getElementById("roleBadge");
-  if(currentUser.role==="employee"){
-    badge.textContent="Ажилтан"; badge.className="role-badge role-emp";
-    document.getElementById("employeeView").classList.remove("hidden");
-    document.getElementById("supervisorView").classList.add("hidden");
-    document.getElementById("empName").value=currentUser.name;
-    buildSalesTable();
-  } else {
-    badge.textContent="Ахлах"; badge.className="role-badge role-sup";
-    document.getElementById("employeeView").classList.add("hidden");
-    document.getElementById("supervisorView").classList.remove("hidden");
-    loadSupervisorData();
-  }
-}
-function buildSalesTable(){
-  const tbody=document.getElementById("salesBody");
-  tbody.innerHTML="";
-  PRODUCT_DEFS.forEach(p=>{
-    const price=getPrice(p.id);
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${p.id}</td><td class="product-name">${p.name}</td><td class="price-col">${price.toLocaleString()}</td><td><input type="number" min="0" id="prev_${p.id}" value="0" oninput="calcRow(${p.id})"></td><td><input type="number" min="0" id="next_${p.id}" value="0" oninput="calcRow(${p.id})"></td><td><input type="number" min="0" id="sold_${p.id}" value="0" oninput="calcIncome(${p.id})"></td><td><input type="number" min="0" step="0.01" id="income_${p.id}" value="0"></td>`;
-    tbody.appendChild(tr);
-  });
-}
-function calcRow(id){
-  const prev=Number(document.getElementById("prev_"+id).value)||0;
-  const next=Number(document.getElementById("next_"+id).value)||0;
-  if(document.activeElement && document.activeElement.id!=="sold_"+id){
-    if(prev>0||next>0){ const sold=Math.max(0,prev-next); document.getElementById("sold_"+id).value=sold; calcIncome(id); }
-  }
-}
-function calcIncome(id){
-  const sold=Number(document.getElementById("sold_"+id).value)||0;
-  document.getElementById("income_"+id).value=sold*getPrice(id);
-}
-function getFormData(){
-  const items=PRODUCT_DEFS.map(p=>({id:p.id,name:p.name,price:getPrice(p.id),prev:Number(document.getElementById("prev_"+p.id).value)||0,next:Number(document.getElementById("next_"+p.id).value)||0,sold:Number(document.getElementById("sold_"+p.id).value)||0,income:Number(document.getElementById("income_"+p.id).value)||0}));
-  return {date:document.getElementById("formDate").value,shift:document.getElementById("shiftType").value,employeeId:currentUser.id,employeeName:currentUser.name,checkerName:document.getElementById("checkerName").value,receiverName:document.getElementById("receiverName").value,items,cashAmount:Number(document.getElementById("cashAmount").value)||0,posNumber:document.getElementById("posNumber").value,cardTotal:Number(document.getElementById("cardTotal").value)||0,cashBalance:Number(document.getElementById("cashBalance").value)||0,submittedAt:new Date().toISOString()};
-}
-function saveSubmission(){
-  const data=getFormData();
-  if(!data.date){ showAlert("empAlert","Огноо сонгоно уу!","error"); return; }
-  let all=getSubs();
-  all=all.filter(s=>!(s.employeeId===data.employeeId && s.date===data.date && s.shift===data.shift));
-  all.push(data); setSubs(all);
-  showAlert("empAlert","Амжилттай хадгаллаа!","success");
-}
-function resetForm(){
-  PRODUCT_DEFS.forEach(p=>{ document.getElementById("prev_"+p.id).value=0; document.getElementById("next_"+p.id).value=0; document.getElementById("sold_"+p.id).value=0; document.getElementById("income_"+p.id).value=0; });
-  ["checkerName","receiverName","posNumber"].forEach(id=>document.getElementById(id).value="");
-  ["cashAmount","cardTotal","cashBalance"].forEach(id=>document.getElementById(id).value=0);
-  document.getElementById("empAlert").innerHTML="";
-}
-function showTab(name){
-  document.getElementById("tabOverview").classList.toggle("hidden", name!=="overview");
-  document.getElementById("tabSubmissions").classList.toggle("hidden", name!=="submissions");
-  document.getElementById("tabPrices").classList.toggle("hidden", name!=="prices");
-  document.getElementById("tabBtnOverview").classList.toggle("active", name==="overview");
-  document.getElementById("tabBtnSubs").classList.toggle("active", name==="submissions");
-  document.getElementById("tabBtnPrices").classList.toggle("active", name==="prices");
-  if(name==="prices") buildPricesTable();
-}
-function loadSupervisorData(){ const all=getSubs(); renderOverview(all); renderSubmissionsList(all); }
-function renderOverview(all){
-  let totalSold=0, totalIncome=0; const empSet=new Set();
-  all.forEach(s=>{ empSet.add(s.employeeId); s.items.forEach(it=>{ totalSold+=it.sold||0; totalIncome+=it.income||0; }); });
-  document.getElementById("overallSummary").innerHTML=`<div class="summary-item"><div class="label">Илгээлтийн тоо</div><div class="value">${all.length}</div></div><div class="summary-item"><div class="label">Ажилчдын тоо</div><div class="value">${empSet.size}</div></div><div class="summary-item"><div class="label">Нийт борлуулсан</div><div class="value">${totalSold}</div></div><div class="summary-item"><div class="label">Нийт орлого</div><div class="value">${totalIncome.toLocaleString()} ₮</div></div>`;
-  const totals={}; PRODUCT_DEFS.forEach(p=>totals[p.id]={name:p.name,sold:0,income:0});
-  all.forEach(s=>s.items.forEach(it=>{ if(totals[it.id]){ totals[it.id].sold+=it.sold||0; totals[it.id].income+=it.income||0; } }));
-  const tbody=document.getElementById("productTotalsBody"); tbody.innerHTML=""; let ts=0,ti=0;
-  PRODUCT_DEFS.forEach(p=>{ const t=totals[p.id]; ts+=t.sold; ti+=t.income;
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${p.id}</td><td class="product-name">${t.name}</td><td class="price-col">${getPrice(p.id).toLocaleString()}</td><td>${t.sold}</td><td>${t.income.toLocaleString()} ₮</td>`;
-    tbody.appendChild(tr);
-  });
-  const trT=document.createElement("tr"); trT.style.fontWeight="700"; trT.style.background="#e8f0fe";
-  trT.innerHTML=`<td colspan="3"><strong>НИЙТ</strong></td><td><strong>${ts}</strong></td><td><strong>${ti.toLocaleString()} ₮</strong></td>`;
-  tbody.appendChild(trT);
-}
-function renderSubmissionsList(all){
-  const list=document.getElementById("submissionsList");
-  if(!all.length){ list.innerHTML=`<div class="alert alert-info">Одоогоор илгээлт байхгүй. Ажилчид бөглөсөн өгөгдлийг <strong>Экспорт</strong> хийж, энд <strong>Импорт</strong> хийнэ үү.</div>`; document.getElementById("selectedSubmissionDetail").classList.add("hidden"); return; }
-  all=all.slice().sort((a,b)=>new Date(b.submittedAt)-new Date(a.submittedAt));
-  _sortedSubs=all;
-  list.innerHTML=all.map((s,idx)=>`<div class="sub-item ${ _editingIdx===idx ? 'selected' : '' }" onclick="showSubmissionDetail(${idx})"><strong>${s.employeeName}</strong> (${s.employeeId}) — ${s.date} (${s.shift||"—"})<br><small>Илгээсэн: ${new Date(s.submittedAt).toLocaleString("mn-MN")} | Борлуулсан: ${s.items.reduce((a,i)=>a+(i.sold||0),0)} ширхэг | Орлого: ${s.items.reduce((a,i)=>a+(i.income||0),0).toLocaleString()} ₮</small></div>`).join("");
-}
-function showSubmissionDetail(idx){ _editingIdx=null; const s=_sortedSubs[idx]; if(!s)return; document.getElementById("selectedSubmissionDetail").classList.remove("hidden"); renderDetailView(idx, false); }
-function renderDetailView(idx, editing){
-  const s=_sortedSubs[idx]; if(!s)return;
-  _editingIdx=editing ? idx : null;
-  if(!editing){
-    const itemsHtml=s.items.map(it=>`<tr><td>${it.id}</td><td class="product-name">${it.name}</td><td class="price-col">${(it.price||getPrice(it.id)||0).toLocaleString()}</td><td>${it.prev}</td><td>${it.next}</td><td>${it.sold}</td><td>${(it.income||0).toLocaleString()} ₮</td></tr>`).join("");
-    document.getElementById("detailContent").innerHTML=`<div class="summary-box"><p><strong>Ажилтан:</strong> ${s.employeeName} (${s.employeeId})</p><p><strong>Огноо:</strong> ${s.date} | <strong>Ээлж:</strong> ${s.shift||"—"}</p><p><strong>Шалгасан:</strong> ${s.checkerName||"—"} | <strong>Хүлээн авсан:</strong> ${s.receiverName||"—"}</p><p><strong>Бэлэн мөнгө:</strong> ${(s.cashAmount||0).toLocaleString()} ₮ | <strong>ПОС:</strong> ${s.posNumber||"—"} | <strong>Карт:</strong> ${(s.cardTotal||0).toLocaleString()} ₮ | <strong>Үлдэгдэл:</strong> ${(s.cashBalance||0).toLocaleString()} ₮</p></div><table><thead><tr><th>№</th><th>Бараа</th><th>Үнэ</th><th>Өмнөх</th><th>Дараах</th><th>Борлуулсан</th><th>Орлого</th></tr></thead><tbody>${itemsHtml}</tbody></table><div style="margin-top:16px;text-align:center"><button class="btn btn-warning" onclick="startEditSubmission(${idx})">✏️ Засварлах</button> <button class="btn btn-secondary btn-sm" onclick="deleteSubmission(${idx})">Устгах</button></div>`;
-  } else {
-    let rows="";
-    s.items.forEach((it,i)=>{ const price=it.price||getPrice(it.id)||0;
-      rows+=`<tr><td>${it.id}</td><td class="product-name">${it.name}</td><td class="price-col">${price.toLocaleString()}</td><td><input type="number" min="0" id="edit_prev_${i}" value="${it.prev||0}" oninput="editCalc(${i})"></td><td><input type="number" min="0" id="edit_next_${i}" value="${it.next||0}" oninput="editCalc(${i})"></td><td><input type="number" min="0" id="edit_sold_${i}" value="${it.sold||0}" oninput="editCalcIncome(${i})"></td><td><input type="number" min="0" step="0.01" id="edit_income_${i}" value="${it.income||0}"></td></tr>`; });
-    document.getElementById("detailContent").innerHTML=`<div class="edit-panel"><h3 style="margin-bottom:12px">✏️ Засварлах горим</h3><div class="header-info" style="margin-bottom:12px"><div><label>Огноо</label><input type="date" id="edit_date" value="${s.date||""}"></div><div><label>Ээлж</label><select id="edit_shift"><option value="өглөө" ${s.shift==="өглөө"?"selected":""}>Өглөө</option><option value="орой" ${s.shift==="орой"?"selected":""}>Орой</option></select></div><div><label>Шалгасан</label><input type="text" id="edit_checker" value="${s.checkerName||""}"></div><div><label>Хүлээн авсан</label><input type="text" id="edit_receiver" value="${s.receiverName||""}"></div></div><table><thead><tr><th>№</th><th>Бараа</th><th>Үнэ</th><th>Өмнөх</th><th>Дараах</th><th>Борлуулсан</th><th>Орлого</th></tr></thead><tbody>${rows}</tbody></table><div class="footer-fields"><div><label>Бэлэн мөнгө</label><input type="number" id="edit_cash" min="0" step="0.01" value="${s.cashAmount||0}"></div><div><label>ПОС дугаар</label><input type="text" id="edit_pos" value="${s.posNumber||""}"></div><div><label>Картын нэгтгэл</label><input type="number" id="edit_card" min="0" step="0.01" value="${s.cardTotal||0}"></div><div><label>Бэлэн мөнгөний үлдэгдэл</label><input type="number" id="edit_balance" min="0" step="0.01" value="${s.cashBalance||0}"></div></div><div style="margin-top:16px;text-align:center"><button class="btn btn-success" onclick="saveEditSubmission(${idx})">💾 Хадгалах</button> <button class="btn btn-secondary" onclick="cancelEdit(${idx})">Болих</button></div><div id="editAlert"></div></div>`;
-  }
-  renderSubmissionsList(getSubs().slice().sort((a,b)=>new Date(b.submittedAt)-new Date(a.submittedAt)));
-}
-function startEditSubmission(idx){ renderDetailView(idx, true); }
-function cancelEdit(idx){ renderDetailView(idx, false); }
-function editCalc(i){
-  const prev=Number(document.getElementById("edit_prev_"+i).value)||0;
-  const next=Number(document.getElementById("edit_next_"+i).value)||0;
-  if(document.activeElement && !document.activeElement.id.startsWith("edit_sold_")){
-    const sold=Math.max(0,prev-next); document.getElementById("edit_sold_"+i).value=sold; editCalcIncome(i);
-  }
-}
-function editCalcIncome(i){
-  const s=_sortedSubs[_editingIdx]; if(!s)return;
-  const sold=Number(document.getElementById("edit_sold_"+i).value)||0;
-  const price=s.items[i].price||getPrice(s.items[i].id)||0;
-  document.getElementById("edit_income_"+i).value=sold*price;
-}
-function saveEditSubmission(idx){
-  const s=_sortedSubs[idx]; if(!s)return;
-  const items=s.items.map((it,i)=>({...it,prev:Number(document.getElementById("edit_prev_"+i).value)||0,next:Number(document.getElementById("edit_next_"+i).value)||0,sold:Number(document.getElementById("edit_sold_"+i).value)||0,income:Number(document.getElementById("edit_income_"+i).value)||0}));
-  const updated={...s,date:document.getElementById("edit_date").value||s.date,shift:document.getElementById("edit_shift").value||s.shift,checkerName:document.getElementById("edit_checker").value,receiverName:document.getElementById("edit_receiver").value,items,cashAmount:Number(document.getElementById("edit_cash").value)||0,posNumber:document.getElementById("edit_pos").value,cardTotal:Number(document.getElementById("edit_card").value)||0,cashBalance:Number(document.getElementById("edit_balance").value)||0,submittedAt:new Date().toISOString(),editedBy:currentUser.id,editedAt:new Date().toISOString()};
-  let all=getSubs();
-  all=all.map(sub=>{ if(sub.employeeId===s.employeeId && sub.date===s.date && (sub.shift||"")===(s.shift||"")) return updated; return sub; });
-  setSubs(all);
-  _sortedSubs=all.slice().sort((a,b)=>new Date(b.submittedAt)-new Date(a.submittedAt));
-  const newIdx=_sortedSubs.findIndex(x=>x.employeeId===updated.employeeId && x.date===updated.date && (x.shift||"")===(updated.shift||""));
-  showAlert("editAlert","Амжилттай засагдлаа!","success");
-  setTimeout(()=>{ loadSupervisorData(); if(newIdx>=0) showSubmissionDetail(newIdx); }, 600);
-}
-function deleteSubmission(idx){
-  const s=_sortedSubs[idx]; if(!s)return;
-  if(!confirm(`${s.employeeName} — ${s.date} (${s.shift||""}) илгээлтийг устгах уу?`)) return;
-  let all=getSubs();
-  all=all.filter(sub=>!(sub.employeeId===s.employeeId && sub.date===s.date && (sub.shift||"")===(s.shift||"")));
-  setSubs(all);
-  document.getElementById("selectedSubmissionDetail").classList.add("hidden");
-  loadSupervisorData();
-}
-function buildPricesTable(){
-  const prices=getPrices();
-  const tbody=document.getElementById("pricesBody"); tbody.innerHTML="";
-  PRODUCT_DEFS.forEach(p=>{ const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${p.id}</td><td class="product-name">${p.name}</td><td><input type="number" min="0" step="100" id="price_${p.id}" value="${prices[p.id]||p.defaultPrice}" style="width:120px"></td>`;
-    tbody.appendChild(tr); });
-}
-function savePrices(){
-  const p={}; PRODUCT_DEFS.forEach(d=>{ p[d.id]=Number(document.getElementById("price_"+d.id).value)||0; });
-  setPrices(p); showAlert("priceAlert","Үнэ амжилттай хадгалагдлаа!","success");
-}
-function resetDefaultPrices(){
-  const p={}; PRODUCT_DEFS.forEach(d=>p[d.id]=d.defaultPrice);
-  setPrices(p); buildPricesTable(); showAlert("priceAlert","Анхны үнэ руу буцаалаа.","success");
-}
-function exportData(){
-  const data={exportedAt:new Date().toISOString(),productPrices:getPrices(),submissions:getSubs()};
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
-  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
-  a.download="borluulalt-"+new Date().toISOString().slice(0,10)+".json"; a.click(); URL.revokeObjectURL(a.href);
-}
-function importData(ev){
-  const file=ev.target.files[0]; if(!file)return;
-  const reader=new FileReader();
-  reader.onload=()=>{ try{
-    const data=JSON.parse(reader.result);
-    if(data.productPrices) setPrices(data.productPrices);
-    const incoming=data.submissions||data;
-    if(!Array.isArray(incoming)) throw new Error("Буруу формат");
-    let all=getSubs();
-    incoming.forEach(inc=>{ all=all.filter(s=>!(s.employeeId===inc.employeeId && s.date===inc.date && (s.shift||"")===(inc.shift||""))); all.push(inc); });
-    setSubs(all);
-    if(currentUser && currentUser.role==="supervisor") loadSupervisorData();
-    alert("Импорт амжилттай! "+incoming.length+" илгээлт нэмэгдлээ.");
-  }catch(e){ alert("Импорт амжилтгүй: "+e.message); } };
-  reader.readAsText(file); ev.target.value="";
-}
+const PRODUCT_DEFS=[{id:1,name:"Боргио",defaultPrice:5000},{id:2,name:"Нийлэл",defaultPrice:4500},{id:3,name:"Cass",defaultPrice:5500},{id:4,name:"Asahi",defaultPrice:6000},{id:5,name:"Калтенберг",defaultPrice:5000},{id:6,name:"Алтангөвь",defaultPrice:4000},{id:7,name:"Gem",defaultPrice:4500},{id:8,name:"ЕРӨӨ говь Задгай",defaultPrice:3500},{id:9,name:"Krush",defaultPrice:4000},{id:10,name:"Tsingtao",defaultPrice:5500},{id:11,name:"Heineken",defaultPrice:7000},{id:12,name:"terra",defaultPrice:5000},{id:14,name:"Сангур laaz",defaultPrice:3000}];
+const USERS={emp001:{name:"Бат-Эрдэнэ",role:"employee"},emp002:{name:"Сарантуяа",role:"employee"},emp003:{name:"Мөнхбаатар",role:"employee"},sup001:{name:"Ахлах менежер",role:"supervisor"}};
+let currentUser=null,_sortedSubs=[],_editingIdx=null;
+function getPrices(){const s=localStorage.getItem("productPrices");if(s){try{return JSON.parse(s)}catch(e){}}const p={};PRODUCT_DEFS.forEach(d=>p[d.id]=d.defaultPrice);return p}
+function setPrices(o){localStorage.setItem("productPrices",JSON.stringify(o))}
+function getPrice(id){return getPrices()[id]||0}
+function getStock(){const s=localStorage.getItem("inventory");if(s){try{return JSON.parse(s)}catch(e){}}const p={};PRODUCT_DEFS.forEach(d=>p[d.id]=0);return p}
+function setStock(o){localStorage.setItem("inventory",JSON.stringify(o))}
+function getStockQty(id){return getStock()[id]||0}
+function getStockLog(){return JSON.parse(localStorage.getItem("stockLog")||"[]")}
+function addStockLog(entry){const log=getStockLog();log.unshift(entry);if(log.length>200)log.length=200;localStorage.setItem("stockLog",JSON.stringify(log))}
+function getSubs(){return JSON.parse(localStorage.getItem("submissions")||"[]")}
+function setSubs(a){localStorage.setItem("submissions",JSON.stringify(a))}
+function showAlert(id,msg,type){const el=document.getElementById(id);if(!el)return;el.innerHTML=`<div class="alert alert-${type}">${msg}</div>`;if(type==="success")setTimeout(()=>{el.innerHTML=""},4000)}
+function init(){const s=localStorage.getItem("lastLoginId");if(s)document.getElementById("loginId").value=s;document.getElementById("formDate").valueAsDate=new Date();document.getElementById("loginId").addEventListener("keyup",e=>{if(e.key==="Enter")doLogin()})}
+function doLogin(){const id=document.getElementById("loginId").value.trim().toLowerCase();if(!USERS[id]){showAlert("loginAlert","Буруу ID","error");return}currentUser={id,...USERS[id]};localStorage.setItem("lastLoginId",id);showApp()}
+function doLogout(){currentUser=null;_editingIdx=null;document.getElementById("loginSection").classList.remove("hidden");document.getElementById("appSection").classList.add("hidden");document.getElementById("loginId").value=localStorage.getItem("lastLoginId")||"";document.getElementById("loginAlert").innerHTML=""}
+function showApp(){document.getElementById("loginSection").classList.add("hidden");document.getElementById("appSection").classList.remove("hidden");document.getElementById("userNameDisplay").textContent=currentUser.name+" ("+currentUser.id+")";const b=document.getElementById("roleBadge");if(currentUser.role==="employee"){b.textContent="Ажилтан";b.className="role-badge role-emp";document.getElementById("employeeView").classList.remove("hidden");document.getElementById("supervisorView").classList.add("hidden");document.getElementById("empName").value=currentUser.name;buildSalesTable()}else{b.textContent="Ахлах";b.className="role-badge role-sup";document.getElementById("employeeView").classList.add("hidden");document.getElementById("supervisorView").classList.remove("hidden");loadSupervisorData()}}
+function buildSalesTable(){const tbody=document.getElementById("salesBody");tbody.innerHTML="";PRODUCT_DEFS.forEach(p=>{const price=getPrice(p.id),stock=getStockQty(p.id);const sc=stock<=5?"stock-low":"stock-ok";const tr=document.createElement("tr");tr.innerHTML=`<td>${p.id}</td><td class="product-name">${p.name}</td><td class="${sc}">${stock}</td><td class="price-col">${price.toLocaleString()}</td><td><input type="number" min="0" id="prev_${p.id}" value="0" oninput="calcRow(${p.id})"></td><td><input type="number" min="0" id="next_${p.id}" value="0" oninput="calcRow(${p.id})"></td><td><input type="number" min="0" id="sold_${p.id}" value="0" oninput="calcIncome(${p.id})"></td><td><input type="number" min="0" step="0.01" id="income_${p.id}" value="0"></td>`;tbody.appendChild(tr)})}
+function fillPrevFromStock(){PRODUCT_DEFS.forEach(p=>{document.getElementById("prev_"+p.id).value=getStockQty(p.id);calcRow(p.id)});showAlert("empAlert","Өмнөх тоог сангаас авсан","success")}
+function calcRow(id){const prev=Number(document.getElementById("prev_"+id).value)||0;const next=Number(document.getElementById("next_"+id).value)||0;if(document.activeElement&&document.activeElement.id!=="sold_"+id){if(prev>0||next>0){document.getElementById("sold_"+id).value=Math.max(0,prev-next);calcIncome(id)}}}
+function calcIncome(id){document.getElementById("income_"+id).value=(Number(document.getElementById("sold_"+id).value)||0)*getPrice(id)}
+function getFormData(){const items=PRODUCT_DEFS.map(p=>({id:p.id,name:p.name,price:getPrice(p.id),prev:Number(document.getElementById("prev_"+p.id).value)||0,next:Number(document.getElementById("next_"+p.id).value)||0,sold:Number(document.getElementById("sold_"+p.id).value)||0,income:Number(document.getElementById("income_"+p.id).value)||0}));return{date:document.getElementById("formDate").value,shift:document.getElementById("shiftType").value,employeeId:currentUser.id,employeeName:currentUser.name,checkerName:document.getElementById("checkerName").value,receiverName:document.getElementById("receiverName").value,items,cashAmount:Number(document.getElementById("cashAmount").value)||0,posNumber:document.getElementById("posNumber").value,cardTotal:Number(document.getElementById("cardTotal").value)||0,cashBalance:Number(document.getElementById("cashBalance").value)||0,submittedAt:new Date().toISOString()}}
+function saveSubmission(){const data=getFormData();if(!data.date){showAlert("empAlert","Огноо сонгоно уу!","error");return}const stock=getStock();data.items.forEach(it=>{if(it.sold>0){const before=stock[it.id]||0;stock[it.id]=Math.max(0,before-it.sold);addStockLog({at:new Date().toISOString(),type:"sale",productId:it.id,productName:it.name,qty:-it.sold,before,after:stock[it.id],by:currentUser.id,note:"Борлуулалт "+data.date+" "+data.shift})}});setStock(stock);let all=getSubs();all=all.filter(s=>!(s.employeeId===data.employeeId&&s.date===data.date&&s.shift===data.shift));all.push(data);setSubs(all);showAlert("empAlert","Хадгаллаа! Сангаас хасагдлаа.","success");buildSalesTable()}
+function resetForm(){PRODUCT_DEFS.forEach(p=>{document.getElementById("prev_"+p.id).value=0;document.getElementById("next_"+p.id).value=0;document.getElementById("sold_"+p.id).value=0;document.getElementById("income_"+p.id).value=0});["checkerName","receiverName","posNumber"].forEach(id=>document.getElementById(id).value="");["cashAmount","cardTotal","cashBalance"].forEach(id=>document.getElementById(id).value=0);document.getElementById("empAlert").innerHTML=""}
+function showTab(name){document.getElementById("tabOverview").classList.toggle("hidden",name!=="overview");document.getElementById("tabSubmissions").classList.toggle("hidden",name!=="submissions");document.getElementById("tabPrices").classList.toggle("hidden",name!=="prices");document.getElementById("tabStock").classList.toggle("hidden",name!=="stock");document.getElementById("tabBtnOverview").classList.toggle("active",name==="overview");document.getElementById("tabBtnSubs").classList.toggle("active",name==="submissions");document.getElementById("tabBtnPrices").classList.toggle("active",name==="prices");document.getElementById("tabBtnStock").classList.toggle("active",name==="stock");if(name==="prices")buildPricesTable();if(name==="stock")buildStockPanel()}
+function loadSupervisorData(){const all=getSubs();renderOverview(all);renderSubmissionsList(all);if(!document.getElementById("tabStock").classList.contains("hidden"))buildStockPanel()}
+function renderOverview(all){let totalSold=0,totalIncome=0;const empSet=new Set();all.forEach(s=>{empSet.add(s.employeeId);s.items.forEach(it=>{totalSold+=it.sold||0;totalIncome+=it.income||0})});let stockTotal=0,stockValue=0;const st=getStock();PRODUCT_DEFS.forEach(p=>{stockTotal+=st[p.id]||0;stockValue+=(st[p.id]||0)*getPrice(p.id)});document.getElementById("overallSummary").innerHTML=`<div class="summary-item"><div class="label">Илгээлт</div><div class="value">${all.length}</div></div><div class="summary-item"><div class="label">Ажилчин</div><div class="value">${empSet.size}</div></div><div class="summary-item"><div class="label">Борлуулсан</div><div class="value">${totalSold}</div></div><div class="summary-item"><div class="label">Орлого</div><div class="value">${totalIncome.toLocaleString()}₮</div></div><div class="summary-item"><div class="label">Сангийн нөөц</div><div class="value">${stockTotal}</div></div><div class="summary-item"><div class="label">Сангийн үнэлгээ</div><div class="value">${stockValue.toLocaleString()}₮</div></div>`;const totals={};PRODUCT_DEFS.forEach(p=>totals[p.id]={name:p.name,sold:0,income:0});all.forEach(s=>s.items.forEach(it=>{if(totals[it.id]){totals[it.id].sold+=it.sold||0;totals[it.id].income+=it.income||0}}));const tbody=document.getElementById("productTotalsBody");tbody.innerHTML="";let ts=0,ti=0;PRODUCT_DEFS.forEach(p=>{const t=totals[p.id];ts+=t.sold;ti+=t.income;const stock=getStockQty(p.id);const sc=stock<=5?"stock-low":"stock-ok";const tr=document.createElement("tr");tr.innerHTML=`<td>${p.id}</td><td class="product-name">${t.name}</td><td class="${sc}">${stock}</td><td class="price-col">${getPrice(p.id).toLocaleString()}</td><td>${t.sold}</td><td>${t.income.toLocaleString()}₮</td>`;tbody.appendChild(tr)});const trT=document.createElement("tr");trT.style.fontWeight="700";trT.style.background="#e8f0fe";trT.innerHTML=`<td colspan="4"><strong>НИЙТ</strong></td><td><strong>${ts}</strong></td><td><strong>${ti.toLocaleString()}₮</strong></td>`;tbody.appendChild(trT)}
+function renderSubmissionsList(all){const list=document.getElementById("submissionsList");if(!all.length){list.innerHTML=`<div class="alert alert-info">Илгээлт байхгүй</div>`;document.getElementById("selectedSubmissionDetail").classList.add("hidden");return}all=all.slice().sort((a,b)=>new Date(b.submittedAt)-new Date(a.submittedAt));_sortedSubs=all;list.innerHTML=all.map((s,idx)=>`<div class="sub-item" onclick="showSubmissionDetail(${idx})"><strong>${s.employeeName}</strong> (${s.employeeId}) — ${s.date} (${s.shift||"—"})<br><small>${new Date(s.submittedAt).toLocaleString("mn-MN")} | ${s.items.reduce((a,i)=>a+(i.sold||0),0)} ш | ${s.items.reduce((a,i)=>a+(i.income||0),0).toLocaleString()}₮</small></div>`).join("")}
+function showSubmissionDetail(idx){_editingIdx=null;if(!_sortedSubs[idx])return;document.getElementById("selectedSubmissionDetail").classList.remove("hidden");renderDetailView(idx,false)}
+function renderDetailView(idx,editing){const s=_sortedSubs[idx];if(!s)return;_editingIdx=editing?idx:null;if(!editing){const itemsHtml=s.items.map(it=>`<tr><td>${it.id}</td><td class="product-name">${it.name}</td><td class="price-col">${(it.price||getPrice(it.id)||0).toLocaleString()}</td><td>${it.prev}</td><td>${it.next}</td><td>${it.sold}</td><td>${(it.income||0).toLocaleString()}₮</td></tr>`).join("");document.getElementById("detailContent").innerHTML=`<div class="summary-box"><p><strong>${s.employeeName}</strong> (${s.employeeId}) | ${s.date} | ${s.shift||"—"}</p><p>Шалгасан: ${s.checkerName||"—"} | Хүлээн: ${s.receiverName||"—"}</p><p>Бэлэн: ${(s.cashAmount||0).toLocaleString()}₮ | ПОС: ${s.posNumber||"—"} | Карт: ${(s.cardTotal||0).toLocaleString()}₮</p></div><table><thead><tr><th>№</th><th>Бараа</th><th>Үнэ</th><th>Өмнөх</th><th>Дараах</th><th>Борлуулсан</th><th>Орлого</th></tr></thead><tbody>${itemsHtml}</tbody></table><div style="margin-top:12px;text-align:center"><button class="btn btn-warning" onclick="startEditSubmission(${idx})">✏️ Засварлах</button> <button class="btn btn-secondary btn-sm" onclick="deleteSubmission(${idx})">Устгах</button></div>`}else{let rows="";s.items.forEach((it,i)=>{const price=it.price||getPrice(it.id)||0;rows+=`<tr><td>${it.id}</td><td class="product-name">${it.name}</td><td class="price-col">${price.toLocaleString()}</td><td><input type="number" min="0" id="edit_prev_${i}" value="${it.prev||0}" oninput="editCalc(${i})"></td><td><input type="number" min="0" id="edit_next_${i}" value="${it.next||0}" oninput="editCalc(${i})"></td><td><input type="number" min="0" id="edit_sold_${i}" value="${it.sold||0}" oninput="editCalcIncome(${i})"></td><td><input type="number" min="0" step="0.01" id="edit_income_${i}" value="${it.income||0}"></td></tr>`});document.getElementById("detailContent").innerHTML=`<div class="edit-panel"><h3>✏️ Засварлах</h3><div class="header-info"><div><label>Огноо</label><input type="date" id="edit_date" value="${s.date||""}"></div><div><label>Ээлж</label><select id="edit_shift"><option value="өглөө" ${s.shift==="өглөө"?"selected":""}>Өглөө</option><option value="орой" ${s.shift==="орой"?"selected":""}>Орой</option></select></div><div><label>Шалгасан</label><input type="text" id="edit_checker" value="${s.checkerName||""}"></div><div><label>Хүлээн</label><input type="text" id="edit_receiver" value="${s.receiverName||""}"></div></div><table><thead><tr><th>№</th><th>Бараа</th><th>Үнэ</th><th>Өмнөх</th><th>Дараах</th><th>Борлуулсан</th><th>Орлого</th></tr></thead><tbody>${rows}</tbody></table><div class="footer-fields"><div><label>Бэлэн</label><input type="number" id="edit_cash" value="${s.cashAmount||0}"></div><div><label>ПОС</label><input type="text" id="edit_pos" value="${s.posNumber||""}"></div><div><label>Карт</label><input type="number" id="edit_card" value="${s.cardTotal||0}"></div><div><label>Үлдэгдэл</label><input type="number" id="edit_balance" value="${s.cashBalance||0}"></div></div><div style="margin-top:12px;text-align:center"><button class="btn btn-success" onclick="saveEditSubmission(${idx})">💾 Хадгалах</button> <button class="btn btn-secondary" onclick="cancelEdit(${idx})">Болих</button></div><div id="editAlert"></div></div>`}}
+function startEditSubmission(idx){renderDetailView(idx,true)}
+function cancelEdit(idx){renderDetailView(idx,false)}
+function editCalc(i){const prev=Number(document.getElementById("edit_prev_"+i).value)||0;const next=Number(document.getElementById("edit_next_"+i).value)||0;if(document.activeElement&&!document.activeElement.id.startsWith("edit_sold_")){document.getElementById("edit_sold_"+i).value=Math.max(0,prev-next);editCalcIncome(i)}}
+function editCalcIncome(i){const s=_sortedSubs[_editingIdx];if(!s)return;document.getElementById("edit_income_"+i).value=(Number(document.getElementById("edit_sold_"+i).value)||0)*(s.items[i].price||getPrice(s.items[i].id)||0)}
+function saveEditSubmission(idx){const s=_sortedSubs[idx];if(!s)return;const items=s.items.map((it,i)=>({...it,prev:Number(document.getElementById("edit_prev_"+i).value)||0,next:Number(document.getElementById("edit_next_"+i).value)||0,sold:Number(document.getElementById("edit_sold_"+i).value)||0,income:Number(document.getElementById("edit_income_"+i).value)||0}));const updated={...s,date:document.getElementById("edit_date").value||s.date,shift:document.getElementById("edit_shift").value||s.shift,checkerName:document.getElementById("edit_checker").value,receiverName:document.getElementById("edit_receiver").value,items,cashAmount:Number(document.getElementById("edit_cash").value)||0,posNumber:document.getElementById("edit_pos").value,cardTotal:Number(document.getElementById("edit_card").value)||0,cashBalance:Number(document.getElementById("edit_balance").value)||0,submittedAt:new Date().toISOString(),editedBy:currentUser.id};setSubs(getSubs().map(sub=>(sub.employeeId===s.employeeId&&sub.date===s.date&&(sub.shift||"")===(s.shift||""))?updated:sub));_sortedSubs=getSubs().slice().sort((a,b)=>new Date(b.submittedAt)-new Date(a.submittedAt));showAlert("editAlert","Засагдлаа!","success");setTimeout(()=>{loadSupervisorData();const ni=_sortedSubs.findIndex(x=>x.employeeId===updated.employeeId&&x.date===updated.date);if(ni>=0)showSubmissionDetail(ni)},500)}
+function deleteSubmission(idx){const s=_sortedSubs[idx];if(!s||!confirm(`${s.employeeName} — ${s.date} устгах уу?`))return;setSubs(getSubs().filter(sub=>!(sub.employeeId===s.employeeId&&sub.date===s.date&&(sub.shift||"")===(s.shift||""))));document.getElementById("selectedSubmissionDetail").classList.add("hidden");loadSupervisorData()}
+function buildPricesTable(){const prices=getPrices();const tbody=document.getElementById("pricesBody");tbody.innerHTML="";PRODUCT_DEFS.forEach(p=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${p.id}</td><td class="product-name">${p.name}</td><td><input type="number" min="0" step="100" id="price_${p.id}" value="${prices[p.id]||p.defaultPrice}" style="width:120px"></td>`;tbody.appendChild(tr)})}
+function savePrices(){const p={};PRODUCT_DEFS.forEach(d=>{p[d.id]=Number(document.getElementById("price_"+d.id).value)||0});setPrices(p);showAlert("priceAlert","Үнэ хадгалагдлаа!","success")}
+function resetDefaultPrices(){const p={};PRODUCT_DEFS.forEach(d=>p[d.id]=d.defaultPrice);setPrices(p);buildPricesTable();showAlert("priceAlert","Анхны үнэ","success")}
+function buildStockPanel(){const sel=document.getElementById("stockProduct");sel.innerHTML=PRODUCT_DEFS.map(p=>`<option value="${p.id}">${p.id}. ${p.name} (одоо: ${getStockQty(p.id)})</option>`).join("");const st=getStock();let totalQty=0,totalVal=0,low=0;PRODUCT_DEFS.forEach(p=>{const q=st[p.id]||0;totalQty+=q;totalVal+=q*getPrice(p.id);if(q<=5)low++});document.getElementById("stockSummary").innerHTML=`<div class="summary-item"><div class="label">Нийт нөөц</div><div class="value">${totalQty}</div></div><div class="summary-item"><div class="label">Үнэлгээ</div><div class="value">${totalVal.toLocaleString()}₮</div></div><div class="summary-item"><div class="label">Бага нөөц (≤5)</div><div class="value" style="color:${low?"#c0392b":"#27ae60"}">${low}</div></div>`;const tbody=document.getElementById("stockBody");tbody.innerHTML="";let tq=0,tv=0;PRODUCT_DEFS.forEach(p=>{const q=st[p.id]||0;const v=q*getPrice(p.id);tq+=q;tv+=v;const sc=q<=5?"stock-low":"stock-ok";const tr=document.createElement("tr");tr.innerHTML=`<td>${p.id}</td><td class="product-name">${p.name}</td><td class="${sc}">${q}</td><td class="price-col">${getPrice(p.id).toLocaleString()}</td><td>${v.toLocaleString()}</td>`;tbody.appendChild(tr)});const trT=document.createElement("tr");trT.style.fontWeight="700";trT.style.background="#e8f0fe";trT.innerHTML=`<td colspan="2"><strong>НИЙТ</strong></td><td><strong>${tq}</strong></td><td></td><td><strong>${tv.toLocaleString()}</strong></td>`;tbody.appendChild(trT);const log=getStockLog();document.getElementById("stockHistory").innerHTML=log.length?log.slice(0,50).map(e=>{const sign=e.qty>0?"+":"";const color=e.qty>0?"#27ae60":(e.qty<0?"#c0392b":"#666");return `<div style="padding:8px;border-bottom:1px solid #eee"><strong>${e.productName||e.productId}</strong> <span style="color:${color};font-weight:700">${sign}${e.qty}</span> <span style="color:#888">(${e.before}→${e.after})</span><br><small>${new Date(e.at).toLocaleString("mn-MN")} | ${e.type} | ${e.by||""} | ${e.note||""}</small></div>`}).join(""):`<div class="alert alert-info">Хөдөлгөөн байхгүй</div>`}
+function applyStockChange(){const pid=Number(document.getElementById("stockProduct").value);const type=document.getElementById("stockType").value;const qty=Number(document.getElementById("stockQty").value)||0;const note=document.getElementById("stockNote").value.trim();if(qty<0){showAlert("stockAlert","Тоо буруу","error");return}const prod=PRODUCT_DEFS.find(p=>p.id===pid);if(!prod)return;const stock=getStock();const before=stock[pid]||0;let after=before,delta=0;if(type==="in"){after=before+qty;delta=qty}else if(type==="out"){after=Math.max(0,before-qty);delta=after-before}else if(type==="set"){after=qty;delta=after-before}stock[pid]=after;setStock(stock);addStockLog({at:new Date().toISOString(),type,productId:pid,productName:prod.name,qty:delta,before,after,by:currentUser.id,note:note||(type==="in"?"Орлого":type==="out"?"Зарлага":"Тохируулга")});document.getElementById("stockQty").value=0;document.getElementById("stockNote").value="";showAlert("stockAlert",`${prod.name}: ${before} → ${after}`,"success");buildStockPanel()}
+function exportData(){const data={exportedAt:new Date().toISOString(),productPrices:getPrices(),inventory:getStock(),stockLog:getStockLog(),submissions:getSubs()};const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="borluulalt-"+new Date().toISOString().slice(0,10)+".json";a.click()}
+function importData(ev){const file=ev.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const data=JSON.parse(reader.result);if(data.productPrices)setPrices(data.productPrices);if(data.inventory)setStock(data.inventory);if(data.stockLog)localStorage.setItem("stockLog",JSON.stringify(data.stockLog));const incoming=data.submissions||(Array.isArray(data)?data:null);if(incoming&&Array.isArray(incoming)){let all=getSubs();incoming.forEach(inc=>{all=all.filter(s=>!(s.employeeId===inc.employeeId&&s.date===inc.date&&(s.shift||"")===(inc.shift||"")));all.push(inc)});setSubs(all)}if(currentUser&&currentUser.role==="supervisor")loadSupervisorData();alert("Импорт амжилттай!")}catch(e){alert("Алдаа: "+e.message)}};reader.readAsText(file);ev.target.value=""}
 init();
