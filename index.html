@@ -57,7 +57,7 @@
     .edit-panel{background:#fffbf0;border:2px solid #f39c12;border-radius:8px;padding:16px;margin-top:16px}
     .form-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin:12px 0}
     .form-row label{font-weight:600;font-size:.85rem;color:#555;display:block}
-    .form-row input{padding:8px 10px;border:1px solid #ccc;border-radius:6px}
+    .form-row input,.form-row select{padding:8px 10px;border:1px solid #ccc;border-radius:6px}
     .recon-box{background:#f8fafc;border:2px solid #0f3460;border-radius:10px;padding:16px;margin-top:20px}
     .recon-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
     .recon-item{background:#fff;padding:12px;border-radius:8px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.06)}
@@ -71,12 +71,10 @@
   <div id="loginSection" class="card login-box">
     <h1>🍺 Ажилтны борлуулалтын хуудас</h1>
     <p style="color:#666;margin:12px 0 20px">Зөвхөн ID-аар нэвтэрнэ үү</p>
-    <input type="text" id="loginId" placeholder="ID (жишээ: emp001)" autofocus><br>
+    <input type="text" id="loginId" placeholder="ID оруулна уу" autofocus><br>
     <button class="btn" onclick="doLogin()">Нэвтрэх</button>
     <div id="loginAlert"></div>
-    <div style="margin-top:24px;text-align:left;font-size:.85rem;color:#555;background:#f8f9fa;padding:14px;border-radius:8px">
-      <strong>ID:</strong> <code>emp001</code>–<code>emp003</code> ажилтан · <code>sup001</code> ахлах
-    </div>
+    <div id="loginHint" style="margin-top:24px;text-align:left;font-size:.85rem;color:#555;background:#f8f9fa;padding:14px;border-radius:8px"></div>
   </div>
   <div id="appSection" class="hidden">
     <div class="card">
@@ -127,6 +125,7 @@
           <button class="tab-btn" id="tabBtnSubs" onclick="showTab('submissions')">Илгээлт</button>
           <button class="tab-btn" id="tabBtnStock" onclick="showTab('stock')">Барааны сан</button>
           <button class="tab-btn" id="tabBtnPrices" onclick="showTab('prices')">Үнэ</button>
+          <button class="tab-btn" id="tabBtnUsers" onclick="showTab('users')">Нэвтрэх эрх</button>
           <button class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="loadSupervisorData()">🔄</button>
         </div>
         <div id="tabOverview">
@@ -139,7 +138,7 @@
           <div id="selectedSubmissionDetail" class="hidden"><h3 style="margin-top:20px">Дэлгэрэнгүй</h3><div id="detailContent"></div></div>
         </div>
         <div id="tabStock" class="hidden">
-          <h3>📦 Барааны сангийн удирдлага</h3>
+          <h3>📦 Барааны сан</h3>
           <div class="form-row">
             <div><label>Нэр</label><input type="text" id="newProdName" placeholder="Шинэ бараа"></div>
             <div><label>Үнэ</label><input type="number" id="newProdPrice" min="0" value="5000" style="width:100px"></div>
@@ -151,10 +150,22 @@
         </div>
         <div id="tabPrices" class="hidden">
           <h3>Нэгж үнэ</h3>
-          <p style="color:#666;margin-bottom:10px;font-size:.9rem">Үнэ зөвхөн энд хадгалагдана. Код шинэчлэгдэхэд өөрчлөгдөхгүй.</p>
+          <p style="color:#666;margin-bottom:10px;font-size:.9rem">Үнэ код шинэчлэгдэхэд өөрчлөгдөхгүй.</p>
           <div style="overflow-x:auto"><table><thead><tr><th>№</th><th>Бараа</th><th>Үнэ (₮)</th></tr></thead><tbody id="pricesBody"></tbody></table></div>
           <div style="text-align:center;margin-top:12px"><button class="btn btn-success" onclick="savePrices()">Хадгалах</button></div>
           <div id="priceAlert"></div>
+        </div>
+        <div id="tabUsers" class="hidden">
+          <h3>🔐 Нэвтрэх эрх тохируулах</h3>
+          <p style="color:#666;margin-bottom:12px;font-size:.9rem">Зөвхөн ID-аар нэвтэрнэ. Нууц үг байхгүй.</p>
+          <div class="form-row">
+            <div><label>ID</label><input type="text" id="newUserId" placeholder="emp004" style="width:120px;text-transform:lowercase"></div>
+            <div><label>Нэр</label><input type="text" id="newUserName" placeholder="Ажилтны нэр" style="width:160px"></div>
+            <div><label>Үүрэг</label><select id="newUserRole"><option value="employee">Ажилтан</option><option value="supervisor">Ахлах</option></select></div>
+            <button class="btn btn-success btn-sm" onclick="addUser()">+ Хэрэглэгч нэмэх</button>
+          </div>
+          <div id="userAlert"></div>
+          <div style="overflow-x:auto"><table><thead><tr><th>ID</th><th>Нэр</th><th>Үүрэг</th><th>Үйлдэл</th></tr></thead><tbody id="usersBody"></tbody></table></div>
         </div>
       </div>
     </div>
