@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ажилтны борлуулалтын хуудас</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);min-height:100vh;color:#333;padding:20px}
+    .container{max-width:1100px;margin:0 auto}
+    .card{background:#fff;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.3);padding:28px;margin-bottom:24px}
+    h1,h2,h3{color:#1a1a2e;margin-bottom:16px}
+    h1{font-size:1.6rem;text-align:center}
+    .login-box{max-width:420px;margin:80px auto;text-align:center}
+    .login-box input{width:100%;padding:14px 16px;font-size:1.1rem;border:2px solid #ddd;border-radius:8px;margin:12px 0;text-align:center;letter-spacing:1px}
+    .login-box input:focus{outline:none;border-color:#0f3460}
+    .btn{background:#0f3460;color:#fff;border:none;padding:12px 28px;font-size:1rem;border-radius:8px;cursor:pointer;transition:background .2s;margin:6px 4px}
+    .btn:hover{background:#16213e}
+    .btn-success{background:#27ae60}.btn-success:hover{background:#219a52}
+    .btn-secondary{background:#7f8c8d}.btn-secondary:hover{background:#6c7a7a}
+    .btn-outline{background:#fff;color:#0f3460;border:2px solid #0f3460}.btn-outline:hover{background:#eef5ff}
+    .header-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px;font-size:.95rem}
+    .header-info label{font-weight:600;color:#555}
+    .header-info input,.header-info select{width:100%;padding:8px 10px;border:1px solid #ccc;border-radius:6px;margin-top:4px}
+    table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.9rem}
+    th,td{border:1px solid #ddd;padding:8px 6px;text-align:center}
+    th{background:#0f3460;color:#fff;font-weight:600;position:sticky;top:0}
+    tr:nth-child(even){background:#f8f9fa}tr:hover{background:#eef5ff}
+    input[type=number]{width:80px;padding:6px;border:1px solid #ccc;border-radius:4px;text-align:center}
+    .footer-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+    .footer-fields label{font-weight:600;display:block;margin-bottom:4px;color:#555}
+    .footer-fields input{width:100%;padding:10px;border:1px solid #ccc;border-radius:6px}
+    .role-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.8rem;font-weight:600;margin-left:8px}
+    .role-emp{background:#3498db;color:#fff}.role-sup{background:#e74c3c;color:#fff}
+    .user-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+    .summary-box{background:#f0f7ff;border-left:5px solid #0f3460;padding:16px;margin:16px 0;border-radius:0 8px 8px 0}
+    .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:12px}
+    .summary-item{background:#fff;padding:12px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.08);text-align:center}
+    .summary-item .label{font-size:.85rem;color:#666}
+    .summary-item .value{font-size:1.35rem;font-weight:700;color:#0f3460}
+    .hidden{display:none!important}
+    .alert{padding:12px 16px;border-radius:8px;margin:12px 0;font-weight:500}
+    .alert-success{background:#d4edda;color:#155724}
+    .alert-info{background:#d1ecf1;color:#0c5460}
+    .alert-error{background:#f8d7da;color:#721c24}
+    .tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+    .tab-btn{padding:10px 18px;border:2px solid #0f3460;background:#fff;color:#0f3460;border-radius:8px;cursor:pointer;font-weight:600}
+    .tab-btn.active{background:#0f3460;color:#fff}
+    .submissions-list{max-height:420px;overflow-y:auto}
+    .sub-item{border:1px solid #e0e0e0;border-radius:8px;padding:12px;margin-bottom:10px;cursor:pointer;transition:background .15s}
+    .sub-item:hover{background:#f5f9ff}
+    .product-name{text-align:left;font-weight:500;padding-left:8px!important}
+    code{background:#eee;padding:2px 6px;border-radius:4px;font-size:.9em}
+    @media(max-width:700px){.header-info,.footer-fields{grid-template-columns:1fr}table{font-size:.8rem}input[type=number]{width:60px}}
+  </style>
+</head>
+<body>
+<div class="container">
+  <div id="loginSection" class="card login-box">
+    <h1>🍺 Ажилтны борлуулалтын хуудас</h1>
+    <p style="color:#666;margin:12px 0 20px">Зөвхөн ID-аар нэвтэрнэ үү (нууц үг хэрэггүй)</p>
+    <input type="text" id="loginId" placeholder="ID оруулна уу (жишээ: emp001)" autofocus>
+    <br>
+    <button class="btn" onclick="doLogin()">Нэвтрэх</button>
+    <div id="loginAlert"></div>
+    <div style="margin-top:24px;text-align:left;font-size:.85rem;color:#555;background:#f8f9fa;padding:14px;border-radius:8px">
+      <strong>Жишээ ID:</strong><br>
+      • Ажилчид: <code>emp001</code>, <code>emp002</code>, <code>emp003</code><br>
+      • Ахлах: <code>sup001</code>
+    </div>
+  </div>
+  <div id="appSection" class="hidden">
+    <div class="card">
+      <div class="user-bar">
+        <div><strong id="userNameDisplay"></strong><span id="roleBadge" class="role-badge"></span></div>
+        <div>
+          <button class="btn btn-outline" onclick="exportData()">⬇️ Экспорт</button>
+          <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">⬆️ Импорт</button>
+          <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
+          <button class="btn btn-secondary" onclick="doLogout()">Гарах</button>
+        </div>
+      </div>
+      <div id="employeeView" class="hidden">
+        <h2>Борлуулалтын хуудас бөглөх</h2>
+        <div class="header-info">
+          <div><label>Огноо:</label><input type="date" id="formDate"></div>
+          <div><label>Ажилтны нэр:</label><input type="text" id="empName" readonly></div>
+          <div><label>Шалгасан ажилтны нэр:</label><input type="text" id="checkerName" placeholder="Шалгасан хүн"></div>
+          <div><label>Хүлээн авсан ажилтны нэр:</label><input type="text" id="receiverName" placeholder="Хүлээн авсан хүн"></div>
+          <div><label>Ээлж:</label><select id="shiftType"><option value="өглөө">Өглөө</option><option value="орой">Орой</option></select></div>
+        </div>
+        <div style="overflow-x:auto"><table><thead><tr><th>№</th><th>Барааны нэр</th><th>Өмнөх тоо</th><th>Дараах тоо</th><th>Борлуулсан тоо</th><th>Нийт орлого (₮)</th></tr></thead><tbody id="salesBody"></tbody></table></div>
+        <div class="footer-fields">
+          <div><label>Бэлэн мөнгө</label><input type="number" id="cashAmount" min="0" step="0.01" value="0"></div>
+          <div><label>ПОС дугаар</label><input type="text" id="posNumber" placeholder="ПОС дугаар"></div>
+          <div><label>Картын нэгтгэл</label><input type="number" id="cardTotal" min="0" step="0.01" value="0"></div>
+          <div><label>Бэлэн мөнгөний үлдэгдэл</label><input type="number" id="cashBalance" min="0" step="0.01" value="0"></div>
+        </div>
+        <div style="margin-top:24px;text-align:center">
+          <button class="btn btn-success" onclick="saveSubmission()">Хадгалах / Илгээх</button>
+          <button class="btn btn-secondary" onclick="resetForm()">Цэвэрлэх</button>
+        </div>
+        <div id="empAlert"></div>
+      </div>
+      <div id="supervisorView" class="hidden">
+        <h2>Ахлахын хяналт &amp; тооцоо</h2>
+        <div class="tabs">
+          <button class="tab-btn active" id="tabBtnOverview" onclick="showTab('overview')">Нийт тооцоо</button>
+          <button class="tab-btn" id="tabBtnSubs" onclick="showTab('submissions')">Ажилчдын илгээлт</button>
+          <button class="btn btn-secondary" style="margin-left:auto" onclick="loadSupervisorData()">🔄 Шинэчлэх</button>
+        </div>
+        <div id="tabOverview">
+          <div class="summary-box"><h3>Нийт борлуулалтын тойм</h3><div class="summary-grid" id="overallSummary"></div></div>
+          <div style="overflow-x:auto"><table><thead><tr><th>№</th><th>Барааны нэр</th><th>Нийт борлуулсан тоо</th><th>Нийт орлого</th></tr></thead><tbody id="productTotalsBody"></tbody></table></div>
+        </div>
+        <div id="tabSubmissions" class="hidden">
+          <div class="submissions-list" id="submissionsList"></div>
+          <div id="selectedSubmissionDetail" class="hidden"><h3 style="margin-top:20px">Сонгосон илгээлтийн дэлгэрэнгүй</h3><div id="detailContent"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const PRODUCTS=[{id:1,name:"Боргио"},{id:2,name:"Нийлэл"},{id:3,name:"Cass"},{id:4,name:"Asahi"},{id:5,name:"Калтенберг"},{id:6,name:"Алтангөвь"},{id:7,name:"Gem"},{id:8,name:"ЕРӨӨ говь Задгай"},{id:9,name:"Krush"},{id:10,name:"Tsingtao"},{id:11,name:"Heineken"},{id:12,name:"terra"},{id:14,name:"Сангур laaz"}];
+const USERS={emp001:{name:"Бат-Эрдэнэ",role:"employee"},emp002:{name:"Сарантуяа",role:"employee"},emp003:{name:"Мөнхбаатар",role:"employee"},sup001:{name:"Ахлах менежер",role:"supervisor"}};
+let currentUser=null,_sortedSubs=[];
+function getSubs(){return JSON.parse(localStorage.getItem("submissions")||"[]")}
+function setSubs(a){localStorage.setItem("submissions",JSON.stringify(a))}
+function showAlert(id,msg,type){const el=document.getElementById(id);if(!el)return;el.innerHTML=`<div class="alert alert-${type}">${msg}</div>`;if(type==="success")setTimeout(()=>{el.innerHTML=""},4000)}
+function init(){const s=localStorage.getItem("lastLoginId");if(s)document.getElementById("loginId").value=s;document.getElementById("formDate").valueAsDate=new Date();document.getElementById("loginId").addEventListener("keyup",e=>{if(e.key==="Enter")doLogin()})}
+function doLogin(){const id=document.getElementById("loginId").value.trim().toLowerCase();if(!USERS[id]){showAlert("loginAlert","Буруу ID. Жишээ: emp001 эсвэл sup001","error");return}currentUser={id,...USERS[id]};localStorage.setItem("lastLoginId",id);showApp()}
+function doLogout(){currentUser=null;document.getElementById("loginSection").classList.remove("hidden");document.getElementById("appSection").classList.add("hidden");document.getElementById("loginId").value=localStorage.getItem("lastLoginId")||"";document.getElementById("loginAlert").innerHTML=""}
+function showApp(){document.getElementById("loginSection").classList.add("hidden");document.getElementById("appSection").classList.remove("hidden");document.getElementById("userNameDisplay").textContent=currentUser.name+" ("+currentUser.id+")";const badge=document.getElementById("roleBadge");if(currentUser.role==="employee"){badge.textContent="Ажилтан";badge.className="role-badge role-emp";document.getElementById("employeeView").classList.remove("hidden");document.getElementById("supervisorView").classList.add("hidden");document.getElementById("empName").value=currentUser.name;buildSalesTable()}else{badge.textContent="Ахлах";badge.className="role-badge role-sup";document.getElementById("employeeView").classList.add("hidden");document.getElementById("supervisorView").classList.remove("hidden");loadSupervisorData()}}
+function buildSalesTable(){const tbody=document.getElementById("salesBody");tbody.innerHTML="";PRODUCTS.forEach(p=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${p.id}</td><td class="product-name">${p.name}</td><td><input type="number" min="0" id="prev_${p.id}" value="0" oninput="calcRow(${p.id})"></td><td><input type="number" min="0" id="next_${p.id}" value="0" oninput="calcRow(${p.id})"></td><td><input type="number" min="0" id="sold_${p.id}" value="0"></td><td><input type="number" min="0" step="0.01" id="income_${p.id}" value="0"></td>`;tbody.appendChild(tr)})}
+function calcRow(id){const prev=Number(document.getElementById("prev_"+id).value)||0;const next=Number(document.getElementById("next_"+id).value)||0;if(document.activeElement&&document.activeElement.id!=="sold_"+id){if(prev>0||next>0)document.getElementById("sold_"+id).value=Math.max(0,prev-next)}}
+function getFormData(){const items=PRODUCTS.map(p=>({id:p.id,name:p.name,prev:Number(document.getElementById("prev_"+p.id).value)||0,next:Number(document.getElementById("next_"+p.id).value)||0,sold:Number(document.getElementById("sold_"+p.id).value)||0,income:Number(document.getElementById("income_"+p.id).value)||0}));return{date:document.getElementById("formDate").value,shift:document.getElementById("shiftType").value,employeeId:currentUser.id,employeeName:currentUser.name,checkerName:document.getElementById("checkerName").value,receiverName:document.getElementById("receiverName").value,items,cashAmount:Number(document.getElementById("cashAmount").value)||0,posNumber:document.getElementById("posNumber").value,cardTotal:Number(document.getElementById("cardTotal").value)||0,cashBalance:Number(document.getElementById("cashBalance").value)||0,submittedAt:new Date().toISOString()}}
+function saveSubmission(){const data=getFormData();if(!data.date){showAlert("empAlert","Огноо сонгоно уу!","error");return}let all=getSubs();all=all.filter(s=>!(s.employeeId===data.employeeId&&s.date===data.date&&s.shift===data.shift));all.push(data);setSubs(all);showAlert("empAlert","Амжилттай хадгаллаа!","success")}
+function resetForm(){PRODUCTS.forEach(p=>{document.getElementById("prev_"+p.id).value=0;document.getElementById("next_"+p.id).value=0;document.getElementById("sold_"+p.id).value=0;document.getElementById("income_"+p.id).value=0});["checkerName","receiverName","posNumber"].forEach(id=>document.getElementById(id).value="");["cashAmount","cardTotal","cashBalance"].forEach(id=>document.getElementById(id).value=0);document.getElementById("empAlert").innerHTML=""}
+function showTab(name){document.getElementById("tabOverview").classList.toggle("hidden",name!=="overview");document.getElementById("tabSubmissions").classList.toggle("hidden",name!=="submissions");document.getElementById("tabBtnOverview").classList.toggle("active",name==="overview");document.getElementById("tabBtnSubs").classList.toggle("active",name==="submissions")}
+function loadSupervisorData(){const all=getSubs();renderOverview(all);renderSubmissionsList(all)}
+function renderOverview(all){let totalSold=0,totalIncome=0;const empSet=new Set();all.forEach(s=>{empSet.add(s.employeeId);s.items.forEach(it=>{totalSold+=it.sold||0;totalIncome+=it.income||0})});document.getElementById("overallSummary").innerHTML=`<div class="summary-item"><div class="label">Илгээлтийн тоо</div><div class="value">${all.length}</div></div><div class="summary-item"><div class="label">Ажилчдын тоо</div><div class="value">${empSet.size}</div></div><div class="summary-item"><div class="label">Нийт борлуулсан</div><div class="value">${totalSold}</div></div><div class="summary-item"><div class="label">Нийт орлого</div><div class="value">${totalIncome.toLocaleString()} ₮</div></div>`;const totals={};PRODUCTS.forEach(p=>totals[p.id]={name:p.name,sold:0,income:0});all.forEach(s=>s.items.forEach(it=>{if(totals[it.id]){totals[it.id].sold+=it.sold||0;totals[it.id].income+=it.income||0}}));const tbody=document.getElementById("productTotalsBody");tbody.innerHTML="";let ts=0,ti=0;PRODUCTS.forEach(p=>{const t=totals[p.id];ts+=t.sold;ti+=t.income;const tr=document.createElement("tr");tr.innerHTML=`<td>${p.id}</td><td class="product-name">${t.name}</td><td>${t.sold}</td><td>${t.income.toLocaleString()} ₮</td>`;tbody.appendChild(tr)});const trT=document.createElement("tr");trT.style.fontWeight="700";trT.style.background="#e8f0fe";trT.innerHTML=`<td colspan="2"><strong>НИЙТ</strong></td><td><strong>${ts}</strong></td><td><strong>${ti.toLocaleString()} ₮</strong></td>`;tbody.appendChild(trT)}
+function renderSubmissionsList(all){const list=document.getElementById("submissionsList");if(!all.length){list.innerHTML=`<div class="alert alert-info">Одоогоор илгээлт байхгүй. Ажилчид бөглөсөн өгөгдлийг <strong>Экспорт</strong> хийж, энд <strong>Импорт</strong> хийнэ үү.</div>`;document.getElementById("selectedSubmissionDetail").classList.add("hidden");return}all=all.slice().sort((a,b)=>new Date(b.submittedAt)-new Date(a.submittedAt));_sortedSubs=all;list.innerHTML=all.map((s,idx)=>`<div class="sub-item" onclick="showSubmissionDetail(${idx})"><strong>${s.employeeName}</strong> (${s.employeeId}) — ${s.date} (${s.shift||"—"})<br><small>Илгээсэн: ${new Date(s.submittedAt).toLocaleString("mn-MN")} | Борлуулсан: ${s.items.reduce((a,i)=>a+(i.sold||0),0)} ширхэг</small></div>`).join("")}
+function showSubmissionDetail(idx){const s=_sortedSubs[idx];if(!s)return;document.getElementById("selectedSubmissionDetail").classList.remove("hidden");const itemsHtml=s.items.map(it=>`<tr><td>${it.id}</td><td class="product-name">${it.name}</td><td>${it.prev}</td><td>${it.next}</td><td>${it.sold}</td><td>${(it.income||0).toLocaleString()} ₮</td></tr>`).join("");document.getElementById("detailContent").innerHTML=`<div class="summary-box"><p><strong>Ажилтан:</strong> ${s.employeeName} (${s.employeeId})</p><p><strong>Огноо:</strong> ${s.date} | <strong>Ээлж:</strong> ${s.shift||"—"}</p><p><strong>Шалгасан:</strong> ${s.checkerName||"—"} | <strong>Хүлээн авсан:</strong> ${s.receiverName||"—"}</p><p><strong>Бэлэн мөнгө:</strong> ${(s.cashAmount||0).toLocaleString()} ₮ | <strong>ПОС:</strong> ${s.posNumber||"—"} | <strong>Карт:</strong> ${(s.cardTotal||0).toLocaleString()} ₮ | <strong>Үлдэгдэл:</strong> ${(s.cashBalance||0).toLocaleString()} ₮</p></div><table><thead><tr><th>№</th><th>Бараа</th><th>Өмнөх</th><th>Дараах</th><th>Борлуулсан</th><th>Орлого</th></tr></thead><tbody>${itemsHtml}</tbody></table>`}
+function exportData(){const data={exportedAt:new Date().toISOString(),submissions:getSubs()};const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="borluulalt-"+new Date().toISOString().slice(0,10)+".json";a.click();URL.revokeObjectURL(a.href)}
+function importData(ev){const file=ev.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const data=JSON.parse(reader.result);const incoming=data.submissions||data;if(!Array.isArray(incoming))throw new Error("Буруу формат");let all=getSubs();incoming.forEach(inc=>{all=all.filter(s=>!(s.employeeId===inc.employeeId&&s.date===inc.date&&(s.shift||"")===(inc.shift||"")));all.push(inc)});setSubs(all);if(currentUser&&currentUser.role==="supervisor")loadSupervisorData();alert("Импорт амжилттай! "+incoming.length+" илгээлт нэмэгдлээ.")}catch(e){alert("Импорт амжилтгүй: "+e.message)}};reader.readAsText(file);ev.target.value=""}
+init();
+</script>
+</body>
+</html>
