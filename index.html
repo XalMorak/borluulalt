@@ -18,7 +18,6 @@
   <br>
   <button class="btn" onclick="doLogin()">Нэвтрэх</button>
   <div id="loginAlert"></div>
-  <div id="loginHint" style="margin-top:18px;text-align:left;font-size:.8rem;color:#555;background:#f8f9fa;padding:12px;border-radius:8px"></div>
 </div>
 <div id="appSection" class="hidden">
 <div class="card">
@@ -26,6 +25,7 @@
     <div><strong id="userNameDisplay"></strong><span id="syncBadge" class="sync-badge off"></span><span id="roleBadge" class="role-badge"></span></div>
     <div>
       <button class="btn btn-outline btn-sm" onclick="exportCSV()">Excel</button>
+      <button class="btn btn-outline btn-sm" onclick="refreshData()">Мэдээлэл шинэчлэх</button>
       <button class="btn btn-secondary btn-sm" onclick="doLogout()">Гарах</button>
     </div>
   </div>
@@ -70,13 +70,12 @@
   </div>
   <div id="supervisorView" class="hidden">
     <div class="tabs no-print">
-      <button class="tab-btn active" id="tabBtnOverview" onclick="showTab('overview')">Ерөнхий</button>
+      <button class="tab-btn active" id="tabBtnOverview" onclick="showTab('overview')">Тойм</button>
       <button class="tab-btn" id="tabBtnSubs" onclick="showTab('submissions')">Илгээлт</button>
       <button class="tab-btn" id="tabBtnReports" onclick="showTab('reports')">Тайлан</button>
       <button class="tab-btn" id="tabBtnStock" onclick="showTab('stock')">Нөөц</button>
       <button class="tab-btn" id="tabBtnPrices" onclick="showTab('prices')">Үнэ</button>
       <button class="tab-btn" id="tabBtnUsers" onclick="showTab('users')">Хэрэглэгч</button>
-      <button class="tab-btn" id="tabBtnLog" onclick="showTab('log')">Түүх</button>
     </div>
     <div id="tabOverview"><div id="overallSummary" class="summary-box"></div><div id="lowStockWarn"></div>
       <table><thead><tr><th>#</th><th>Бараа</th><th>Үнэ</th><th>Нөөц</th><th>Зарсан</th><th>Орлого</th></tr></thead><tbody id="productTotalsBody"></tbody></table>
@@ -108,7 +107,6 @@
       <button class="btn btn-success btn-sm" onclick="addUser()">Нэмэх</button></div>
       <div id="userAlert"></div><table><thead><tr><th>ID</th><th>Нэр</th><th>Эрх</th><th>PIN</th><th></th></tr></thead><tbody id="usersBody"></tbody></table>
     </div>
-    <div id="tabLog" class="hidden"><table><thead><tr><th>Цаг</th><th>Хэн</th><th>Үйлдэл</th><th>Дэлгэрэнгүй</th></tr></thead><tbody id="logBody"></tbody></table></div>
   </div>
 </div>
 </div>
@@ -162,6 +160,16 @@ function onLocationChange(){var loc=document.getElementById("locationName").valu
   wrapIncome();wrapRecon();
   setInterval(function(){wrapIncome();wrapRecon();},500);
 })();
+async function refreshData(){
+  try{
+    if(typeof updateSyncBadge==="function")updateSyncBadge("busy");
+    if(typeof cloudPull==="function")await cloudPull();
+    if(currentUser&&currentUser.role==="supervisor"&&typeof loadSupervisorData==="function")loadSupervisorData();
+    else if(currentUser&&currentUser.role==="employee"&&typeof buildSalesTable==="function"&&!window._formDirty)buildSalesTable();
+    if(typeof updateSyncBadge==="function")updateSyncBadge("ok");
+    alert("Мэдээлэл шинэчлэгдлээ");
+  }catch(e){alert("Шинэчлэхэд алдаа: "+e.message);}
+}
 </script>
 </body>
 </html>
