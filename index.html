@@ -94,49 +94,8 @@
 </div>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/XalMorak/borluulalt@334538d29bad03cec332cdd7ce7433d03d9d01e1/app.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/XalMorak/borluulalt@731d31526d7d0cb70503d57a61a6eab8e95d08c8/app.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/XalMorak/borluulalt@334538d29bad03cec332cdd7ce7433d03d9d01e1/app2.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/XalMorak/borluulalt@aed0be8af697d9a7bb5a94731202d7bc08b98b6e/app3.js"></script>
-<script>
-(function(){
-  window._formDirty=false;
-  var highest=setInterval(function(){},99999);
-  for(var i=1;i<=highest;i++)clearInterval(i);
-  setInterval(async function(){
-    if(typeof currentUser==='undefined'||!currentUser)return;
-    if(typeof cloudPull==='function')await cloudPull();
-    if(currentUser.role==='supervisor'&&typeof loadSupervisorData==='function')loadSupervisorData();
-  },45000);
-  window.buildSalesTable=function(){
-    var tbody=document.getElementById('salesBody');
-    if(!tbody)return;
-    var products=(typeof getActiveProducts==='function')?getActiveProducts():[];
-    var saved={};
-    products.forEach(function(p){
-      var a=document.getElementById('prev_'+p.id),b=document.getElementById('next_'+p.id);
-      var c=document.getElementById('sold_'+p.id),d=document.getElementById('income_'+p.id);
-      if(a||b||c||d)saved[p.id]={prev:a?a.value:'0',next:b?b.value:'0',sold:c?c.value:'0',income:d?d.value:'0'};
-    });
-    var isEmp=currentUser&&currentUser.role==='employee';
-    var thead=document.querySelector('#employeeView table thead tr');
-    if(thead)thead.innerHTML=isEmp?'<th>#</th><th>Бараа</th><th>Үнэ</th><th>Өмнөх</th><th>Дараах</th><th>Зарсан</th><th>Орлого</th>':'<th>#</th><th>Бараа</th><th>Үнэ</th><th>Нөөц</th><th>Өмнөх</th><th>Дараах</th><th>Зарсан</th><th>Орлого</th>';
-    tbody.innerHTML='';
-    var LOW=(typeof LOW_STOCK!=='undefined')?LOW_STOCK:10;
-    products.forEach(function(p){
-      var sc=(p.stock||0)<=LOW?'stock-low':'stock-ok';
-      var sv=saved[p.id]||{prev:'0',next:'0',sold:'0',income:'0'};
-      var stockTd=isEmp?'':'<td class="'+sc+'">'+(p.stock||0)+'</td>';
-      tbody.innerHTML+='<tr><td>'+p.id+'</td><td class="product-name">'+p.name+'</td><td class="price-col">'+(p.price||0).toLocaleString()+'</td>'+stockTd+
-        '<td><input type="number" min="0" id="prev_'+p.id+'" value="'+sv.prev+'" oninput="window._formDirty=true;calcRow('+p.id+')"></td>'+
-        '<td><input type="number" min="0" id="next_'+p.id+'" value="'+sv.next+'" oninput="window._formDirty=true;calcRow('+p.id+')"></td>'+
-        '<td><input type="number" min="0" id="sold_'+p.id+'" value="'+sv.sold+'" oninput="window._formDirty=true;calcIncome('+p.id+')"></td>'+
-        '<td><input type="number" min="0" id="income_'+p.id+'" value="'+sv.income+'" oninput="window._formDirty=true;updateRecon()"></td></tr>';
-    });
-  };
-  var _origSave=window.saveSubmission;
-  if(_origSave){window.saveSubmission=function(){window._formDirty=false;return _origSave.apply(this,arguments);};}
-  console.log('[patch] applied');
-})();
-</script>
 </body>
 </html>
