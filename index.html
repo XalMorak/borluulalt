@@ -105,8 +105,32 @@
   </div>
 </div>
 </div>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getDatabase, ref, set, onValue, get, child } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCj0zqo31QoCw2ggpOl2Aewu8u95azL6jQ",
+    authDomain: "borluulalt-f9d70.firebaseapp.com",
+    databaseURL: "https://borluulalt-f9d70-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "borluulalt-f9d70",
+    storageBucket: "borluulalt-f9d70.firebasestorage.app",
+    messagingSenderId: "855180069212",
+    appId: "1:855180069212:web:851496c0ded1b428121999"
+  };
+
+  // Firebase-г эхлүүлэх
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // app.js файлууддаа ашиглахын тулд глобал хувьсагч болгож байна
+  window.db = db;
+  window.ref = ref;
+  window.set = set;
+  window.onValue = onValue;
+  window.get = get;
+  window.child = child;
+</script>
 <script src="app.js"></script>
 <script src="app2.js"></script>
 <script src="app3.js"></script>
