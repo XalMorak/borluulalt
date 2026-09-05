@@ -5,69 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>Ажилтны борлуулалтын хуудас</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,sans-serif;background:linear-gradient(135deg,#1a1a2e,#0f3460);min-height:100vh;color:#333;padding:10px}
-.container{max-width:1100px;margin:0 auto}
-.card{background:#fff;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.25);padding:16px;margin-bottom:12px}
-h1{font-size:1.3rem;text-align:center;color:#1a1a2e;margin-bottom:10px}
-.login-box{max-width:380px;margin:40px auto;text-align:center}
-.login-box input{width:100%;padding:12px;font-size:1rem;border:2px solid #ddd;border-radius:8px;margin:6px 0;text-align:center}
-.btn{background:#0f3460;color:#fff;border:none;padding:10px 18px;font-size:.95rem;border-radius:8px;cursor:pointer;margin:3px}
-.btn:hover{background:#16213e}.btn-success{background:#27ae60}.btn-secondary{background:#7f8c8d}
-.btn-outline{background:#fff;color:#0f3460;border:2px solid #0f3460}.btn-sm{padding:5px 10px;font-size:.8rem}
-.header-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:12px;font-size:.9rem}
-.header-info label{font-weight:600;color:#555;display:block;font-size:.8rem}
-.header-info input,.header-info select{width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;margin-top:2px}
-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.82rem}
-th,td{border:1px solid #ddd;padding:5px 3px;text-align:center}
-th{background:#0f3460;color:#fff}
-tr:nth-child(even){background:#f8f9fa}
-input[type=number]{width:64px;padding:5px;border:1px solid #ccc;border-radius:4px;text-align:center;font-size:16px}
-.product-name{text-align:left!important;padding-left:6px!important}
-.price-col{font-weight:600}
-.footer-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.footer-fields label{font-weight:600;display:block;margin-bottom:2px;color:#555;font-size:.8rem}
-.footer-fields input{width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;font-size:16px}
-.role-badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.72rem;font-weight:600;margin-left:4px}
-.role-emp{background:#3498db;color:#fff}.role-sup{background:#e74c3c;color:#fff}
-.user-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px}
-.summary-box{background:#f0f7ff;border-left:4px solid #0f3460;border-radius:8px;padding:12px;margin-top:12px}
-.summary-item{display:inline-block;margin:4px 10px 4px 0}
-.summary-item .label{font-size:.72rem;color:#666}.summary-item .value{font-size:1.05rem;font-weight:700}
-.alert{padding:8px 12px;border-radius:8px;margin:8px 0;font-size:.88rem}
-.alert-success{background:#d4edda;color:#155724}.alert-error{background:#f8d7da;color:#721c24}
-.alert-info{background:#d1ecf1;color:#0c5460}.alert-warn{background:#fff3cd;color:#856404}
-.hidden{display:none!important}
-.tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
-.tab-btn{padding:7px 10px;font-size:.78rem;border:1px solid #ccc;background:#f5f5f5;border-radius:8px;cursor:pointer}
-.tab-btn.active{background:#0f3460;color:#fff;border-color:#0f3460}
-.sub-item{padding:10px;border:1px solid #eee;border-radius:8px;margin:5px 0;cursor:pointer}
-.sub-item:hover{background:#f8f9fa}
-.recon-box{background:#f8fbff;border:2px solid #0f3460;border-radius:10px;padding:12px;margin-top:12px}
-.recon-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
-.recon-item{background:#fff;padding:8px;border-radius:8px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.recon-item .label{font-size:.72rem;color:#666}.recon-item .value{font-size:1.05rem;font-weight:700}
-.diff-ok{color:#27ae60}.diff-over{color:#2980b9}.diff-short{color:#c0392b}
-.sync-badge{font-size:.72rem;padding:2px 7px;border-radius:10px;margin-left:4px}
-.sync-badge.ok{background:#d4edda;color:#155724}.sync-badge.err{background:#f8d7da;color:#721c24}
-.sync-badge.busy{background:#fff3cd;color:#856404}.sync-badge.off{background:#eee;color:#666}
-.stock-low{color:#c0392b;font-weight:700}.stock-ok{color:#27ae60}
-.sticky-header{position:sticky;top:0;background:#fff;z-index:20;padding-bottom:8px;border-bottom:1px solid #eee}
-.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;max-height:55vh;overflow-y:auto}
-@media(max-width:600px){body{padding:6px}.card{padding:12px}.footer-fields{grid-template-columns:1fr}table{font-size:.72rem}input[type=number]{width:52px}}
-@media print{body{background:#fff;padding:0}.user-bar,.tabs,.btn,.no-print,#loginSection{display:none!important}.card{box-shadow:none}}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e 50%,#0f3460);min-height:100vh;color:#333;padding:12px}.container{max-width:1100px;margin:0 auto}.card{background:#fff;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.3);padding:20px;margin-bottom:16px}h1{font-size:1.4rem;text-align:center;color:#1a1a2e}.login-box{max-width:400px;margin:48px auto;text-align:center}.login-box input{width:100%;padding:12px;font-size:1.05rem;border:2px solid #ddd;border-radius:8px;margin:8px 0;text-align:center}.btn{background:#0f3460;color:#fff;border:none;padding:10px 20px;font-size:.95rem;border-radius:8px;cursor:pointer;margin:4px}.btn:hover{background:#16213e}.btn-success{background:#27ae60}.btn-secondary{background:#7f8c8d}.btn-outline{background:#fff;color:#0f3460;border:2px solid #0f3460}.btn-sm{padding:5px 12px;font-size:.8rem}.header-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px;font-size:.9rem}.header-info label{font-weight:600;color:#555;display:block}.header-info input,.header-info select{width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;margin-top:3px}table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.85rem}th,td{border:1px solid #ddd;padding:6px 4px;text-align:center}th{background:#0f3460;color:#fff}tr:nth-child(even){background:#f8f9fa}input[type=number]{width:72px;padding:5px;border:1px solid #ccc;border-radius:4px;text-align:center;font-size:16px}.footer-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.footer-fields label{font-weight:600;display:block;margin-bottom:3px;color:#555;font-size:.85rem}.footer-fields input{width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;font-size:16px}.role-badge{display:inline-block;padding:3px 10px;border-radius:16px;font-size:.75rem;font-weight:600;margin-left:6px}.role-emp{background:#3498db;color:#fff}.role-sup{background:#e74c3c;color:#fff}.user-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}.summary-box{background:#f0f7ff;border-left:5px solid #0f3460;border-radius:10px;padding:14px;margin-top:16px}.summary-item{display:inline-block;margin:6px 12px 6px 0}.summary-item .label{font-size:.75rem;color:#666}.summary-item .value{font-size:1.15rem;font-weight:700}.alert{padding:10px 14px;border-radius:8px;margin:10px 0;font-size:.9rem}.alert-success{background:#d4edda;color:#155724}.alert-error{background:#f8d7da;color:#721c24}.alert-info{background:#d1ecf1;color:#0c5460}.alert-warn{background:#fff3cd;color:#856404}.hidden{display:none!important}.tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px}.tab-btn{padding:8px 12px;font-size:.8rem;border:1px solid #ccc;background:#f5f5f5;border-radius:8px;cursor:pointer}.tab-btn.active{background:#0f3460;color:#fff;border-color:#0f3460}.sub-item{padding:10px;border:1px solid #eee;border-radius:8px;margin:6px 0;cursor:pointer}.sub-item:hover{background:#f8f9fa}.product-name{text-align:left!important;padding-left:8px!important}.price-col{font-weight:600}.stock-low{color:#c0392b;font-weight:700}.stock-ok{color:#27ae60}.recon-box{background:#f8fbff;border:2px solid #0f3460;border-radius:10px;padding:14px;margin-top:16px}.recon-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}.recon-item{background:#fff;padding:10px;border-radius:8px;text-align:center}.recon-item .label{font-size:.75rem;color:#666}.recon-item .value{font-size:1.1rem;font-weight:700}.diff-ok{color:#27ae60}.diff-over{color:#2980b9}.diff-short{color:#c0392b}.sync-badge{font-size:.75rem;padding:3px 8px;border-radius:12px;margin-left:6px}.sync-badge.ok{background:#d4edda;color:#155724}.sync-badge.err{background:#f8d7da;color:#721c24}.sync-badge.busy{background:#fff3cd;color:#856404}.sync-badge.off{background:#eee;color:#666}@media(max-width:600px){body{padding:8px}.card{padding:14px}.footer-fields{grid-template-columns:1fr}table{font-size:.75rem}input[type=number]{width:56px}}
 </style>
 </head>
 <body>
 <div class="container">
 <div id="loginSection" class="card login-box">
   <h1>🍺 Ажилтны борлуулалтын хуудас</h1>
-  <p style="color:#666;margin:8px 0 12px;font-size:.88rem">ID-аар нэвтэрнэ (PIN байвал оруулна)</p>
+  <p style="color:#666;margin:10px 0 16px;font-size:.9rem">ID-аар нэвтэрнэ (PIN байвал оруулна)</p>
   <input type="text" id="loginId" placeholder="ID" autofocus>
   <input type="password" id="loginPin" placeholder="PIN (байвал)" inputmode="numeric">
   <br><button class="btn" onclick="doLogin()">Нэвтрэх</button>
   <div id="loginAlert"></div>
-  <div id="loginHint" style="margin-top:14px;text-align:left;font-size:.78rem;color:#555;background:#f8f9fa;padding:10px;border-radius:8px"></div>
+  <div id="loginHint" style="margin-top:18px;text-align:left;font-size:.8rem;color:#555;background:#f8f9fa;padding:12px;border-radius:8px"></div>
 </div>
 <div id="appSection" class="hidden">
 <div class="card">
@@ -80,7 +30,7 @@ input[type=number]{width:64px;padding:5px;border:1px solid #ccc;border-radius:4p
     </div>
   </div>
   <div id="employeeView" class="hidden">
-    <div class="sticky-header header-info">
+    <div class="header-info">
       <div><label>Огноо</label><input type="date" id="formDate"></div>
       <div><label>Ажилтан</label><input type="text" id="empName" readonly></div>
       <div><label>Байршил</label>
@@ -94,16 +44,11 @@ input[type=number]{width:64px;padding:5px;border:1px solid #ccc;border-radius:4p
       <div><label>Шалгагч</label><input type="text" id="checkerName"></div>
       <div><label>Хүлээн авагч</label><input type="text" id="receiverName"></div>
     </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr id="salesHead"></tr></thead>
-        <tbody id="salesBody"></tbody>
-      </table>
-    </div>
+    <table><thead><tr><th>#</th><th>Бараа</th><th>Үнэ</th><th>Өмнөх</th><th>Дараах</th><th>Зарсан</th><th>Орлого</th></tr></thead><tbody id="salesBody"></tbody></table>
     <div class="footer-fields">
-      <div><label>Бэлэн мөнгө</label><input type="number" id="cashAmount" value="0" oninput="markDirty();updateRecon()"></div>
+      <div><label>Бэлэн мөнгө</label><input type="number" id="cashAmount" value="0" oninput="updateRecon()"></div>
       <div><label>POS дугаар</label><input type="text" id="posNumber"></div>
-      <div><label>Карт нийт</label><input type="number" id="cardTotal" value="0" oninput="markDirty();updateRecon()"></div>
+      <div><label>Карт нийт</label><input type="number" id="cardTotal" value="0" oninput="updateRecon()"></div>
       <div><label>Мөнгөний үлдэгдэл</label><input type="number" id="cashBalance" value="0"></div>
     </div>
     <div class="recon-box"><div class="recon-grid">
@@ -112,7 +57,7 @@ input[type=number]{width:64px;padding:5px;border:1px solid #ccc;border-radius:4p
       <div class="recon-item"><div class="label">Зөрүү</div><div class="value" id="reconDiff">0</div></div>
       <div class="recon-item"><div class="label">Төлөв</div><div class="value" id="reconStatus">—</div></div>
     </div></div>
-    <div style="margin-top:12px;text-align:center" class="no-print">
+    <div style="margin-top:14px;text-align:center" class="no-print">
       <button class="btn btn-success" onclick="saveSubmission()">Хадгалах</button>
       <button class="btn btn-secondary" onclick="resetForm()">Цэвэрлэх</button>
       <button class="btn btn-outline" onclick="window.print()">Хэвлэх</button>
@@ -132,36 +77,66 @@ input[type=number]{width:64px;padding:5px;border:1px solid #ccc;border-radius:4p
     </div>
     <div id="tabSubmissions" class="hidden"><div id="submissionsList"></div><div id="selectedSubmissionDetail" class="hidden"></div></div>
     <div id="tabStock" class="hidden">
-      <div class="header-info">
-        <div><label>Нэр</label><input id="newProdName"></div>
-        <div><label>Үнэ</label><input type="number" id="newProdPrice" value="0"></div>
-        <div><label>Нөөц</label><input type="number" id="newProdStock" value="0"></div>
-        <button class="btn btn-success btn-sm" onclick="addProduct()">Нэмэх</button>
-      </div>
-      <div id="stockAlert"></div>
-      <table><thead><tr><th>#</th><th>Нэр</th><th>Үнэ</th><th>Нөөц</th><th></th></tr></thead><tbody id="stockBody"></tbody></table>
+      <div class="header-info"><div><label>Нэр</label><input id="newProdName"></div><div><label>Үнэ</label><input type="number" id="newProdPrice" value="0"></div><div><label>Нөөц</label><input type="number" id="newProdStock" value="0"></div>
+      <button class="btn btn-success btn-sm" onclick="addProduct()">Нэмэх</button></div>
+      <div id="stockAlert"></div><table><thead><tr><th>#</th><th>Нэр</th><th>Үнэ</th><th>Нөөц</th><th></th></tr></thead><tbody id="stockBody"></tbody></table>
     </div>
-    <div id="tabPrices" class="hidden">
-      <div id="priceAlert"></div>
-      <table><thead><tr><th>#</th><th>Бараа</th><th>Үнэ</th></tr></thead><tbody id="pricesBody"></tbody></table>
-      <button class="btn btn-success btn-sm" onclick="savePrices()">Хадгалах</button>
-    </div>
+    <div id="tabPrices" class="hidden"><div id="priceAlert"></div><table><thead><tr><th>#</th><th>Бараа</th><th>Үнэ</th></tr></thead><tbody id="pricesBody"></tbody></table>
+      <button class="btn btn-success btn-sm" onclick="savePrices()">Хадгалах</button></div>
     <div id="tabUsers" class="hidden">
-      <div class="header-info">
-        <div><label>ID</label><input id="newUserId"></div>
-        <div><label>Нэр</label><input id="newUserName"></div>
-        <div><label>Эрх</label><select id="newUserRole"><option value="employee">Ажилтан</option><option value="supervisor">Ахлах</option></select></div>
-        <button class="btn btn-success btn-sm" onclick="addUser()">Нэмэх</button>
-      </div>
-      <div id="userAlert"></div>
-      <table><thead><tr><th>ID</th><th>Нэр</th><th>Эрх</th><th>PIN</th><th></th></tr></thead><tbody id="usersBody"></tbody></table>
+      <div class="header-info"><div><label>ID</label><input id="newUserId"></div><div><label>Нэр</label><input id="newUserName"></div>
+      <div><label>Эрх</label><select id="newUserRole"><option value="employee">Ажилтан</option><option value="supervisor">Ахлах</option></select></div>
+      <button class="btn btn-success btn-sm" onclick="addUser()">Нэмэх</button></div>
+      <div id="userAlert"></div><table><thead><tr><th>ID</th><th>Нэр</th><th>Эрх</th><th>PIN</th><th></th></tr></thead><tbody id="usersBody"></tbody></table>
     </div>
   </div>
 </div>
 </div>
-</div>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
-<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/XalMorak/borluulalt@334538d29bad03cec332cdd7ce7433d03d9d01e1/app.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/XalMorak/borluulalt@334538d29bad03cec332cdd7ce7433d03d9d01e1/app2.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/XalMorak/borluulalt@aed0be8af697d9a7bb5a94731202d7bc08b98b6e/app3.js"></script>
+<script>
+(function(){
+  window._formDirty=false;
+  var highest=setInterval(function(){},99999);
+  for(var i=1;i<=highest;i++)clearInterval(i);
+  setInterval(async function(){
+    if(typeof currentUser==='undefined'||!currentUser)return;
+    if(typeof cloudPull==='function')await cloudPull();
+    if(currentUser.role==='supervisor'&&typeof loadSupervisorData==='function')loadSupervisorData();
+  },45000);
+  window.buildSalesTable=function(){
+    var tbody=document.getElementById('salesBody');
+    if(!tbody)return;
+    var products=(typeof getActiveProducts==='function')?getActiveProducts():[];
+    var saved={};
+    products.forEach(function(p){
+      var a=document.getElementById('prev_'+p.id),b=document.getElementById('next_'+p.id);
+      var c=document.getElementById('sold_'+p.id),d=document.getElementById('income_'+p.id);
+      if(a||b||c||d)saved[p.id]={prev:a?a.value:'0',next:b?b.value:'0',sold:c?c.value:'0',income:d?d.value:'0'};
+    });
+    var isEmp=currentUser&&currentUser.role==='employee';
+    var thead=document.querySelector('#employeeView table thead tr');
+    if(thead)thead.innerHTML=isEmp?'<th>#</th><th>Бараа</th><th>Үнэ</th><th>Өмнөх</th><th>Дараах</th><th>Зарсан</th><th>Орлого</th>':'<th>#</th><th>Бараа</th><th>Үнэ</th><th>Нөөц</th><th>Өмнөх</th><th>Дараах</th><th>Зарсан</th><th>Орлого</th>';
+    tbody.innerHTML='';
+    var LOW=(typeof LOW_STOCK!=='undefined')?LOW_STOCK:10;
+    products.forEach(function(p){
+      var sc=(p.stock||0)<=LOW?'stock-low':'stock-ok';
+      var sv=saved[p.id]||{prev:'0',next:'0',sold:'0',income:'0'};
+      var stockTd=isEmp?'':'<td class="'+sc+'">'+(p.stock||0)+'</td>';
+      tbody.innerHTML+='<tr><td>'+p.id+'</td><td class="product-name">'+p.name+'</td><td class="price-col">'+(p.price||0).toLocaleString()+'</td>'+stockTd+
+        '<td><input type="number" min="0" id="prev_'+p.id+'" value="'+sv.prev+'" oninput="window._formDirty=true;calcRow('+p.id+')"></td>'+
+        '<td><input type="number" min="0" id="next_'+p.id+'" value="'+sv.next+'" oninput="window._formDirty=true;calcRow('+p.id+')"></td>'+
+        '<td><input type="number" min="0" id="sold_'+p.id+'" value="'+sv.sold+'" oninput="window._formDirty=true;calcIncome('+p.id+')"></td>'+
+        '<td><input type="number" min="0" id="income_'+p.id+'" value="'+sv.income+'" oninput="window._formDirty=true;updateRecon()"></td></tr>';
+    });
+  };
+  var _origSave=window.saveSubmission;
+  if(_origSave){window.saveSubmission=function(){window._formDirty=false;return _origSave.apply(this,arguments);};}
+  console.log('[patch] applied');
+})();
+</script>
 </body>
 </html>
