@@ -92,7 +92,27 @@ body.dark .btn-outline{background:#1e1e2a;color:#8ab4f8;border-color:#8ab4f8}
     <div id="tabOverview"><div id="overallSummary" class="summary-box"></div><div id="lowStockWarn"></div>
       <table><thead><tr><th>#</th><th>Бараа</th><th>Үнэ</th><th>Нөөц</th><th>Зарсан</th><th>Орлого</th></tr></thead><tbody id="productTotalsBody"></tbody></table>
     </div>
-    <div id="tabSubmissions" class="hidden"><div id="submissionsList"></div><div id="selectedSubmissionDetail" class="hidden"></div></div>
+    <div id="tabSubmissions" class="hidden">
+      <div class="header-info no-print" style="margin-bottom:10px">
+        <div><label>Эхлэх огноо</label><input type="date" id="subFilterFrom" onchange="applySubFilter()"></div>
+        <div><label>Дуусах огноо</label><input type="date" id="subFilterTo" onchange="applySubFilter()"></div>
+        <div><label>Байршил</label>
+          <select id="subFilterLoc" onchange="applySubFilter()">
+            <option value="">Бүгд</option>
+            <option value="Оюут бар">Оюут бар</option>
+            <option value="Манлай бар">Манлай бар</option>
+            <option value="VIP">VIP</option>
+            <option value="POWER">POWER</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:6px">
+          <button class="btn btn-sm" onclick="applySubFilter()">Шүүх</button>
+          <button class="btn btn-outline btn-sm" onclick="clearSubFilter()">Цэвэрлэх</button>
+        </div>
+      </div>
+      <div id="submissionsList"></div>
+      <div id="selectedSubmissionDetail" class="hidden"></div>
+    </div>
     <div id="tabReports" class="hidden">
       <div class="header-info no-print">
         <div><label>Эхлэх</label><input type="date" id="reportFrom"></div>
@@ -167,5 +187,6 @@ body.dark .btn-outline{background:#1e1e2a;color:#8ab4f8;border-color:#8ab4f8}
 <script src="https://cdn.jsdelivr.net/gh/XalMorak/borluulalt@c26ee5918d7fe4f934b4a0d64645acf3f90644a5/features.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/XalMorak/borluulalt@be8f5cbb2b85b05b3f682e579ae1de248c59526b/enhancements.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/XalMorak/borluulalt@8c92b01257090f84426d9bb4785188eec414aa13/firebase_auth_fix.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/XalMorak/borluulalt@1d6850ca7fef6d30c7e9798d91aa2bf206594ff0/subs_ui.js"></script>
 </body>
 </html>
