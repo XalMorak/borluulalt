@@ -15,10 +15,7 @@ body.dark .tab-btn{background:#2a2a3a;color:#ccc;border-color:#444}
 body.dark .tab-btn.active{background:#4a90d9;color:#fff}
 body.dark .btn-outline{background:#1e1e2a;color:#8ab4f8;border-color:#8ab4f8}
 .chart-wrap{margin:16px 0;padding:12px;background:rgba(15,52,96,.08);border-radius:10px}
-.chart-bars{display:flex;align-items:flex-end;gap:4px;height:160px;overflow-x:auto}
-.chart-bar-col{flex:1;min-width:28px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
-.chart-bar{width:100%;max-width:36px;border-radius:4px 4px 0 0;min-height:2px}
-.chart-bar.income{background:#27ae60}.chart-bar.over{background:#2980b9}.chart-bar.short{background:#c0392b}
+.chart-bars{display:flex;align-items:flex-end;gap:4px;height:auto;min-height:160px;overflow-x:auto}
 .period-btns{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
 </style>
 </head>
@@ -121,7 +118,10 @@ body.dark .btn-outline{background:#1e1e2a;color:#8ab4f8;border-color:#8ab4f8}
         <button class="btn btn-outline btn-sm" onclick="exportCSV()">Excel</button>
         <button class="btn btn-outline btn-sm" onclick="printReport()">Хэвлэх</button>
       </div>
-      <div id="chartArea" class="chart-wrap no-print"><div id="chartBars" class="chart-bars"></div><div id="chartTitle" style="font-size:.85rem;color:#666;margin-top:6px">Сүүлийн 7 хоног</div></div>
+      <div id="chartArea" class="chart-wrap no-print">
+        <div id="chartBars" class="chart-bars"></div>
+        <div id="chartTitle" style="font-size:.85rem;color:#666;margin-top:6px">Сүүлийн 7 хоног</div>
+      </div>
       <div id="reportSummary" class="summary-box"></div>
       <table><thead><tr><th>Огноо</th><th>Ажилтан</th><th>Ээлж</th><th>Байршил</th><th>Тек</th><th>Орлого</th><th>Зөрүү</th></tr></thead><tbody id="reportBody"></tbody></table>
     </div>
@@ -164,5 +164,6 @@ body.dark .btn-outline{background:#1e1e2a;color:#8ab4f8;border-color:#8ab4f8}
 <script src="https://cdn.jsdelivr.net/gh/XalMorak/borluulalt@f1ed81d7ab3d79cba874571068f2b1ea1f69b086/merge_fix.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/XalMorak/borluulalt@3dbaefb674ad7616639b0f33fdcbefe236ea1d29/stock_fix.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/XalMorak/borluulalt@c26ee5918d7fe4f934b4a0d64645acf3f90644a5/features.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/XalMorak/borluulalt@be8f5cbb2b85b05b3f682e579ae1de248c59526b/enhancements.js"></script>
 </body>
 </html>
