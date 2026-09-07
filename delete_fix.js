@@ -1,30 +1,97 @@
-/* delete_fix: soft-delete submissions so merge does not restore them */
+/* delete_fix v2: delete only ONE submission; hide deleted in reports */
 (function(){
-  function subMatch(a,b){
-    if(!a||!b)return false;
-    if(a.id&&b.id&&a.id===b.id)return true;
-    return a.employeeId===b.employeeId&&a.date===b.date&&(a.shift||"")===(b.shift||"");
-  }
   function visibleSubs(all){
     return (all||[]).filter(function(s){return s&&!s.deleted;});
   }
 
-  function wrapRender(){
-    if(typeof window.renderSubmissionsListEnhanced==="function"){
-      var _r=window.renderSubmissionsListEnhanced;
-      if(!_r._delWrap){
-        window.renderSubmissionsListEnhanced=function(all){
-          return _r(visibleSubs(all||(typeof getSubs==="function"?getSubs():[])));
-        };
-        window.renderSubmissionsListEnhanced._delWrap=true;
+  function findIndexExact(all, s){
+    if(!s||!all)return -1;
+    if(s.id){
+      for(var i=0;i<all.length;i++){
+        if(all[i]&&all[i].id===s.id)return i;
       }
     }
-    if(typeof window.renderSubmissionsList==="function"&&!window.renderSubmissionsList._delWrap){
+    if(s.submittedAt){
+      for(var i=0;i<all.length;i++){
+        var x=all[i];
+        if(!x||x.deleted)continue;
+        if(x.submittedAt===s.submittedAt&&x.employeeId===s.employeeId&&x.date===s.date)return i;
+      }
+    }
+    for(var i=0;i<all.length;i++){
+      var x=all[i];
+      if(!x||x.deleted)continue;
+      if(x.employeeId===s.employeeId&&x.date===s.date&&
+         (x.shift||"")===(s.shift||"")&&
+         (x.location||"")===(s.location||"")&&
+         (x.receiverName||x.receiver||"")===(s.receiverName||s.receiver||"")){
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  function wrapListRenders(){
+    if(typeof window.renderSubmissionsListEnhanced==="function"&&!window.renderSubmissionsListEnhanced._del2){
+      var _r=window.renderSubmissionsListEnhanced;
+      window.renderSubmissionsListEnhanced=function(all){
+        return _r(visibleSubs(all||(typeof getSubs==="function"?getSubs():[])));
+      };
+      window.renderSubmissionsListEnhanced._del2=true;
+    }
+    if(typeof window.renderSubmissionsList==="function"&&!window.renderSubmissionsList._del2){
       var _rs=window.renderSubmissionsList;
       window.renderSubmissionsList=function(all){
         return _rs(visibleSubs(all||(typeof getSubs==="function"?getSubs():[])));
       };
-      window.renderSubmissionsList._delWrap=true;
+      window.renderSubmissionsList._del2=true;
+    }
+    if(typeof window.renderOverview==="function"&&!window.renderOverview._del2){
+      var _o=window.renderOverview;
+      window.renderOverview=function(all){return _o(visibleSubs(all));};
+      window.renderOverview._del2=true;
+    }
+  }
+
+  function wrapReports(){
+    if(typeof window.runReport==="function"&&!window.runReport._del2){
+      var _rr=window.runReport;
+      window.runReport=function(){
+        if(typeof window.getSubs==="function"){
+          var _g=window.getSubs;
+          window.getSubs=function(){return visibleSubs(_g());};
+          try{return _rr.apply(this,arguments);}
+          finally{window.getSubs=_g;}
+        }
+        return _rr.apply(this,arguments);
+      };
+      window.runReport._del2=true;
+    }
+    if(typeof window.showChart==="function"&&!window.showChart._del2){
+      var _sc=window.showChart;
+      window.showChart=function(){
+        if(typeof window.getSubs==="function"){
+          var _g=window.getSubs;
+          window.getSubs=function(){return visibleSubs(_g());};
+          try{return _sc.apply(this,arguments);}
+          finally{window.getSubs=_g;}
+        }
+        return _sc.apply(this,arguments);
+      };
+      window.showChart._del2=true;
+    }
+    if(typeof window.exportCSV==="function"&&!window.exportCSV._del2){
+      var _ex=window.exportCSV;
+      window.exportCSV=function(){
+        if(typeof window.getSubs==="function"){
+          var _g=window.getSubs;
+          window.getSubs=function(){return visibleSubs(_g());};
+          try{return _ex.apply(this,arguments);}
+          finally{window.getSubs=_g;}
+        }
+        return _ex.apply(this,arguments);
+      };
+      window.exportCSV._del2=true;
     }
   }
 
@@ -32,20 +99,18 @@
     var s=window._sortedSubs&&window._sortedSubs[idx];
     if(!s){alert("Илгээлт олдсонгүй");return;}
     if(s.locked){alert("Түгжигдсэн илгээлтийг устгахын тулд эхлээд түгжээг тайлана уу");return;}
-    if(!confirm((s.employeeName||"")+" — "+(s.date||"")+" устгах уу?"))return;
+    var label=(s.employeeName||"")+" — "+(s.date||"")+(s.shift?" ("+s.shift+")":"")+(s.location?" · "+s.location:"");
+    if(!confirm(label+"\nустгах уу? (зөвхөн энэ нэг илгээлт)"))return;
     if(typeof getSubs!=="function"||typeof setSubs!=="function")return;
-    var all=getSubs();
-    var found=false;
-    for(var i=0;i<all.length;i++){
-      if(subMatch(all[i],s)){
-        all[i].deleted=true;
-        all[i].submittedAt=new Date().toISOString();
-        found=true;
-      }
+
+    var all=getSubs().slice();
+    var i=findIndexExact(all,s);
+    if(i<0){
+      alert("Илгээлт өгөгдлөөс олдсонгүй");
+      return;
     }
-    if(!found){
-      all=all.filter(function(sub){return !subMatch(sub,s);});
-    }
+    all[i]=Object.assign({},all[i],{deleted:true,submittedAt:new Date().toISOString()});
+
     try{
       if(s.items&&typeof getProducts==="function"){
         var products=getProducts();
@@ -64,30 +129,27 @@
         setProducts(products);
       }
     }catch(e){console.warn(e);}
+
     setSubs(all);
-    try{
-      if(typeof cloudPush==="function")await cloudPush();
-    }catch(e){console.warn(e);alert("Cloud sync алдаа — локал устгагдсан");}
+    try{if(typeof cloudPush==="function")await cloudPush();}
+    catch(e){console.warn(e);}
+
     var det=document.getElementById("selectedSubmissionDetail");
     if(det){det.classList.add("hidden");det.innerHTML="";}
+
     if(typeof loadSupervisorData==="function")loadSupervisorData();
-    else if(typeof renderSubmissionsList==="function")renderSubmissionsList(getSubs());
-    alert("Устгагдлаа");
+    if(typeof runReport==="function"){try{runReport();}catch(e){}}
+
+    alert("1 илгээлт устгагдлаа");
   }
 
-  function wrapDelete(){
-    window.deleteSubmission=deleteSubmissionFixed;
-  }
-
-  function wrapOverview(){
-    if(typeof window.renderOverview!=="function"||window.renderOverview._del)return;
-    var _o=window.renderOverview;
-    window.renderOverview=function(all){return _o(visibleSubs(all));};
-    window.renderOverview._del=true;
-  }
+  function wrapDelete(){window.deleteSubmission=deleteSubmissionFixed;}
 
   function tick(){
-    wrapRender();wrapDelete();wrapOverview();
+    wrapListRenders();
+    wrapReports();
+    wrapDelete();
   }
-  tick();setInterval(tick,300);
+  tick();
+  setInterval(tick,300);
 })();
