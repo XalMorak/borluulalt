@@ -19,7 +19,6 @@
   ];
   DEFAULT_WINES[0].name="\u0423\u043b\u0430\u0430\u043d";
   DEFAULT_WINES[9].name="Epee roux \u0437\u0430\u0433\u0432\u0430\u0439";
-  DEFAULT_WINES[0].cat="ulaan";
 
   function extraTek(){
     if(typeof TEK_BY_LOC!=="object")window.TEK_BY_LOC={};
@@ -195,7 +194,7 @@
   }
 
   function attr(s){
-    return String(s==null?"":s).replace(/&/g,"&").replace(/"/g,""");
+    return String(s==null?"":s).split(String.fromCharCode(34)).join(String.fromCharCode(39));
   }
 
   function renderWineSup(){
@@ -209,8 +208,17 @@
       var sl=sold[w.id]||{sold:0,income:0};
       ts+=sl.sold;ti+=sl.income;
       var tr=document.createElement("tr");
-      var n=attr(w.name);
-      tr.innerHTML="<td>"+(i+1)+"</td><td><input value=\""+n+"\" data-id=\""+w.id+"\" data-f=\"name\"></td><td><input type=\"number\" value=\""+(w.price||0)+"\" data-id=\""+w.id+"\" data-f=\"price\"></td><td><input type=\"number\" value=\""+(w.stock||0)+"\" data-id=\""+w.id+"\" data-f=\"stock\"></td><td>"+sl.sold+"</td><td>"+(sl.income||0).toLocaleString()+"\u20ae</td><td><button class=\"btn btn-outline btn-sm\" type=\"button\" data-del=\""+w.id+"\">\u0423\u0441\u0442\u0433\u0430\u0445</button></td>";
+      var inpN=document.createElement("input"); inpN.value=w.name||""; inpN.setAttribute("data-id",w.id); inpN.setAttribute("data-f","name");
+      var inpP=document.createElement("input"); inpP.type="number"; inpP.value=w.price||0; inpP.setAttribute("data-id",w.id); inpP.setAttribute("data-f","price");
+      var inpS=document.createElement("input"); inpS.type="number"; inpS.value=w.stock||0; inpS.setAttribute("data-id",w.id); inpS.setAttribute("data-f","stock");
+      var del=document.createElement("button"); del.className="btn btn-outline btn-sm"; del.type="button"; del.setAttribute("data-del",w.id); del.textContent="\u0423\u0441\u0442\u0433\u0430\u0445";
+      tr.appendChild(document.createElement("td")).textContent=String(i+1);
+      var tdN=document.createElement("td"); tdN.appendChild(inpN); tr.appendChild(tdN);
+      var tdP=document.createElement("td"); tdP.appendChild(inpP); tr.appendChild(tdP);
+      var tdS=document.createElement("td"); tdS.appendChild(inpS); tr.appendChild(tdS);
+      tr.appendChild(document.createElement("td")).textContent=String(sl.sold);
+      tr.appendChild(document.createElement("td")).textContent=(sl.income||0).toLocaleString()+"\u20ae";
+      var tdD=document.createElement("td"); tdD.appendChild(del); tr.appendChild(tdD);
       tbody.appendChild(tr);
     });
     tbody.onchange=function(ev){
