@@ -1,26 +1,51 @@
-/* Submissions list: show tek + date filter */
+/* Submissions list: show tek + date/loc/tek filter */
 function getSubTek(s){
   return (s && (s.receiverName || s.receiver || "")).toString().trim();
+}
+
+function fillSubTekOptions(){
+  var sel=document.getElementById("subFilterTek");
+  if(!sel)return;
+  var cur=sel.value;
+  var set={};
+  var all=(typeof getSubs==="function"?getSubs():[]).filter(function(s){return s&&!s.deleted;});
+  all.forEach(function(s){
+    var t=getSubTek(s);
+    if(t)set[t]=1;
+  });
+  var opts=Object.keys(set).sort();
+  sel.innerHTML='<option value="">Бүгд</option>'+opts.map(function(t){
+    return '<option value="'+t.replace(/"/g,"&quot;")+'">'+t+'</option>';
+  }).join("");
+  if(cur){
+    for(var i=0;i<sel.options.length;i++)if(sel.options[i].value===cur){sel.value=cur;break;}
+  }
 }
 
 function renderSubmissionsListEnhanced(all){
   var list=document.getElementById("submissionsList");
   if(!list)return;
   all=all||(typeof getSubs==="function"?getSubs():[]);
+  all=all.filter(function(s){return s&&!s.deleted;});
   var fromEl=document.getElementById("subFilterFrom");
   var toEl=document.getElementById("subFilterTo");
   var locEl=document.getElementById("subFilterLoc");
+  var tekEl=document.getElementById("subFilterTek");
   var from=fromEl?fromEl.value:"";
   var to=toEl?toEl.value:"";
   var loc=locEl?locEl.value:"";
+  var tek=tekEl?tekEl.value:"";
+  fillSubTekOptions();
+  if(tekEl&&tek)tekEl.value=tek;
   var filtered=all.filter(function(s){
     if(from && (s.date||"")<from)return false;
     if(to && (s.date||"")>to)return false;
     if(loc && (s.location||"")!==loc)return false;
+    if(tek && getSubTek(s)!==tek)return false;
     return true;
   });
   if(!filtered.length){
-    list.innerHTML='<div class="alert alert-info">Илгээлт байхгүй'+(from||to||loc?' (шүүлтээр)':'')+'</div>';
+    list.innerHTML='<div class="alert alert-info">Илгээлт байхгүй'+(from||to||loc||tek?' (шүүлтээр)':'')+'</div>';
     var det=document.getElementById("selectedSubmissionDetail");
     if(det)det.classList.add("hidden");
     return;
@@ -31,9 +56,10 @@ function renderSubmissionsListEnhanced(all){
   window._sortedSubs=filtered;
   list.innerHTML=filtered.map(function(s,idx){
     var calc=s.calcTotal!=null?s.calcTotal:(s.items||[]).reduce(function(a,i){return a+(i.income||0);},0);
-    var diff=s.diff!=null?s.diff:((s.cashAmount||0)+(s.cardTotal||0)-calc);
-    var tek=getSubTek(s);
-    var locLine=(s.location||"")+(tek?" · Тек: "+tek:"");
+    var collected=s.collected!=null?s.collected:Math.max(0,(s.cashAmount||0)-(s.cashBalance||0))+(s.cardTotal||0);
+    var diff=s.diff!=null?s.diff:(collected-calc);
+    var tekTxt=getSubTek(s);
+    var locLine=(s.location||"")+(tekTxt?" · Тек: "+tekTxt:"");
     var diffCls=Math.abs(diff)<0.01?"diff-ok":(diff>0?"diff-over":"diff-short");
     var diffTxt=Math.abs(diff)<0.01?"✓":(diff>0?"+":"")+Number(diff).toLocaleString();
     return '<div class="sub-item '+(s.locked?"locked":"")+'" onclick="showSubmissionDetail('+idx+')">'+
@@ -50,18 +76,27 @@ function applySubFilter(){
     renderSubmissionsListEnhanced(typeof getSubs==="function"?getSubs():[]);
 }
 function clearSubFilter(){
-  ["subFilterFrom","subFilterTo","subFilterLoc"].forEach(function(id){
+  ["subFilterFrom","subFilterTo","subFilterLoc","subFilterTek"].forEach(function(id){
     var el=document.getElementById(id);if(el)el.value="";
   });
   applySubFilter();
 }
 
 (function(){
+  function ensureTekFilter(){
+    if(document.getElementById("subFilterTek"))return;
+    var loc=document.getElementById("subFilterLoc");
+    if(!loc||!loc.parentNode||!loc.parentNode.parentNode)return;
+    var wrap=document.createElement("div");
+    wrap.innerHTML='<label>Тек</label><select id="subFilterTek" onchange="applySubFilter()"><option value="">Бүгд</option></select>';
+    loc.parentNode.parentNode.insertBefore(wrap, loc.parentNode.nextSibling);
+    fillSubTekOptions();
+  }
   function wrap(){
     if(typeof window.renderSubmissionsList!=="function")return;
     window.renderSubmissionsList=function(all){renderSubmissionsListEnhanced(all);};
   }
-  wrap();setInterval(wrap,400);
+  wrap();setInterval(function(){wrap();ensureTekFilter();},400);
 
   function wrapDetail(){
     if(window._detTek||typeof window.renderDetailView!=="function")return;
