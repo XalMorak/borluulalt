@@ -30,6 +30,7 @@
     + 'gh/XalMorak/borluulalt@f45e2da0d3ebb93abe1370bc4036630bf3ac95b1/overview_date.js,'
     + 'gh/XalMorak/borluulalt@2fd42750f551a14999eef0b208fd967c6008f565/edit_select.js';
   var WINE = B + '297c5c5dacbb01908a183c6b41ba45b1631bd3d0/wine_page.js';
+  var BEER = B + 'cc15768670203752ecbce9cf0eb76bbf486ed7ad/beer_prices.js';
   try {
     var html = await (await fetch(B + '5f0394ed2bf8986dd10ab8c16fc318523cdb7e23/index.html')).text();
     html = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
@@ -45,7 +46,8 @@
       + '<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"><\/script>'
       + '<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"><\/script>'
       + '<script src="' + COMBINE + '"><\/script>'
-      + '<script src="' + WINE + '"><\/script>';
+      + '<script src="' + WINE + '"><\/script>'
+      + '<script src="' + BEER + '"><\/script>';
     html = html.replace('</body>', inject + '</body>');
     document.open();
     document.write(html);
