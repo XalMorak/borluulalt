@@ -32,7 +32,7 @@
   var WINE = B + '297c5c5dacbb01908a183c6b41ba45b1631bd3d0/wine_page.js';
   var BEER = B + 'cc15768670203752ecbce9cf0eb76bbf486ed7ad/beer_prices.js';
   var WSEC = B + 'c6c5a4734a5e63b43093737a6109815075526775/wine_sections.js';
-  var W2B = B + '740743f0fb6e4f2c362339055b36bbadea0e944b/wine_to_bar.js';
+  var BUSAD = B + '2de114c89aac2f971431b17a645dfa5c49d9248e/wine_busad.js';
   try {
     var html = await (await fetch(B + '5f0394ed2bf8986dd10ab8c16fc318523cdb7e23/index.html')).text();
     html = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
@@ -51,7 +51,7 @@
       + '<script src="' + WINE + '"><\/script>'
       + '<script src="' + BEER + '"><\/script>'
       + '<script src="' + WSEC + '"><\/script>'
-      + '<script src="' + W2B + '"><\/script>';
+      + '<script src="' + BUSAD + '"><\/script>';
     html = html.replace('</body>', inject + '</body>');
     document.open();
     document.write(html);
