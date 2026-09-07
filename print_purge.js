@@ -1,4 +1,4 @@
-/* print CSS + soft-delete purge 30d */
+/* print CSS + soft-delete purge 30d + hide prices tab */
 (function(){
   if(!document.getElementById("print_css_fix")){
     var s=document.createElement("style");
@@ -42,7 +42,27 @@
     };
     window.deleteSubmission._purge=true;
   }
+  function hidePricesTab(){
+    document.querySelectorAll("#supervisorView .tab-btn, .tabs .tab-btn").forEach(function(b){
+      var t=(b.textContent||"").replace(/\s+/g,"").trim();
+      if(t==="\u04ae\u043d\u044d" || b.id==="tabBtnPrices" || (b.getAttribute("onclick")||"").indexOf("prices")>=0){
+        b.remove();
+      }
+    });
+    var pane=document.getElementById("tabPrices");
+    if(pane) pane.remove();
+    if(typeof window.showTab==="function" && !window.showTab._noPrice){
+      var st=window.showTab;
+      window.showTab=function(name){
+        if(name==="prices") name="stock";
+        return st.call(this,name);
+      };
+      window.showTab._noPrice=true;
+    }
+  }
+  hidePricesTab();
   setInterval(function(){
+    hidePricesTab();
     wrapDelete();
     if(window.currentUser&&currentUser.role==="supervisor"){
       if(!window._lastPurge||Date.now()-window._lastPurge>120000){
@@ -51,6 +71,6 @@
         if(n&&typeof cloudPush==="function")cloudPush();
       }
     }
-  },2000);
+  },800);
   window.purgeDeletedSubs=purgeDeleted;
 })();
