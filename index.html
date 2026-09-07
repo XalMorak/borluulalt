@@ -37,6 +37,7 @@
   var WHITE = B + '5fcee20aab0dcec2751caea8e4618e149e3160fa/wine_white_seed.js';
   var RED = B + '6b284183bdb4d45268947ab2a636e8d33e73424a/wine_red_seed.js';
   var ORDER = B + '547c33906f1c9a5a71988c13d87af75e449557ed/wine_order.js';
+  var KIND = B + '9957141499b03e80612b218a6fdccf9d04608d48/wine_kind_filter.js';
   try {
     var html = await (await fetch(B + '5f0394ed2bf8986dd10ab8c16fc318523cdb7e23/index.html')).text();
     html = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
@@ -59,7 +60,8 @@
       + '<script src="' + CLEAN + '"><\/script>'
       + '<script src="' + WHITE + '"><\/script>'
       + '<script src="' + RED + '"><\/script>'
-      + '<script src="' + ORDER + '"><\/script>';
+      + '<script src="' + ORDER + '"><\/script>'
+      + '<script src="' + KIND + '"><\/script>';
     html = html.replace('</body>', inject + '</body>');
     document.open();
     document.write(html);
