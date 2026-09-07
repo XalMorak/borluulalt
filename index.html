@@ -11,24 +11,6 @@
 <script>
 (async function(){
   var B='https://cdn.jsdelivr.net/gh/XalMorak/borluulalt@';
-  var CORE='https://cdn.jsdelivr.net/combine/'
-    + 'gh/XalMorak/borluulalt@main/app.js,'
-    + 'gh/XalMorak/borluulalt@main/app2.js,'
-    + 'gh/XalMorak/borluulalt@main/app3.js,'
-    + 'gh/XalMorak/borluulalt@main/merge_fix.js,'
-    + 'gh/XalMorak/borluulalt@main/stock_fix.js,'
-    + 'gh/XalMorak/borluulalt@main/features.js,'
-    + 'gh/XalMorak/borluulalt@main/enhancements.js,'
-    + 'gh/XalMorak/borluulalt@main/firebase_auth_fix.js,'
-    + 'gh/XalMorak/borluulalt@main/subs_ui.js,'
-    + 'gh/XalMorak/borluulalt@main/bugfix.js,'
-    + 'gh/XalMorak/borluulalt@main/delete_fix.js,'
-    + 'gh/XalMorak/borluulalt@main/edit_fix.js,'
-    + 'gh/XalMorak/borluulalt@main/mobile_ux.js,'
-    + 'gh/XalMorak/borluulalt@main/temp_save.js,'
-    + 'gh/XalMorak/borluulalt@f45e2da0d3ebb93abe1370bc4036630bf3ac95b1/overview_date.js,'
-    + 'gh/XalMorak/borluulalt@2fd42750f551a14999eef0b208fd967c6008f565/edit_select.js,'
-    + 'gh/XalMorak/borluulalt@main/print_purge.js';
   try{
     var html=await (await fetch(B+'3517f1bc04656aceb82d1f1140caf06a5f9c32fe/ui.html')).text();
     html=html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'');
@@ -40,7 +22,7 @@
       + '<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"><\/script>'
       + '<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"><\/script>'
       + '<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"><\/script>'
-      + '<script src="'+CORE+'"><\/script>'
+      + '<script src="'+B+'a96d0529390d948ec86454cddd30c7dccc1d4029/borluulalt.js"><\/script>'
       + '<script src="'+B+'e2ce4c149464449e79e0ad80b87515517a5d1f09/wine.js"><\/script>';
     html=html.replace('</body>', inject+'</body>');
     document.open(); document.write(html); document.close();
