@@ -43,6 +43,8 @@
     var html = await (await fetch(B + '5f0394ed2bf8986dd10ab8c16fc318523cdb7e23/index.html')).text();
     html = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
     html = html.replace(/<script\b[^>]*src=[^>]*>\s*<\/script>/gi, '');
+    html = html.replace(/<button class="tab-btn" id="tabBtnPrices"[^>]*>\u04ae\u043d\u044d<\/button>/g, '');
+    html = html.replace(/id="tabPrices"/g, 'id="tabPrices" class="hidden" style="display:none"');
     if (html.indexOf('btnTempSave') < 0) {
       html = html.replace(
         'onclick="saveSubmission()">Хадгалах</button>',
