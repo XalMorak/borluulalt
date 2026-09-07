@@ -1,5 +1,8 @@
 /* overview_date: filter Тойм by date range */
 (function(){
+  if(window._ovDateLoaded)return;
+  window._ovDateLoaded=true;
+
   function todayISO(){
     var t=new Date();
     return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");
@@ -13,6 +16,20 @@
     if(from) list=list.filter(function(s){return (s.date||"")>=from;});
     if(to) list=list.filter(function(s){return (s.date||"")<=to;});
     return list;
+  }
+  function setNote(text){
+    var n=document.getElementById("ovFilterNote");
+    if(!n){
+      var tab=document.getElementById("tabOverview");
+      var box=document.getElementById("overallSummary");
+      n=document.createElement("div");
+      n.id="ovFilterNote";
+      n.style.cssText="font-size:.8rem;color:#666;margin:6px 0 8px;width:100%";
+      if(box&&box.parentNode) box.parentNode.insertBefore(n, box.nextSibling);
+      else if(tab) tab.insertBefore(n, tab.firstChild);
+    }
+    n.textContent=text||"";
+    n.style.display=text?"block":"none";
   }
   function applyOverviewFilter(){
     if(typeof renderOverview==="function") renderOverview(typeof getSubs==="function"?getSubs():[]);
@@ -49,30 +66,33 @@
       '</div>';
     tab.insertBefore(bar, tab.firstChild);
   }
+  var wrappedFn=null;
   function wrapOverview(){
-    if(typeof window.renderOverview!=="function"||window.renderOverview._ovDate)return;
+    if(typeof window.renderOverview!=="function")return;
+    if(window.renderOverview===wrappedFn)return;
+    if(window.renderOverview._ovDate){wrappedFn=window.renderOverview;return;}
     var orig=window.renderOverview;
-    window.renderOverview=function(all){
+    function wrapped(all){
       var filtered=overviewFiltered(all);
       var r=orig(filtered);
-      var box=document.getElementById("overallSummary");
       var fromEl=document.getElementById("ovFrom");
       var toEl=document.getElementById("ovTo");
       var from=fromEl&&fromEl.value;
       var to=toEl&&toEl.value;
-      if(box&&(from||to)){
+      if(from||to){
         var label=(from&&to&&from===to)?from:((from||"...")+" – "+(to||"..."));
-        var note=document.createElement("div");
-        note.style.cssText="font-size:.8rem;color:#666;margin-top:8px;width:100%";
-        note.textContent="Шүүлт: "+label+" · "+filtered.length+" илгээлт";
-        box.appendChild(note);
+        setNote("Шүүлт: "+label+" · "+filtered.length+" илгээлт");
+      } else {
+        setNote("");
       }
       return r;
-    };
-    window.renderOverview._ovDate=true;
+    }
+    wrapped._ovDate=true;
+    window.renderOverview=wrapped;
+    wrappedFn=wrapped;
   }
   function tick(){ensureBar();wrapOverview();}
   tick();
-  setInterval(tick,500);
+  setInterval(tick,800);
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",tick);
 })();
