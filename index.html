@@ -10,24 +10,46 @@
 <div id="bootmsg">Ачаалж байна...</div>
 <script>
 (async function(){
-  var APP='a824b888211c9e8da1be8818f70d1452b051cc11';
-  var TEMP='5f0394ed2bf8986dd10ab8c16fc318523cdb7e23';
-  var B='https://cdn.jsdelivr.net/gh/XalMorak/borluulalt@';
+  var B = 'https://cdn.jsdelivr.net/gh/XalMorak/borluulalt@';
+  var COMBINE = 'https://cdn.jsdelivr.net/combine/'
+    + 'gh/XalMorak/borluulalt@main/app.js,'
+    + 'gh/XalMorak/borluulalt@main/app2.js,'
+    + 'gh/XalMorak/borluulalt@main/app3.js,'
+    + 'gh/XalMorak/borluulalt@main/merge_fix.js,'
+    + 'gh/XalMorak/borluulalt@main/stock_fix.js,'
+    + 'gh/XalMorak/borluulalt@main/features.js,'
+    + 'gh/XalMorak/borluulalt@main/enhancements.js,'
+    + 'gh/XalMorak/borluulalt@main/firebase_auth_fix.js,'
+    + 'gh/XalMorak/borluulalt@main/subs_ui.js,'
+    + 'gh/XalMorak/borluulalt@main/bugfix.js,'
+    + 'gh/XalMorak/borluulalt@main/delete_fix.js,'
+    + 'gh/XalMorak/borluulalt@main/edit_fix.js,'
+    + 'gh/XalMorak/borluulalt@main/mobile_ux.js,'
+    + 'gh/XalMorak/borluulalt@main/temp_save.js,'
+    + 'gh/XalMorak/borluulalt@main/print_purge.js';
   try {
-    var html = await (await fetch(B+'5f0394ed2bf8986dd10ab8c16fc318523cdb7e23/index.html')).text();
-    html = html.replace(/@[^"\/]+\/app\.js/,'@'+APP+'/app.js');
-    html = html.replace(/form_persist\.js/g,'temp_save.js');
-    html = html.replace(/@5e9b6a4fb8e7659ad59d7f7f91feee4afe30fa0f\/temp_save/,'@'+TEMP+'/temp_save');
+    var html = await (await fetch(B + '5f0394ed2bf8986dd10ab8c16fc318523cdb7e23/index.html')).text();
+    // remove all existing script tags (firebase + app patches)
+    html = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
+    html = html.replace(/<script\b[^>]*src=[^>]*>\s*<\/script>/gi, '');
+    // temp save button
     if (html.indexOf('btnTempSave') < 0) {
       html = html.replace(
         'onclick="saveSubmission()">Хадгалах</button>',
         'onclick="saveSubmission()">Хадгалах</button>\n      <button type="button" id="btnTempSave" class="btn btn-outline" onclick="saveTempDraft()">Түр хадгалах</button>'
       );
     }
+    // inject firebase + ONE combined bundle
+    var inject = ''
+      + '<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"><\/script>'
+      + '<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"><\/script>'
+      + '<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"><\/script>'
+      + '<script src="' + COMBINE + '"><\/script>';
+    html = html.replace('</body>', inject + '</body>');
     document.open();
     document.write(html);
     document.close();
-  } catch(e) {
+  } catch (e) {
     document.getElementById('bootmsg').textContent = 'Алдаа: ' + e;
   }
 })();
