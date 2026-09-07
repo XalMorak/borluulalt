@@ -1,4 +1,4 @@
-/* form_persist v3: draft + temp button + report day + tek normalize */
+/* form_persist v4: draft + temp save works on employee form (no false role block) */
 (function(){
   var DRAFT_KEY="borluulalt_emp_draft";
   function draftKey(){
@@ -9,8 +9,18 @@
     var t=new Date();
     return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");
   }
+  function isEmployeeFormOpen(){
+    var emp=document.getElementById("employeeView");
+    if(!emp)return false;
+    if(emp.classList.contains("hidden"))return false;
+    if(window.currentUser&&currentUser.role==="supervisor"){
+      var sup=document.getElementById("supervisorView");
+      if(sup&&!sup.classList.contains("hidden"))return false;
+    }
+    return true;
+  }
   function collectDraft(){
-    if(!window.currentUser||currentUser.role!=="employee")return null;
+    if(!isEmployeeFormOpen())return null;
     var items={};
     if(typeof getActiveProducts==="function"){
       getActiveProducts().forEach(function(p){
@@ -52,7 +62,7 @@
   }
   function loadDraft(){
     try{
-      if(!window.currentUser||currentUser.role!=="employee")return;
+      if(!isEmployeeFormOpen())return;
       var raw=localStorage.getItem(draftKey());
       if(!raw)return;
       var d=JSON.parse(raw);
@@ -173,41 +183,33 @@
   function tick(){wrapBuild();wrapSave();wrapReset();bindDraftEvents();ensureReportDayUI();wrapReport();}
   tick();setInterval(tick,400);
   setInterval(function(){
-    if(window.currentUser&&currentUser.role==="employee"){
+    if(isEmployeeFormOpen()){
       var el=document.getElementById("prev_1")||document.querySelector("#salesBody input");
       if(el&&(el.value==="0"||el.value===""))loadDraft();
     }
   },1500);
-})();
 
-/* temp save button */
-(function(){
-  var DRAFT_KEY="borluulalt_emp_draft";
-  function draftKey(){return DRAFT_KEY+"_"+((window.currentUser&&currentUser.id)||"anon");}
-  function todayISO(){var t=new Date();return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");}
-  function collectDraft(){
-    if(!window.currentUser||currentUser.role!=="employee")return null;
-    var items={};
-    if(typeof getActiveProducts==="function"){
-      getActiveProducts().forEach(function(p){
-        var prev=document.getElementById("prev_"+p.id),next=document.getElementById("next_"+p.id),sold=document.getElementById("sold_"+p.id);
-        if(!prev&&!next&&!sold)return;
-        items[p.id]={prev:prev?prev.value:"0",next:next?next.value:"0",sold:sold?sold.value:"0"};
-      });
-    }
-    var dateEl=document.getElementById("formDate");
-    return {date:(dateEl&&dateEl.value)||todayISO(),shift:(document.getElementById("shiftType")||{}).value||"",location:(document.getElementById("locationName")||{}).value||"",checkerName:(document.getElementById("checkerName")||{}).value||"",receiverName:(document.getElementById("receiverName")||{}).value||"",cashAmount:(document.getElementById("cashAmount")||{}).value||"0",cardTotal:(document.getElementById("cardTotal")||{}).value||"0",cashBalance:(document.getElementById("cashBalance")||{}).value||"0",posNumber:(document.getElementById("posNumber")||{}).value||"",items:items,savedAt:Date.now(),temp:true};
-  }
   function saveTempDraft(){
-    if(!window.currentUser||currentUser.role!=="employee"){alert("Зөвхөн ажилтан түр хадгална");return;}
+    if(!isEmployeeFormOpen()){
+      if(typeof showAlert==="function")showAlert("empAlert","Ажилтны борлуулалтын хуудсан дээр түр хадгална","error");
+      else alert("Ажилтны борлуулалтын хуудсан дээр түр хадгална");
+      return;
+    }
     try{
       var d=collectDraft();
-      if(!d){alert("Хадгалах өгөгдөл олдсонгүй");return;}
+      if(!d){
+        if(typeof showAlert==="function")showAlert("empAlert","Хадгалах өгөгдөл олдсонгүй","error");
+        else alert("Хадгалах өгөгдөл олдсонгүй");
+        return;
+      }
       localStorage.setItem(draftKey(), JSON.stringify(d));
       window._formDirty=true;
       if(typeof showAlert==="function")showAlert("empAlert","Түр хадгаллаа ✓ (энэ төхөөрөмж дээр)","success");
       else alert("Түр хадгаллаа ✓");
-    }catch(e){console.warn(e);alert("Түр хадгалах алдаа");}
+    }catch(e){
+      console.warn(e);
+      alert("Түр хадгалах алдаа");
+    }
   }
   window.saveTempDraft=saveTempDraft;
   function ensureBtn(){
@@ -217,18 +219,16 @@
     if(!btns)return;
     var b=document.createElement("button");
     b.id="btnTempSave";b.type="button";b.className="btn btn-outline";b.textContent="Түр хадгалах";
-    b.onclick=function(){saveTempDraft();};
+    b.onclick=function(ev){if(ev)ev.preventDefault();saveTempDraft();};
     var clearBtn=null;
-    btns.querySelectorAll("button").forEach(function(x){if((x.textContent||"").indexOf("Цэвэрлэх")>=0)clearBtn=x;});
+    btns.querySelectorAll("button").forEach(function(x){
+      if((x.textContent||"").indexOf("Цэвэрлэх")>=0)clearBtn=x;
+    });
     if(clearBtn)btns.insertBefore(b, clearBtn); else btns.appendChild(b);
   }
   setInterval(ensureBtn,500);
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",ensureBtn); else ensureBtn();
-})();
 
-/* tek normalize for report/chart */
-(function(){
-  function tekOf(s){return ((s&&(s.receiverName||s.receiver))||"").toString().trim();}
   function normGetSubs(fn){
     return function(){
       return fn().map(function(s){
@@ -253,6 +253,6 @@
     };
     window[name]._tekN=true;
   }
-  function tick(){wrapFn("runReport");wrapFn("showChart");wrapFn("showChartLines");}
-  tick();setInterval(tick,400);
+  function tickTek(){wrapFn("runReport");wrapFn("showChart");wrapFn("showChartLines");}
+  tickTek();setInterval(tickTek,400);
 })();
