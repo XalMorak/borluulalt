@@ -1,17 +1,14 @@
-/* form_persist v2: stable draft key + one-day report */
+/* form_persist v3: draft + temp button + report day + tek normalize */
 (function(){
   var DRAFT_KEY="borluulalt_emp_draft";
-
   function draftKey(){
     var uid=(window.currentUser&&currentUser.id)||"anon";
     return DRAFT_KEY+"_"+uid;
   }
-
   function todayISO(){
     var t=new Date();
     return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");
   }
-
   function collectDraft(){
     if(!window.currentUser||currentUser.role!=="employee")return null;
     var items={};
@@ -21,17 +18,12 @@
         var next=document.getElementById("next_"+p.id);
         var sold=document.getElementById("sold_"+p.id);
         if(!prev&&!next&&!sold)return;
-        items[p.id]={
-          prev:prev?prev.value:"0",
-          next:next?next.value:"0",
-          sold:sold?sold.value:"0"
-        };
+        items[p.id]={prev:prev?prev.value:"0",next:next?next.value:"0",sold:sold?sold.value:"0"};
       });
     }
     var dateEl=document.getElementById("formDate");
-    var date=(dateEl&&dateEl.value)||todayISO();
     return {
-      date:date,
+      date:(dateEl&&dateEl.value)||todayISO(),
       shift:(document.getElementById("shiftType")||{}).value||"",
       location:(document.getElementById("locationName")||{}).value||"",
       checkerName:(document.getElementById("checkerName")||{}).value||"",
@@ -40,11 +32,9 @@
       cardTotal:(document.getElementById("cardTotal")||{}).value||"0",
       cashBalance:(document.getElementById("cashBalance")||{}).value||"0",
       posNumber:(document.getElementById("posNumber")||{}).value||"",
-      items:items,
-      savedAt:Date.now()
+      items:items,savedAt:Date.now()
     };
   }
-
   function saveDraft(){
     try{
       var d=collectDraft();
@@ -60,7 +50,6 @@
       window._formDirty=true;
     }catch(e){}
   }
-
   function loadDraft(){
     try{
       if(!window.currentUser||currentUser.role!=="employee")return;
@@ -94,9 +83,7 @@
         var it=d.items[pid];
         ["prev","next","sold"].forEach(function(k){
           var el=document.getElementById(k+"_"+pid);
-          if(el&&it[k]!=null){
-            if(!el.value||el.value==="0")el.value=it[k];
-          }
+          if(el&&it[k]!=null){if(!el.value||el.value==="0")el.value=it[k];}
         });
         if(typeof calcRow==="function")calcRow(Number(pid));
       });
@@ -104,12 +91,10 @@
       window._formDirty=true;
     }catch(e){console.warn("draft load",e);}
   }
-
   function clearDraft(){
     try{localStorage.removeItem(draftKey());}catch(e){}
     window._formDirty=false;
   }
-
   function wrapBuild(){
     if(typeof window.buildSalesTable!=="function"||window.buildSalesTable._draft)return;
     var _b=window.buildSalesTable;
@@ -121,7 +106,6 @@
     };
     window.buildSalesTable._draft=true;
   }
-
   function wrapSave(){
     if(typeof window.saveSubmission!=="function"||window.saveSubmission._draft)return;
     var _s=window.saveSubmission;
@@ -132,7 +116,6 @@
     };
     window.saveSubmission._draft=true;
   }
-
   function wrapReset(){
     if(typeof window.resetForm!=="function"||window.resetForm._draft)return;
     var _r=window.resetForm;
@@ -143,7 +126,6 @@
     };
     window.resetForm._draft=true;
   }
-
   function bindDraftEvents(){
     var root=document.getElementById("employeeView");
     if(!root||root._draftBound)return;
@@ -151,14 +133,12 @@
     root.addEventListener("input",function(){saveDraft();},{passive:true});
     root.addEventListener("change",function(){saveDraft();},{passive:true});
   }
-
   document.addEventListener("visibilitychange",function(){
     if(document.visibilityState==="hidden")saveDraft();
     if(document.visibilityState==="visible")setTimeout(loadDraft,100);
   });
   window.addEventListener("pagehide",saveDraft);
   window.addEventListener("beforeunload",saveDraft);
-
   function ensureReportDayUI(){
     var area=document.querySelector("#tabReports .period-btns");
     if(!area||area._dayBtn)return;
@@ -177,7 +157,6 @@
     };
     area.insertBefore(b, area.firstChild);
   }
-
   function wrapReport(){
     if(typeof window.runReport!=="function"||window.runReport._day)return;
     var _rr=window.runReport;
@@ -191,16 +170,89 @@
     };
     window.runReport._day=true;
   }
-
-  function tick(){
-    wrapBuild();wrapSave();wrapReset();bindDraftEvents();ensureReportDayUI();wrapReport();
-  }
-  tick();
-  setInterval(tick,400);
+  function tick(){wrapBuild();wrapSave();wrapReset();bindDraftEvents();ensureReportDayUI();wrapReport();}
+  tick();setInterval(tick,400);
   setInterval(function(){
     if(window.currentUser&&currentUser.role==="employee"){
       var el=document.getElementById("prev_1")||document.querySelector("#salesBody input");
       if(el&&(el.value==="0"||el.value===""))loadDraft();
     }
   },1500);
+})();
+
+/* temp save button */
+(function(){
+  var DRAFT_KEY="borluulalt_emp_draft";
+  function draftKey(){return DRAFT_KEY+"_"+((window.currentUser&&currentUser.id)||"anon");}
+  function todayISO(){var t=new Date();return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");}
+  function collectDraft(){
+    if(!window.currentUser||currentUser.role!=="employee")return null;
+    var items={};
+    if(typeof getActiveProducts==="function"){
+      getActiveProducts().forEach(function(p){
+        var prev=document.getElementById("prev_"+p.id),next=document.getElementById("next_"+p.id),sold=document.getElementById("sold_"+p.id);
+        if(!prev&&!next&&!sold)return;
+        items[p.id]={prev:prev?prev.value:"0",next:next?next.value:"0",sold:sold?sold.value:"0"};
+      });
+    }
+    var dateEl=document.getElementById("formDate");
+    return {date:(dateEl&&dateEl.value)||todayISO(),shift:(document.getElementById("shiftType")||{}).value||"",location:(document.getElementById("locationName")||{}).value||"",checkerName:(document.getElementById("checkerName")||{}).value||"",receiverName:(document.getElementById("receiverName")||{}).value||"",cashAmount:(document.getElementById("cashAmount")||{}).value||"0",cardTotal:(document.getElementById("cardTotal")||{}).value||"0",cashBalance:(document.getElementById("cashBalance")||{}).value||"0",posNumber:(document.getElementById("posNumber")||{}).value||"",items:items,savedAt:Date.now(),temp:true};
+  }
+  function saveTempDraft(){
+    if(!window.currentUser||currentUser.role!=="employee"){alert("Зөвхөн ажилтан түр хадгална");return;}
+    try{
+      var d=collectDraft();
+      if(!d){alert("Хадгалах өгөгдөл олдсонгүй");return;}
+      localStorage.setItem(draftKey(), JSON.stringify(d));
+      window._formDirty=true;
+      if(typeof showAlert==="function")showAlert("empAlert","Түр хадгаллаа ✓ (энэ төхөөрөмж дээр)","success");
+      else alert("Түр хадгаллаа ✓");
+    }catch(e){console.warn(e);alert("Түр хадгалах алдаа");}
+  }
+  window.saveTempDraft=saveTempDraft;
+  function ensureBtn(){
+    var emp=document.getElementById("employeeView");
+    if(!emp||document.getElementById("btnTempSave"))return;
+    var btns=emp.querySelector(".no-print");
+    if(!btns)return;
+    var b=document.createElement("button");
+    b.id="btnTempSave";b.type="button";b.className="btn btn-outline";b.textContent="Түр хадгалах";
+    b.onclick=function(){saveTempDraft();};
+    var clearBtn=null;
+    btns.querySelectorAll("button").forEach(function(x){if((x.textContent||"").indexOf("Цэвэрлэх")>=0)clearBtn=x;});
+    if(clearBtn)btns.insertBefore(b, clearBtn); else btns.appendChild(b);
+  }
+  setInterval(ensureBtn,500);
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",ensureBtn); else ensureBtn();
+})();
+
+/* tek normalize for report/chart */
+(function(){
+  function tekOf(s){return ((s&&(s.receiverName||s.receiver))||"").toString().trim();}
+  function normGetSubs(fn){
+    return function(){
+      return fn().map(function(s){
+        if(!s)return s;
+        var c=Object.assign({},s);
+        if(!c.receiver&&c.receiverName)c.receiver=c.receiverName;
+        if(!c.receiverName&&c.receiver)c.receiverName=c.receiver;
+        return c;
+      });
+    };
+  }
+  function wrapFn(name){
+    if(typeof window[name]!=="function"||window[name]._tekN)return;
+    var _o=window[name];
+    window[name]=function(){
+      var _g=window.getSubs;
+      if(typeof _g==="function"){
+        window.getSubs=normGetSubs(_g);
+        try{return _o.apply(this,arguments);}finally{window.getSubs=_g;}
+      }
+      return _o.apply(this,arguments);
+    };
+    window[name]._tekN=true;
+  }
+  function tick(){wrapFn("runReport");wrapFn("showChart");wrapFn("showChartLines");}
+  tick();setInterval(tick,400);
 })();
