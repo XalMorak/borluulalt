@@ -26,20 +26,18 @@
     + 'gh/XalMorak/borluulalt@main/edit_fix.js,'
     + 'gh/XalMorak/borluulalt@main/mobile_ux.js,'
     + 'gh/XalMorak/borluulalt@main/temp_save.js,'
-    + 'gh/XalMorak/borluulalt@main/print_purge.js';
+    + 'gh/XalMorak/borluulalt@main/print_purge.js,'
+    + 'gh/XalMorak/borluulalt@main/overview_date.js';
   try {
     var html = await (await fetch(B + '5f0394ed2bf8986dd10ab8c16fc318523cdb7e23/index.html')).text();
-    // remove all existing script tags (firebase + app patches)
     html = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
     html = html.replace(/<script\b[^>]*src=[^>]*>\s*<\/script>/gi, '');
-    // temp save button
     if (html.indexOf('btnTempSave') < 0) {
       html = html.replace(
         'onclick="saveSubmission()">Хадгалах</button>',
         'onclick="saveSubmission()">Хадгалах</button>\n      <button type="button" id="btnTempSave" class="btn btn-outline" onclick="saveTempDraft()">Түр хадгалах</button>'
       );
     }
-    // inject firebase + ONE combined bundle
     var inject = ''
       + '<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"><\/script>'
       + '<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"><\/script>'
