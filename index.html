@@ -34,6 +34,7 @@
   var WSEC = B + 'c6c5a4734a5e63b43093737a6109815075526775/wine_sections.js';
   var BUSAD = B + '2de114c89aac2f971431b17a645dfa5c49d9248e/wine_busad.js';
   var CLEAN = B + 'daa3563adca0ca71705ce06655a783a631bf0426/beer_cleanup.js';
+  var WHITE = B + '5fcee20aab0dcec2751caea8e4618e149e3160fa/wine_white_seed.js';
   try {
     var html = await (await fetch(B + '5f0394ed2bf8986dd10ab8c16fc318523cdb7e23/index.html')).text();
     html = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
@@ -53,7 +54,8 @@
       + '<script src="' + BEER + '"><\/script>'
       + '<script src="' + WSEC + '"><\/script>'
       + '<script src="' + BUSAD + '"><\/script>'
-      + '<script src="' + CLEAN + '"><\/script>';
+      + '<script src="' + CLEAN + '"><\/script>'
+      + '<script src="' + WHITE + '"><\/script>';
     html = html.replace('</body>', inject + '</body>');
     document.open();
     document.write(html);
