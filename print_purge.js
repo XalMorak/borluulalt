@@ -1,9 +1,9 @@
-/* hide prices, tek-driven wine, report chart */
+/* hide prices, tek-driven wine, report chart, wine cats */
 (function(){
   if(!document.getElementById("print_css_fix")){
     var s=document.createElement("style");
     s.id="print_css_fix";
-    s.textContent="#empModeTabs,#empModeBar,#empModeWine,#empSheetTitle{display:none!important}#chartBars{min-height:200px;overflow-x:auto}";
+    s.textContent="#empModeTabs,#empModeBar,#empModeWine,#empSheetTitle{display:none!important}#chartBars{min-height:200px;overflow-x:auto}.wine-sec td{background:#1e3a5f!important;color:#fff!important;font-weight:700;text-align:left!important}";
     document.head.appendChild(s);
   }
   function hidePricesTab(){
@@ -26,10 +26,38 @@
     if(typeof setWineMode==="function") setWineMode(want);
     else { window._wineMode=want; if(typeof buildSalesTable==="function") buildSalesTable(); }
   }
+  function groupWine(){
+    if(!window._wineMode)return;
+    var tbody=document.getElementById("salesBody");
+    if(!tbody||tbody.querySelector(".wine-sec"))return;
+    var wines=typeof getWines==="function"?getWines():[];
+    var byId={};
+    wines.forEach(function(w){
+      var c=String(w.cat||"").toLowerCase();
+      if(c.indexOf("busad")>=0||c.indexOf("\u0431\u0443\u0441\u0430\u0434")>=0) byId[w.id]="busad";
+      else if(c.indexOf("tsagaan")>=0||c.indexOf("\u0446\u0430\u0433\u0430\u0430\u043d")>=0) byId[w.id]="tsagaan";
+      else byId[w.id]="ulaan";
+    });
+    var rows=[].slice.call(tbody.querySelectorAll("tr")); if(!rows.length)return;
+    var g={busad:[],ulaan:[],tsagaan:[]};
+    rows.forEach(function(tr){
+      var inp=tr.querySelector("input[id^='prev_'],input[id^='sold_']");
+      var id=0; if(inp){var m=String(inp.id).match(/_(\d+)$/); if(m)id=Number(m[1]);}
+      (g[byId[id]||"ulaan"]||g.ulaan).push(tr);
+    });
+    function hdr(txt){
+      var tr=document.createElement("tr"); tr.className="wine-sec";
+      var td=document.createElement("td"); td.colSpan=7; td.textContent=txt; tr.appendChild(td); return tr;
+    }
+    tbody.innerHTML="";
+    tbody.appendChild(hdr("\u0411\u0443\u0441\u0430\u0434 \u0431\u0430\u0440\u0430\u0430")); g.busad.forEach(function(r){tbody.appendChild(r);});
+    tbody.appendChild(hdr("\u0423\u043b\u0430\u0430\u043d \u0432\u0438\u043d\u043e")); g.ulaan.forEach(function(r){tbody.appendChild(r);});
+    tbody.appendChild(hdr("\u0426\u0430\u0433\u0430\u0430\u043d \u0432\u0438\u043d\u043e")); g.tsagaan.forEach(function(r){tbody.appendChild(r);});
+  }
   hidePricesTab(); hideEmpSwitch(); syncWineFromTek();
   var tek=document.getElementById("receiverName");
   if(tek&&!tek._tekWine){ tek._tekWine=true; tek.addEventListener("change",syncWineFromTek); }
-  setInterval(function(){ hidePricesTab(); hideEmpSwitch(); syncWineFromTek(); },700);
+  setInterval(function(){ hidePricesTab(); hideEmpSwitch(); syncWineFromTek(); groupWine(); },700);
 })();
 (function(){
   function ymd(d){
@@ -83,5 +111,4 @@
     var m=(b.textContent||"").match(/(\d+)\s*\u0445\u043e\u043d\u043e\u0433/);
     if(m){ ev.preventDefault(); drawChart(Number(m[1])); }
   },true);
-  setInterval(function(){ window.showChart=drawChart; },1500);
 })();
