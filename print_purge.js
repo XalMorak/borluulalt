@@ -9,6 +9,7 @@
   add("runtime_fix_src", B+"f199642bbb0c3a88f5ba9dc181643d6a6478d86e/runtime_fix.js");
   add("wine_stock_src", B+"4e6667232d8ba65b979d1a959a06bdb7b04042cb/wine_stock.js");
   add("wine_split_src", B+"4f1ee626066921a13f397e76162e0c68c488c97e/wine_split.js");
+  add("wine_form_src", B+"30ed5937bf27d3b18f12c2b151c5bb5ce917656c/wine_form.js");
 })();
 (function(){
   if(window._iosDraft) return; window._iosDraft=true;
@@ -21,10 +22,12 @@
       if(!emp||emp.classList.contains("hidden")) return false;
       var items={};
       var body=document.getElementById("salesBody");
-      if(body) body.querySelectorAll("input[id^='prev_']").forEach(function(el){
-        var pid=el.id.replace("prev_","");
-        var n=document.getElementById("next_"+pid), s=document.getElementById("sold_"+pid);
-        items[pid]={prev:el.value||"0",next:n?n.value:"0",sold:s?s.value:"0"};
+      if(body) body.querySelectorAll("input[id^='prev_'],input[id^='sold_']").forEach(function(el){
+        var m=String(el.id).match(/^(prev|sold)_(\d+)$/); if(!m) return;
+        var pid=m[2];
+        if(items[pid]) return;
+        var p=document.getElementById("prev_"+pid), n=document.getElementById("next_"+pid), s=document.getElementById("sold_"+pid);
+        items[pid]={prev:p?p.value:"0",next:n?n.value:"0",sold:s?s.value:"0"};
       });
       function v(id){ var e=document.getElementById(id); return e?e.value:""; }
       put(key(), JSON.stringify({date:v("formDate"),shift:v("shiftType"),location:v("locationName"),checkerName:v("checkerName"),receiverName:v("receiverName"),cashAmount:v("cashAmount")||"0",cardTotal:v("cardTotal")||"0",cashBalance:v("cashBalance")||"0",posNumber:v("posNumber"),items:items,savedAt:Date.now()}));
