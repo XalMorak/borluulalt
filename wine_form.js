@@ -1,7 +1,7 @@
 /* Employee wine form: busad=prev/next, red/white=sold only. Fix price lookup. */
 (function(){
   if(window._wineForm) return; window._wineForm=true;
-  var SNACK=["ундаа","pringless","pringles","schoco","rosinen","max fun","toffifee","kowar","самар","alpen gold","айраг","ерөө говь","ooze","vibez"];
+  var SNACK=["ундаа","pringless","pringles","schoco","rosinen","max fun","toffifee","kowar","самар","alpen gold","айраг лааз","ерөө говь","ooze","vibez"];
   function nrm(s){ return String(s||"").toLowerCase(); }
   function isSnack(name){
     name=nrm(name);
