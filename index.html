@@ -14,10 +14,6 @@
   try{
     var html=await (await fetch(B+'3517f1bc04656aceb82d1f1140caf06a5f9c32fe/ui.html')).text();
     html=html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'');
-    if(html.indexOf('btnTempSave')<0){
-      html=html.replace('onclick="saveSubmission()">Хадгалах</button>',
-        'onclick="saveSubmission()">Хадгалах</button>\n      <button type="button" id="btnTempSave" class="btn btn-outline" onclick="saveTempDraft()">Түр хадгалах</button>');
-    }
     var inject=''
       + '<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"><\/script>'
       + '<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"><\/script>'
@@ -25,7 +21,9 @@
       + '<script src="'+B+'a96d0529390d948ec86454cddd30c7dccc1d4029/borluulalt.js"><\/script>'
       + '<script src="'+B+'e2ce4c149464449e79e0ad80b87515517a5d1f09/wine.js"><\/script>'
       + '<script src="'+B+'f199642bbb0c3a88f5ba9dc181643d6a6478d86e/runtime_fix.js"><\/script>'
-      + '<script src="'+B+'4e6667232d8ba65b979d1a959a06bdb7b04042cb/wine_stock.js"><\/script>';
+      + '<script src="'+B+'4e6667232d8ba65b979d1a959a06bdb7b04042cb/wine_stock.js"><\/script>'
+      + '<script src="'+B+'4f1ee626066921a13f397e76162e0c68c488c97e/wine_split.js"><\/script>'
+      + '<script src="'+B+'30ed5937bf27d3b18f12c2b151c5bb5ce917656c/wine_form.js"><\/script>';
     html=html.replace('</body>', inject+'</body>');
     document.open(); document.write(html); document.close();
   }catch(e){
