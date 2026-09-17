@@ -1,23 +1,40 @@
-name: Static site check
+name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main]
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+
+      - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - name: Syntax check JS
+
+      - name: Syntax-check all JS
         run: |
-          node --check app.js
-          node --check app2.js
-          node --check app3.js
-          echo "All JS files OK"
+          set -euo pipefail
+          found=0
+          for f in *.js; do
+            echo "check $f"
+            node --check "$f"
+            found=$((found + 1))
+          done
+          test "$found" -gt 0
+
+      - name: Required files
+        run: |
+          test -f index.html
+          test -f ui.html
+          test -f vercel.json
