@@ -1,5 +1,7 @@
 # Борлуулалт (borluulalt)
 
+[![CI](https://github.com/XalMorak/borluulalt/actions/workflows/node.js.yml/badge.svg)](https://github.com/XalMorak/borluulalt/actions/workflows/node.js.yml)
+
 Бар/рестораны борлуулалт, нөөц, илгээлт, тайлангийн веб апп.
 
 **Live:** [borluulalt-xalmorak.vercel.app](https://borluulalt-xalmorak.vercel.app)
@@ -39,9 +41,10 @@ npx serve .
 
 `index.html`-ийг браузераар нээнэ. Интернет хэрэгтэй (Firebase, jsDelivr).
 
-## Deploy
+## CI/CD
 
-GitHub `XalMorak/borluulalt` `main` → Vercel `borluulalt-xalmorak`.
+- **CI:** GitHub Actions — бүх JS-ийн `node --check` + `index.html` / `ui.html` / `vercel.json`
+- **CD:** GitHub `main` → Vercel `borluulalt-xalmorak`
 
 ## Өгөгдөл
 
