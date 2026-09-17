@@ -46,3 +46,7 @@ GitHub `XalMorak/borluulalt` `main` → Vercel `borluulalt-xalmorak`.
 ## Өгөгдөл
 
 Firebase зангилаа `borluulalt`: products, wines, submissions, users, logs.
+
+## License
+
+MIT — дэлгэрэх `LICENSE`.
