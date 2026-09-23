@@ -9,9 +9,9 @@
 ## Юу хийдэг вэ
 
 - Ажилтан: өдөр, ээлж, байршил, тек сонгоод пиво эсвэл вино борлуулалт оруулна
-- Ахлах: тойм, илгээлт, тайлан, нөөц, хэрэглэгч
+- Ахлах: тойм, илгээлт, тайлан, нөөц, хэрэглэгч, түүх
 - Пиво ба вино тусдаа. Тойм / илгээлт / тайлан дээр Пиво | Вино | Нэгдсэн
-- Нөөц байршлаар: Оюут бар, Манлай бар, POWER
+- Нөөц байршлаар: Оюут бар, Манлай бар, VIP, POWER
 - Түр хадгалалт (утас, Safari)
 - Үүлэн синк автомат
 
@@ -23,32 +23,26 @@ JavaScript · Firebase Realtime Database · Vercel
 
 | Файл | Зорилго |
 |------|---------|
-| `index.html` | Ачаалагч |
+| `index.html` | Ачаалагч — иж хостын `ui.html` + JS |
 | `ui.html` | Хуудасны HTML/CSS |
 | `app.js`, `app2.js`, `app3.js` | Үндсэн логик |
-| `borluulalt.js` | Модуль ачаалах орох цэг |
+| `compat_fix.js` | XSS-safe alert, илгээлтийн түлхүүр (байршил орно) |
 | `wine.js` | Вино каталог, тек, ангилал |
 | `wine_stock.js` | Виноны нөөц байршлаар |
-| `runtime_fix.js` | Хоосон локалаар үүлэн дата дарахгүй, график |
-| `temp_save.js` | Түр хадгалалт |
 | `vercel.json` | Хостинг |
+
+Скриптүүдийг `index.html` иж домейнаас ачаална (jsDelivr SHA pin байхгүй).
 
 ## Локал
 
 ```bash
 npx serve .
+npm run check
 ```
-
-`index.html`-ийг браузераар нээнэ. Интернет хэрэгтэй (Firebase, jsDelivr).
-
-## CI/CD
-
-- **CI:** GitHub Actions — бүх JS-ийн `node --check` + `index.html` / `ui.html` / `vercel.json`
-- **CD:** GitHub `main` → Vercel `borluulalt-xalmorak`
 
 ## Өгөгдөл
 
-Firebase зангилаа `borluulalt`: products, wines, submissions, users, logs.
+Firebase зангилаа `borluulalt`. Илгээлт: ажилтан + огноо + ээлж + **байршил**.
 
 ## License
 
