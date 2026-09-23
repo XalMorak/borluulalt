@@ -1,4 +1,4 @@
-/* user_fix: merge users on sync. Do not replace doLogin. */
+/* user_fix: merge users, refresh them before login. Do not replace doLogin. */
 (function(){
   if(window._userFix) return; window._userFix=true;
   var DEL="deleted_user_ids";
@@ -91,6 +91,7 @@
           try{ applyAll(local); } finally { window._skipUserMerge=false; }
         }
         await window._fbDb.ref("borluulalt").set(local);
+        if(local.users) await window._fbDb.ref("borluulalt/users").set(local.users);
         window._lastCloudAt=local.updatedAt;
         if(typeof updateSyncBadge==="function") updateSyncBadge("ok");
         window._syncBusy=false;
@@ -113,11 +114,50 @@
       if(data && !window._skipUserMerge){
         if(Array.isArray(data.deletedUsers)) rememberDeleted(data.deletedUsers);
         var merged=mergeUsers(typeof getUsers==="function"?getUsers():{}, data.users||{});
+        try{ if(typeof setUsers==="function") setUsers(merged); }catch(e){}
         data=Object.assign({}, data, {users:merged});
       }
       return prev.call(this, data);
     };
     window.applyAll._userFix=true;
+  }
+
+  function installPull(){
+    if(typeof window.cloudPull!=="function" || window.cloudPull._userFix) return;
+    var prev=window.cloudPull;
+    window.cloudPull=async function(){
+      var r=false;
+      try{ r=await prev.apply(this, arguments); }catch(e){ r=false; }
+      try{
+        if(typeof initFirebase==="function") initFirebase();
+        if(window._fbDb){
+          var snap=await window._fbDb.ref("borluulalt/users").once("value");
+          var cloud=snap.val()||{};
+          var merged=mergeUsers(typeof getUsers==="function"?getUsers():{}, cloud);
+          if(typeof setUsers==="function") setUsers(merged);
+          r=true;
+        }
+      }catch(e){}
+      return r;
+    };
+    window.cloudPull._userFix=true;
+  }
+
+  function installGet(){
+    if(typeof window.getUser!=="function" || window.getUser._userFix) return;
+    window.getUser=function(id){
+      var users=(typeof getUsers==="function")?getUsers():{};
+      var key=String(id||"").trim().toLowerCase();
+      if(users && users[key]) return users[key];
+      if(users){
+        var keys=Object.keys(users);
+        for(var i=0;i<keys.length;i++){
+          if(String(keys[i]).toLowerCase()===key) return users[keys[i]];
+        }
+      }
+      return null;
+    };
+    window.getUser._userFix=true;
   }
 
   function installDelete(){
@@ -148,8 +188,10 @@
       try{ ok=await cloudPush(); }catch(e){ ok=false; }
       try{
         if(typeof initFirebase==="function") initFirebase();
-        if(window._fbDb) await window._fbDb.ref("borluulalt/users/"+id).set({name:name, role:role, pin:""});
-        ok=true;
+        if(window._fbDb){
+          await window._fbDb.ref("borluulalt/users/"+id).set({name:name, role:role, pin:""});
+          ok=true;
+        }
       }catch(e){}
       document.getElementById("newUserId").value="";
       document.getElementById("newUserName").value="";
@@ -162,7 +204,7 @@
   }
 
   function install(){
-    installPush(); installApply(); installDelete(); installAdd();
+    installPush(); installApply(); installPull(); installGet(); installDelete(); installAdd();
   }
   install();
   setInterval(install, 700);
