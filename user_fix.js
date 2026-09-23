@@ -1,4 +1,4 @@
-/* user_fix: new user must survive sync and login */
+/* user_fix: merge users on sync. Do not replace doLogin. */
 (function(){
   if(window._userFix) return; window._userFix=true;
   var DEL="deleted_user_ids";
@@ -120,28 +120,6 @@
     window.applyAll._userFix=true;
   }
 
-  function installLogin(){
-    if(window.doLogin && window.doLogin._userFix) return;
-    window.doLogin=async function(){
-      var idEl=document.getElementById("loginId");
-      var pinEl=document.getElementById("loginPin");
-      var id=(idEl&&idEl.value||"").trim().toLowerCase();
-      var pin=(pinEl&&pinEl.value||"").trim();
-      if(!id){ if(typeof showAlert==="function") showAlert("loginAlert","ID оруулна уу","error"); return; }
-      try{ if(typeof cloudPull==="function") await cloudPull(); }catch(e){}
-      var user=typeof getUser==="function"?getUser(id):null;
-      if(!user){ if(typeof showAlert==="function") showAlert("loginAlert","Ийм ID байхгүй. Ахлах дээр нэмсэн ID-г яг оруулна уу.","error"); return; }
-      if(user.disabled){ if(typeof showAlert==="function") showAlert("loginAlert","ID идэвхгүй","error"); return; }
-      if(user.pin && String(user.pin)!==pin){ if(typeof showAlert==="function") showAlert("loginAlert","PIN буруу","error"); return; }
-      window.currentUser={id:id,name:user.name,role:user.role};
-      localStorage.setItem("lastLoginId", id);
-      if(typeof addLog==="function") addLog("login","Нэвтэрсэн");
-      window._formDirty=false;
-      if(typeof showApp==="function") showApp();
-    };
-    window.doLogin._userFix=true;
-  }
-
   function installDelete(){
     if(typeof window.deleteUser!=="function" || window.deleteUser._userFix) return;
     var prev=window.deleteUser;
@@ -166,10 +144,16 @@
       localStorage.setItem(DEL, JSON.stringify(Object.keys(gone)));
       users[id]={name:name, role:role, pin:""};
       setUsers(users);
-      var ok=await cloudPush();
+      var ok=false;
+      try{ ok=await cloudPush(); }catch(e){ ok=false; }
+      try{
+        if(typeof initFirebase==="function") initFirebase();
+        if(window._fbDb) await window._fbDb.ref("borluulalt/users/"+id).set({name:name, role:role, pin:""});
+        ok=true;
+      }catch(e){}
       document.getElementById("newUserId").value="";
       document.getElementById("newUserName").value="";
-      if(!ok){ showAlert("userAlert","Энэ төхөөрөмж дээр хадгалагдсан. Дахин Нэмэх дарна уу.","error"); }
+      if(!ok) showAlert("userAlert","Хадгалагдсангүй. Дахин Нэмэх дарна уу.","error");
       else showAlert("userAlert","Нэмэгдлээ. Нэвтрэх ID: "+id,"success");
       if(typeof buildUsersTable==="function") buildUsersTable();
       if(typeof updateLoginHint==="function") updateLoginHint();
@@ -178,7 +162,7 @@
   }
 
   function install(){
-    installPush(); installApply(); installLogin(); installDelete(); installAdd();
+    installPush(); installApply(); installDelete(); installAdd();
   }
   install();
   setInterval(install, 700);
