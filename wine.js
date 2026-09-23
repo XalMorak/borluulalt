@@ -5,7 +5,7 @@
   var SNACKS=[
     ["\u0423\u043d\u0434\u0430\u0430",4000],["pringless",8000],["Schoco rosinen",8000],["Max fun (\u0448\u043e\u043a\u043e\u043b\u0430\u0434)",9000],
     ["Toffifee",10000],["Kowar mix",7000],["\u0441\u0430\u043c\u0430\u0440",4000],["Alpen gold",5500],
-    ["\u0410\u0439\u0440\u0430\u0433",6900],["\u0415\u0440\u04e9\u04e9 \u0433\u043e\u0432\u044c \u0437\u0430\u0434\u0433\u0430\u0439",3500],["Ooze",7400],["Vibez",4000]
+    ["\u0410\u0439\u0440\u0430\u0433",6000],["\u0415\u0440\u04e9\u04e9 \u0433\u043e\u0432\u044c \u0437\u0430\u0434\u0433\u0430\u0439",3500],["Ooze",7400],["Vibez",4000]
   ];
   var REDS=[
     ["Sangria",5000],["Australian Passion Merlot New",5500],["Australian Passion Shiraz Cabernet New",5500],["Australian Passion Shiraz",5500],
@@ -46,6 +46,9 @@
         var name=row[0], price=row[1];
         if(have[nrm(name)]){
           if(!have[nrm(name)].cat) have[nrm(name)].cat=cat;
+          if(nrm(name)===nrm("\u0410\u0439\u0440\u0430\u0433") && have[nrm(name)].price!==price){
+            have[nrm(name)].price=price; added=true;
+          }
           return;
         }
         maxId++;
