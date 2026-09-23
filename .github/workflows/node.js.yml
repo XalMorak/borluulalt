@@ -17,24 +17,8 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-
-      - name: Syntax-check all JS
-        run: |
-          set -euo pipefail
-          found=0
-          for f in *.js; do
-            echo "check $f"
-            node --check "$f"
-            found=$((found + 1))
-          done
-          test "$found" -gt 0
-
-      - name: Required files
-        run: |
-          test -f index.html
-          test -f ui.html
-          test -f vercel.json
+      - name: Syntax and required files
+        run: node scripts/syntax-check.js

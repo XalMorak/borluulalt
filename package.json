@@ -1,0 +1,9 @@
+{
+  "name": "borluulalt",
+  "private": true,
+  "description": "Бар/рестораны борлуулалт, нөөц, тайлан",
+  "scripts": {
+    "syntax": "node scripts/syntax-check.js",
+    "check": "npm run syntax"
+  }
+}
