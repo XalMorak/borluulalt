@@ -50,7 +50,8 @@
       + '<script src="report_fix.js"><\/script>'
       + '<script src="guard.js"><\/script>'
       + '<script src="user_fix.js"><\/script>'
-      + '<script src="ui_patch.js"><\/script>';
+      + '<script src="ui_patch.js"><\/script>'
+      + '<script src="sync_merge.js"><\/script>';
     html=html.replace('</body>', inject+'</body>');
     document.open(); document.write(html); document.close();
   }catch(e){
