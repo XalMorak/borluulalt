@@ -1,5 +1,5 @@
 /* stock by location + single save + stronger sync */
-var STOCK_LOCS=["Оюут бар","Манлай бар","POWER"];
+var STOCK_LOCS=["Оюут бар","Манлай бар","VIP","POWER"];
 
 function ensureStockByLoc(p){
   if(!p.stockByLoc||typeof p.stockByLoc!=="object")p.stockByLoc={};
@@ -42,7 +42,7 @@ function buildStockTableLoc(){
     var sc=st<=(window.LOW_STOCK||10)?"stock-low":"stock-ok";
     tbody.innerHTML+='<tr>'+
       '<td>'+p.id+'</td>'+
-      '<td><input id="st_name_'+p.id+'" value="'+String(p.name||"").replace(/"/g,"&quot;")+'" style="width:120px"></td>'+
+      '<td><input id="st_name_'+p.id+'" value="'+String(p.name||"").replace(/"/g,""")+'" style="width:120px"></td>'+
       '<td><input type="number" id="st_price_'+p.id+'" value="'+(p.price||0)+'" style="width:80px"></td>'+
       '<td class="'+sc+'"><input type="number" id="st_stock_'+p.id+'" value="'+st+'" style="width:70px"></td>'+
       '<td><button class="btn btn-sm btn-danger" onclick="deleteProduct('+p.id+')">Устгах</button></td>'+
