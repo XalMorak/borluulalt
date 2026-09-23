@@ -1,4 +1,4 @@
-/* login_fix: pull latest users from Firebase (SDK + REST) before ID check */
+/* login_fix: refresh users from Firebase, then use original doLogin/showApp */
 (function(){
   if(window._loginFix) return;
   window._loginFix=true;
@@ -9,8 +9,7 @@
     if(Array.isArray(u)){
       u.forEach(function(v,i){
         if(v && typeof v==="object" && v.name){
-          var id=String(v.id||v.uid||i);
-          o[id]=v;
+          o[String(v.id||v.uid||i)]=v;
         }
       });
       return o;
@@ -74,26 +73,24 @@
     return asUsers(cloud);
   }
 
-  window.doLogin=async function(){
-    var raw=(document.getElementById("loginId").value||"").trim();
-    var pin=(document.getElementById("loginPin").value||"").trim();
-    if(!raw){ if(typeof showAlert==="function") showAlert("loginAlert","ID оруулна уу","error"); return; }
-    var users=asUsers(typeof getUsers==="function"?getUsers():{});
-    var cloud=await fetchUsers();
-    users=mergeUsers(users, cloud);
-    if(typeof setUsers==="function") setUsers(users);
-    var hit=findUser(users, raw);
-    if(!hit){
-      if(typeof showAlert==="function") showAlert("loginAlert","Ийм ID алга: "+raw,"error");
-      return;
-    }
-    var user=hit.rec;
-    if(user.disabled){ if(typeof showAlert==="function") showAlert("loginAlert","ID идэвхгүй","error"); return; }
-    if(user.pin && String(user.pin)!==pin){ if(typeof showAlert==="function") showAlert("loginAlert","PIN буруу","error"); return; }
-    window.currentUser={id:hit.id, name:user.name, role:user.role||"employee"};
-    try{ localStorage.setItem("lastLoginId", hit.id); }catch(e){}
-    try{ if(typeof addLog==="function") addLog("login","Нэвтэрсэн"); }catch(e){}
-    window._formDirty=false;
-    if(typeof showApp==="function") showApp();
-  };
+  function wrap(){
+    if(typeof window.doLogin!=="function" || window.doLogin._loginFix) return;
+    var orig=window.doLogin;
+    window.doLogin=async function(){
+      var raw=(document.getElementById("loginId").value||"").trim();
+      if(!raw){ if(typeof showAlert==="function") showAlert("loginAlert","ID оруулна уу","error"); return; }
+      try{
+        var users=mergeUsers(typeof getUsers==="function"?getUsers():{}, await fetchUsers());
+        if(typeof setUsers==="function") setUsers(users);
+        var hit=findUser(users, raw);
+        if(hit){
+          document.getElementById("loginId").value=hit.id;
+        }
+      }catch(e){ console.warn("login_fix", e); }
+      return orig.apply(this, arguments);
+    };
+    window.doLogin._loginFix=true;
+  }
+  wrap();
+  setInterval(wrap, 400);
 })();
