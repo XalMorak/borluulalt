@@ -82,8 +82,17 @@
     return Object.keys(map).map(function(k){ return map[k]; });
   }
   function db(){
-    if(typeof initFirebase==="function") initFirebase();
-    return window._fbDb||null;
+    try{ if(typeof initFirebase==="function") initFirebase(); }catch(e){}
+    try{
+      if(typeof firebase!=="undefined" && firebase.database){
+        if((!firebase.apps||!firebase.apps.length) && typeof firebaseConfig!=="undefined"){
+          firebase.initializeApp(firebaseConfig);
+        }
+        var d=firebase.database();
+        if(d && d.ref){ window._fbDb=d; return d; }
+      }
+    }catch(e){}
+    return (window._fbDb && window._fbDb.ref) ? window._fbDb : null;
   }
   async function writeUser(id, rec){
     var base=db();
