@@ -29,10 +29,28 @@
       view.appendChild(pane);
     }
   }
+  function hideLowStockWarn(){
+    var el=document.getElementById("lowStockWarn");
+    if(!el) return;
+    el.innerHTML="";
+    el.style.display="none";
+  }
+  function wrapOverview(){
+    if(typeof window.renderOverview!=="function" || window.renderOverview._hideLow) return;
+    var orig=window.renderOverview;
+    window.renderOverview=function(){
+      var r=orig.apply(this, arguments);
+      hideLowStockWarn();
+      return r;
+    };
+    window.renderOverview._hideLow=true;
+  }
   function apply(){
     addVip(document.getElementById("stockLocSelect"));
     addVip(document.getElementById("wineStockLoc"));
     ensureLogTab();
+    hideLowStockWarn();
+    wrapOverview();
   }
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", apply);
   else apply();
