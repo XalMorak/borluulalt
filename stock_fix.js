@@ -40,14 +40,14 @@ function buildStockTableLoc(){
     ensureStockByLoc(p);
     var st=Number(p.stockByLoc[loc])||0;
     var sc=st<=(window.LOW_STOCK||10)?"stock-low":"stock-ok";
-    var safeName=String(p.name||"").replace(/&/g,"&").replace(/</g,"<").replace(/"/g,""");
-    tbody.innerHTML+='<tr>'+
-      '<td>'+p.id+'</td>'+
-      '<td><input id="st_name_'+p.id+'" value="'+safeName+'" style="width:120px"></td>'+
-      '<td><input type="number" id="st_price_'+p.id+'" value="'+(p.price||0)+'" style="width:80px"></td>'+
-      '<td class="'+sc+'"><input type="number" id="st_stock_'+p.id+'" value="'+st+'" style="width:70px"></td>'+
-      '<td><button class="btn btn-sm btn-danger" onclick="deleteProduct('+p.id+')">Устгах</button></td>'+
-      '</tr>';
+    var safeName=String(p.name||"").split('"').join("'");
+    tbody.innerHTML+="<tr>"+
+      "<td>"+p.id+"</td>"+
+      "<td><input id=\"st_name_"+p.id+"\" value=\""+safeName+"\" style=\"width:120px\"></td>"+
+      "<td><input type=\"number\" id=\"st_price_"+p.id+"\" value=\""+(p.price||0)+"\" style=\"width:80px\"></td>"+
+      "<td class=\""+sc+"\"><input type=\"number\" id=\"st_stock_"+p.id+"\" value=\""+st+"\" style=\"width:70px\"></td>"+
+      "<td><button class=\"btn btn-sm btn-danger\" onclick=\"deleteProduct("+p.id+")\">Устгах</button></td>"+
+      "</tr>";
   });
 }
 
@@ -68,7 +68,7 @@ function saveAllStock(){
   });
   setProducts(products);
   if(typeof cloudPush==="function")cloudPush().then(function(){
-    if(typeof showAlert==="function")showAlert("stockAlert","Бүх нөөц хадгалагдлаа ✓ ("+loc+")","success");
+    if(typeof showAlert==="function")showAlert("stockAlert","Бүх нөөц хадгалагдлаа ("+loc+")","success");
     buildStockTableLoc();
   });
   else{
