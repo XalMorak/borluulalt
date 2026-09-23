@@ -3,7 +3,7 @@
   if(window._borluulaltCore) return;
   window._borluulaltCore = true;
   var src = "https://cdn.jsdelivr.net/combine/"
-    + "gh/XalMorak/borluulalt@main/app.js,"
+    + "gh/XalMorak/borluulalt@5989a1a0fa81a81113e1691ae90ee434bcb042bc/app.js,"
     + "gh/XalMorak/borluulalt@main/app2.js,"
     + "gh/XalMorak/borluulalt@main/app3.js,"
     + "gh/XalMorak/borluulalt@main/merge_fix.js,"
