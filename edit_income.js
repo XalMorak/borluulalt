@@ -1,12 +1,36 @@
-/* edit_income: supervisor can edit income; show totals; less freeze. Does not wipe submissions. */
+/* edit_income: prev/next change updates sold + income; totals; no data wipe */
 (function(){
-  if(window._editIncome) return; window._editIncome=true;
+  if(window._editIncome) window._editIncome = true;
+  window._editIncome = true;
 
   function isSup(){
     var u=window.currentUser||{};
     return u.role==="supervisor" || window._editingIdx!=null;
   }
   function num(v){ var n=Number(v); return isFinite(n)?n:0; }
+
+  function priceOf(id){
+    if(typeof getProduct==="function"){
+      var p=getProduct(Number(id)||id);
+      if(p && p.price) return num(p.price);
+    }
+    if(typeof getWines==="function"){
+      var arr=getWines()||[];
+      for(var i=0;i<arr.length;i++) if(String(arr[i].id)===String(id)) return num(arr[i].price);
+    }
+    var cell=document.querySelector("#salesBody tr td.price-col");
+    var row=document.getElementById("prev_"+id);
+    if(row){
+      row=row.closest("tr");
+      if(row){
+        var tds=row.querySelectorAll("td");
+        for(var j=0;j<tds.length;j++){
+          if(tds[j].classList.contains("price-col")) return num(String(tds[j].textContent).replace(/[^\d.-]/g,""));
+        }
+      }
+    }
+    return 0;
+  }
 
   function unlockIncome(){
     var nodes=document.querySelectorAll("input[id^='income_'],input[id^='edit_income_']");
@@ -17,44 +41,134 @@
       el.removeAttribute("readonly");
       el.style.pointerEvents="auto";
       el.style.background="#fff";
-      if(!el._incBound){
-        el._incBound=true;
-        el.addEventListener("input", function(){
-          this.dataset.manual="1";
-          paintTotals();
-        });
-      }
     }
   }
 
-  function rowIncome(i){
-    var el=document.getElementById("edit_income_"+i);
-    return el?num(el.value):0;
+  function cascadeEmp(id){
+    var prev=document.getElementById("prev_"+id);
+    var next=document.getElementById("next_"+id);
+    var sold=document.getElementById("sold_"+id);
+    var inc=document.getElementById("income_"+id);
+    if(!prev||!next||!sold) return;
+    var a=num(prev.value), b=num(next.value);
+    sold.value=Math.max(0, a-b);
+    if(inc){
+      var pr=priceOf(id);
+      inc.value=Math.round(num(sold.value)*pr);
+      inc.dataset.manual="";
+    }
+    paintTotals();
   }
+
+  function cascadeEdit(i){
+    var prev=document.getElementById("edit_prev_"+i);
+    var next=document.getElementById("edit_next_"+i);
+    var sold=document.getElementById("edit_sold_"+i);
+    var inc=document.getElementById("edit_income_"+i);
+    if(!prev||!next||!sold) return;
+    var a=num(prev.value), b=num(next.value);
+    sold.value=Math.max(0, a-b);
+    if(inc){
+      var price=num(inc.dataset.price);
+      if(!price){
+        var nameCell=sold.closest("tr") && sold.closest("tr").cells[0];
+        var name=nameCell?nameCell.textContent.trim():"";
+        if(typeof getProducts==="function"){
+          (getProducts()||[]).forEach(function(p){ if(p && p.name===name) price=num(p.price); });
+        }
+        if(!price && typeof getWines==="function"){
+          (getWines()||[]).forEach(function(p){ if(p && p.name===name) price=num(p.price); });
+        }
+        if(price) inc.dataset.price=String(price);
+      }
+      inc.value=Math.round(num(sold.value)*price);
+      inc.dataset.manual="";
+    }
+    paintTotals();
+  }
+
+  window.editCalc=function(i){ cascadeEdit(i); };
+  window.editCalcIncome=function(i){
+    var sold=document.getElementById("edit_sold_"+i);
+    var inc=document.getElementById("edit_income_"+i);
+    if(sold && inc && inc.dataset.manual!=="1"){
+      var price=num(inc.dataset.price);
+      if(price) inc.value=Math.round(num(sold.value)*price);
+    }
+    paintTotals();
+  };
+
+  function bindEmp(){
+    document.querySelectorAll("#salesBody input[id^='prev_'],#salesBody input[id^='next_']").forEach(function(el){
+      if(el._rowBound) return;
+      el._rowBound=true;
+      el.addEventListener("input", function(){
+        var m=String(this.id).match(/_(\d+)$/);
+        if(m) cascadeEmp(m[1]);
+      });
+      el.addEventListener("change", function(){
+        var m=String(this.id).match(/_(\d+)$/);
+        if(m) cascadeEmp(m[1]);
+      });
+    });
+    document.querySelectorAll("#salesBody input[id^='sold_']").forEach(function(el){
+      if(el._rowBound) return;
+      el._rowBound=true;
+      el.addEventListener("input", function(){
+        var m=String(this.id).match(/_(\d+)$/);
+        if(!m) return;
+        var inc=document.getElementById("income_"+m[1]);
+        if(inc){
+          inc.value=Math.round(num(this.value)*priceOf(m[1]));
+          inc.dataset.manual="";
+        }
+        paintTotals();
+      });
+    });
+  }
+
+  function bindEdit(){
+    var i=0;
+    while(document.getElementById("edit_prev_"+i) || document.getElementById("edit_sold_"+i)){
+      ["edit_prev_","edit_next_"].forEach(function(pre){
+        var el=document.getElementById(pre+i);
+        if(!el || el._rowBound) return;
+        el._rowBound=true;
+        (function(idx){
+          el.addEventListener("input", function(){ cascadeEdit(idx); });
+          el.addEventListener("change", function(){ cascadeEdit(idx); });
+        })(i);
+      });
+      var sold=document.getElementById("edit_sold_"+i);
+      if(sold && !sold._rowBound){
+        sold._rowBound=true;
+        (function(idx){
+          sold.addEventListener("input", function(){ if(window.editCalcIncome) window.editCalcIncome(idx); });
+        })(i);
+      }
+      i++;
+    }
+  }
+
   function paintEditTotals(){
+    var cash=document.getElementById("edit_cash");
+    if(!cash) return;
     var box=document.getElementById("editTotalsBox");
     if(!box){
-      var cash=document.getElementById("edit_cash");
-      if(!cash) return;
       box=document.createElement("div");
       box.id="editTotalsBox";
       box.className="summary-box";
       box.style.marginTop="12px";
-      cash.closest(".footer-fields") && cash.closest(".footer-fields").parentNode.insertBefore(box, cash.closest(".footer-fields").nextSibling);
-      if(!document.getElementById("editTotalsBox")){
-        var host=document.getElementById("selectedSubmissionDetail")||cash.parentNode.parentNode;
-        host.appendChild(box);
-      }
+      var host=cash.closest(".footer-fields");
+      if(host && host.parentNode) host.parentNode.insertBefore(box, host.nextSibling);
+      else (document.getElementById("selectedSubmissionDetail")||cash.parentNode).appendChild(box);
     }
     var sum=0, i=0;
     while(document.getElementById("edit_income_"+i) || document.getElementById("edit_sold_"+i)){
-      sum+=rowIncome(i);
+      sum+=num((document.getElementById("edit_income_"+i)||{}).value);
       i++;
     }
-    var cash=num((document.getElementById("edit_cash")||{}).value);
-    var card=num((document.getElementById("edit_card")||{}).value);
-    var start=num((document.getElementById("edit_start")||{}).value);
-    var collected=Math.max(0,cash-start)+card;
+    var collected=Math.max(0,num((document.getElementById("edit_cash")||{}).value)-num((document.getElementById("edit_start")||{}).value))+num((document.getElementById("edit_card")||{}).value);
     var diff=collected-sum;
     var cls=Math.abs(diff)<0.01?"diff-ok":(diff>0?"diff-over":"diff-short");
     box.innerHTML=
@@ -64,11 +178,9 @@
   }
 
   function paintEmpTotals(){
-    if(typeof updateRecon==="function"){
-      try{ updateRecon(); }catch(e){}
-    }
     var host=document.getElementById("employeeView");
     if(!host || host.classList.contains("hidden")) return;
+    if(typeof updateRecon==="function"){ try{ updateRecon(); }catch(e){} }
     var box=document.getElementById("empTotalsBox");
     if(!box){
       box=document.createElement("div");
@@ -82,10 +194,7 @@
     }
     var sum=0;
     document.querySelectorAll("#salesBody input[id^='income_']").forEach(function(el){ sum+=num(el.value); });
-    var cash=num((document.getElementById("cashAmount")||{}).value);
-    var card=num((document.getElementById("cardTotal")||{}).value);
-    var start=num((document.getElementById("cashBalance")||{}).value);
-    var collected=Math.max(0,cash-start)+card;
+    var collected=Math.max(0,num((document.getElementById("cashAmount")||{}).value)-num((document.getElementById("cashBalance")||{}).value))+num((document.getElementById("cardTotal")||{}).value);
     var diff=collected-sum;
     var cls=Math.abs(diff)<0.01?"diff-ok":(diff>0?"diff-over":"diff-short");
     box.innerHTML=
@@ -94,101 +203,50 @@
       '<div class="summary-item"><div class="label">Зөрүү</div><div class="value '+cls+'">'+(diff>=0?"+":"")+diff.toLocaleString()+'₮</div></div>';
   }
 
-  function paintTotals(){
-    paintEditTotals();
-    paintEmpTotals();
+  function paintTotals(){ paintEditTotals(); paintEmpTotals(); }
+
+  if(typeof window.calcRow==="function" && !window.calcRow._cascade){
+    window.calcRow=function(id){ cascadeEmp(id); };
+    window.calcRow._cascade=true;
   }
-
-  window.editCalc=function(i){
-    var p=document.getElementById("edit_prev_"+i);
-    var n=document.getElementById("edit_next_"+i);
-    var s=document.getElementById("edit_sold_"+i);
-    var inc=document.getElementById("edit_income_"+i);
-    if(p && n && s && document.activeElement!==s){
-      var a=num(p.value), b=num(n.value);
-      if(a>0||b>0) s.value=Math.max(0,a-b);
-    }
-    if(inc && inc.dataset.manual!=="1" && s){
-      var price=0;
-      var row=s.closest("tr");
-      if(row && row.cells && row.cells.length){
-        /* keep existing income if already set */
-      }
-    }
-    paintEditTotals();
-  };
-  window.editCalcIncome=function(i){
-    var s=document.getElementById("edit_sold_"+i);
-    var inc=document.getElementById("edit_income_"+i);
-    if(s && inc && inc.dataset.manual!=="1"){
-      /* do not force overwrite when supervisor is typing income */
-    }
-    paintEditTotals();
-  };
-
-  if(typeof window.calcIncome==="function" && !window.calcIncome._unlock){
+  if(typeof window.calcIncome==="function" && !window.calcIncome._cascade){
     var _ci=window.calcIncome;
     window.calcIncome=function(id){
-      var r=_ci.apply(this, arguments);
+      var sold=document.getElementById("sold_"+id);
       var inc=document.getElementById("income_"+id);
-      if(inc && isSup()){
-        inc.readOnly=false;
-        inc.style.pointerEvents="auto";
-        inc.style.background="#fff";
+      if(sold && inc){
+        inc.value=Math.round(num(sold.value)*priceOf(id));
+        if(isSup()){ inc.readOnly=false; inc.style.pointerEvents="auto"; inc.style.background="#fff"; }
+      } else {
+        try{ _ci.apply(this, arguments); }catch(e){}
       }
       paintTotals();
-      return r;
     };
-    window.calcIncome._unlock=true;
+    window.calcIncome._cascade=true;
   }
-
-  ["edit_cash","edit_card","edit_start","cashAmount","cardTotal","cashBalance"].forEach(function(id){
-    document.addEventListener("input", function(ev){
-      if(ev.target && ev.target.id===id) paintTotals();
-    });
-  });
 
   var _start=window.startEditSubmission;
-  if(typeof _start==="function" && !_start._tot){
+  if(typeof _start==="function" && !_start._cascade){
     window.startEditSubmission=function(){
       var r=_start.apply(this, arguments);
-      setTimeout(function(){
-        unlockIncome();
-        ["edit_cash","edit_card","edit_start"].forEach(function(id){
-          var el=document.getElementById(id);
-          if(el && !el._totBound){ el._totBound=true; el.addEventListener("input", paintEditTotals); }
-        });
-        var n=0;
-        while(document.getElementById("edit_income_"+n)){
-          (function(i){
-            var el=document.getElementById("edit_income_"+i);
-            if(el && !el._totBound){ el._totBound=true; el.addEventListener("input", function(){ el.dataset.manual="1"; paintEditTotals(); }); }
-            ["edit_prev_","edit_next_","edit_sold_"].forEach(function(pre){
-              var x=document.getElementById(pre+i);
-              if(x && !x._totBound){ x._totBound=true; x.addEventListener("input", function(){ if(window.editCalc) window.editCalc(i); }); }
-            });
-          })(n);
-          n++;
-        }
-        paintEditTotals();
-      }, 30);
+      setTimeout(function(){ bindEdit(); unlockIncome(); paintEditTotals(); }, 40);
       return r;
     };
-    window.startEditSubmission._tot=true;
+    window.startEditSubmission._cascade=true;
   }
 
-  /* cut freeze: live_fix recalcAll every 1.5s locks income and janks the page */
-  if(window._liveFixTimer) try{ clearInterval(window._liveFixTimer); }catch(e){}
-  var last=0;
-  setInterval(function(){
-    var now=Date.now();
-    if(now-last<2500) return;
-    last=now;
-    unlockIncome();
-    if(document.hidden) return;
-    paintTotals();
-  }, 2500);
+  document.addEventListener("input", function(ev){
+    var id=ev.target && ev.target.id || "";
+    if(id==="cashAmount"||id==="cardTotal"||id==="cashBalance"||id==="edit_cash"||id==="edit_card"||id==="edit_start") paintTotals();
+  });
 
-  if(document.readyState==="complete"){ unlockIncome(); paintTotals(); }
-  else window.addEventListener("load", function(){ unlockIncome(); paintTotals(); });
+  setInterval(function(){
+    if(document.hidden) return;
+    bindEmp();
+    bindEdit();
+    unlockIncome();
+  }, 2000);
+
+  if(document.readyState==="complete"){ bindEmp(); bindEdit(); }
+  else window.addEventListener("load", function(){ bindEmp(); bindEdit(); });
 })();
