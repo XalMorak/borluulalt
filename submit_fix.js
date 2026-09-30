@@ -27,8 +27,11 @@
   }
   function sid(s){
     if(!s) return "";
-    if(s.id) return String(s.id).replace(/[.#$\[\]\/]/g,"_");
     return ["s", s.employeeId||"", s.date||"", s.shift||"", s.location||"", tekOf(s), kindOf(s)].join("_").replace(/[.#$\[\]\/]/g,"_");
+  }
+  function biz(s){
+    if(!s) return "";
+    return [s.employeeId||"", s.date||"", s.shift||"", s.location||"", tekOf(s), kindOf(s)].join("|").toLowerCase();
   }
   function gone(){
     var o={};
@@ -38,8 +41,8 @@
   function mergeSubs(a,b){
     var del=gone(), map={};
     listOf(a).concat(listOf(b)).forEach(function(s){
-      var k=sid(s);
-      if(!k || del[k] || s.deleted) return;
+      var k=biz(s)||sid(s);
+      if(!k || del[k] || del[sid(s)] || s.deleted) return;
       var cur=map[k];
       if(!cur || String(s.submittedAt||"")>=String(cur.submittedAt||"")) map[k]=s;
     });
@@ -64,8 +67,8 @@
     data.sheet=data.kind==="wine"?"wine":"bar";
     data.submittedAt=new Date().toISOString();
     data.locked=false;
-    if(!data.id) data.id=Date.now()+"_"+(data.employeeId||"e")+"_"+data.kind;
     var key=sid(data);
+    data.id=key;
     var local=(typeof getSubs==="function")?getSubs():[];
     var merged=mergeSubs(local, [data]);
     if(typeof setSubs==="function") setSubs(merged);
