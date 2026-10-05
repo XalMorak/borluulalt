@@ -1,7 +1,7 @@
 const DEFAULT_PRODUCTS=[{id:1,name:"Боргио",price:3500,stock:0},{id:2,name:"Нийлэл",price:3500,stock:0},{id:3,name:"Cass",price:4000,stock:0},{id:4,name:"Asahi",price:5000,stock:0},{id:5,name:"Калтенберг",price:4000,stock:0},{id:6,name:"Алтангөвь",price:3500,stock:0},{id:7,name:"Gem",price:6500,stock:0},{id:8,name:"ЕРӨӨ говь Задгай",price:3500,stock:0},{id:10,name:"Tsingtao",price:5000,stock:0},{id:11,name:"Heineken",price:5000,stock:0},{id:12,name:"terra",price:4000,stock:0},{id:14,name:"Сэнгур (лааз)",price:4000,stock:0}];
 const DEFAULT_USERS={emp001:{name:"Бат-Эрдэнэ",role:"employee",pin:""},emp002:{name:"Сарантуяа",role:"employee",pin:""},emp003:{name:"Мөнхбаатар",role:"employee",pin:""},sup001:{name:"Ахлах менежер",role:"supervisor",pin:""}};
 const LOW_STOCK=10,STORAGE_KEY="borluulalt_products_v2",USERS_KEY="borluulalt_users_v1",LOG_KEY="borluulalt_logs_v1";
-let currentUser=null,_editingIdx=null,_sortedSubs=[],_formDirty=false,_syncBusy=false,_lastCloudAt=null,_reportRows=[];
+var currentUser=null;/* var: window.currentUser === currentUser for patch files */let _editingIdx=null,_sortedSubs=[],_formDirty=false,_syncBusy=false,_lastCloudAt=null,_reportRows=[];
 function getProducts(){const s=localStorage.getItem(STORAGE_KEY);let arr;if(s){try{arr=JSON.parse(s)}catch(e){arr=null}}if(!arr)arr=JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));let changed=false;arr.forEach(p=>{if(p&&p.id===14&&String(p.name||"").indexOf("Сангур")>=0){p.id=13;changed=true}});if(changed)try{localStorage.setItem(STORAGE_KEY,JSON.stringify(arr))}catch(e){}return arr}
 function setProducts(arr){localStorage.setItem(STORAGE_KEY,JSON.stringify(arr))}
 function getActiveProducts(){return getProducts().filter(p=>!p.deleted)}

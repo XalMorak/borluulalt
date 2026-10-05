@@ -1,0 +1,156 @@
+/* supervisor_day.js — Ахлах: only today's submissions + per-employee илүү/дутуу for today.
+   Data filter itself lives in accountant.js (_supTodayFilter); this file locks the date inputs
+   to today and draws the илүү/дутуу panel on Тойм and Илгээлт tabs. */
+(function(){
+  if(window._supDay) return;
+  window._supDay=true;
+
+  function U(){ return window._acctUtil||{}; }
+  function today(){
+    if(U().today) return U().today();
+    var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  }
+  function role(){ var u=(U().me?U().me():window.currentUser)||{}; return u.role||""; }
+  function isSup(){ return role()==="supervisor"; }
+  function num(v){ var n=Number(v); return isFinite(n)?n:0; }
+  function esc(v){ return U().esc?U().esc(v):String(v==null?"":v); }
+  function signed(n){ return U().signed?U().signed(n):String(Math.round(num(n))); }
+  function money(n){ return U().money?U().money(n):String(Math.round(num(n))); }
+  function diffCls(d){ return Math.abs(d)<0.01?"diff-ok":(d>0?"diff-over":"diff-short"); }
+
+  function lockInput(id, t){
+    var el=document.getElementById(id);
+    if(!el) return false;
+    var changed=el.value!==t;
+    if(changed) el.value=t;
+    el.disabled=true;
+    el.title="Ахлах зөвхөн өнөөдрийн илгээлт харна";
+    return changed;
+  }
+  function unlockInput(id){
+    var el=document.getElementById(id);
+    if(el && el.disabled && el.title.indexOf("Ахлах")===0){ el.disabled=false; el.title=""; }
+  }
+  function note(tabId, t){
+    var tab=document.getElementById(tabId);
+    if(!tab) return;
+    var id="supDayNote_"+tabId, n=document.getElementById(id);
+    if(!n){
+      n=document.createElement("div");
+      n.id=id;
+      n.className="no-print";
+      n.style.cssText="margin:0 0 10px;padding:8px 12px;border-radius:10px;background:#fff7e6;border:1px solid #f5c26b;font-size:.85rem;color:#7a4b00";
+      tab.insertBefore(n, tab.firstChild);
+    }
+    n.textContent="Зөвхөн өнөөдрийн илгээлт: "+t;
+  }
+  function hideAllBtn(){
+    document.querySelectorAll("#ovFilterBar button").forEach(function(b){
+      if((b.getAttribute("onclick")||"").indexOf("clearOverviewFilter")>=0) b.style.display=isSup()?"none":"";
+    });
+  }
+
+  function kind(){ return window._sheetKind||"all"; }
+  function todayRows(){
+    var t=today(), k=kind();
+    var kindOf=U().kindOf||function(s){ return (s&&(s.kind==="wine"||s.sheet==="wine"))?"wine":"bar"; };
+    var all=(typeof getSubs==="function"?getSubs():[])||[];
+    return all.filter(function(s){ return s && !s.deleted && (s.date||"")===t && (k==="all"||kindOf(s)===k); });
+  }
+  function compute(){
+    var users=(typeof getUsers==="function"?getUsers():{})||{};
+    var calcOf=U().calcOf||function(s){ return num(s.calcTotal); };
+    var colOf=U().collectedOf||function(s){ return num(s.collected); };
+    var diffOf=U().diffOf||function(s){ return num(s.diff); };
+    var emp={};
+    Object.keys(users).forEach(function(id){
+      var u=users[id]||{};
+      if(u.role==="employee" && !u.disabled) emp[id]={id:id, name:u.name||id, n:0, calc:0, col:0, over:0, short:0};
+    });
+    todayRows().forEach(function(s){
+      var id=s.employeeId||"?";
+      var e=emp[id]||(emp[id]={id:id, name:s.employeeName||id, n:0, calc:0, col:0, over:0, short:0});
+      var d=diffOf(s);
+      e.n++; e.calc+=calcOf(s); e.col+=colOf(s);
+      if(d<0) e.short+=d; else e.over+=d;
+    });
+    return Object.keys(emp).map(function(k){ return emp[k]; }).sort(function(a,b){
+      if(!!a.n!==!!b.n) return a.n?-1:1;
+      return (a.over+a.short)-(b.over+b.short) || String(a.name).localeCompare(String(b.name));
+    });
+  }
+  function panelHtml(rows, t){
+    var tot={n:0,calc:0,col:0,over:0,short:0}, missing=0;
+    var body=rows.map(function(e){
+      if(!e.n){ missing++; return '<tr style="color:#999"><td style="text-align:left">'+esc(e.name)+' <small>('+esc(e.id)+')</small></td><td>0</td><td colspan="5">Илгээгээгүй</td></tr>'; }
+      tot.n+=e.n; tot.calc+=e.calc; tot.col+=e.col; tot.over+=e.over; tot.short+=e.short;
+      var net=e.over+e.short;
+      return '<tr><td style="text-align:left">'+esc(e.name)+' <small style="color:#888">('+esc(e.id)+')</small></td><td>'+e.n+'</td><td>'+money(e.calc)+'</td><td>'+money(e.col)+'</td>'
+        +'<td class="diff-over">'+signed(e.over)+'</td><td class="diff-short">'+signed(e.short)+'</td><td class="'+diffCls(net)+'"><strong>'+signed(net)+'</strong></td></tr>';
+    }).join("");
+    var kl={all:"Нэгдсэн",bar:"Пиво",wine:"Вино"}[kind()]||"";
+    return '<h4 style="margin:4px 0 6px">Өнөөдрийн илүү / дутуу — '+esc(t)+(kl?' · '+kl:'')+(missing?' <small style="font-weight:400;color:#c0392b">· '+missing+' ажилтан илгээгээгүй</small>':'')+'</h4>'
+      +'<div class="table-wrap"><table style="margin:4px 0 14px"><thead><tr><th>Ажилтан</th><th>Илгээлт</th><th>Бодолт</th><th>Цуглуулсан</th><th>Илүү</th><th>Дутуу</th><th>Цэвэр</th></tr></thead><tbody>'
+      +(body||'<tr><td colspan="7">Ажилтан алга</td></tr>')
+      +'<tr style="font-weight:700;background:#e8f0fe"><td>НИЙТ</td><td>'+tot.n+'</td><td>'+money(tot.calc)+'</td><td>'+money(tot.col)+'</td><td class="diff-over">'+signed(tot.over)+'</td><td class="diff-short">'+signed(tot.short)+'</td><td class="'+diffCls(tot.over+tot.short)+'">'+signed(tot.over+tot.short)+'</td></tr>'
+      +'</tbody></table></div>';
+  }
+  function mountPanel(tabId, beforeId){
+    var tab=document.getElementById(tabId);
+    if(!tab) return null;
+    var id="supDiff_"+tabId, el=document.getElementById(id);
+    if(!el){
+      el=document.createElement("div");
+      el.id=id;
+      el.className="sup-diff-panel";
+      var before=beforeId&&document.getElementById(beforeId);
+      if(before && before.parentNode===tab) tab.insertBefore(el, before);
+      else tab.appendChild(el);
+    }
+    return el;
+  }
+
+  var lastSig="", lastDay=today();
+  function tick(){
+    var t=today();
+    if(!isSup()){
+      ["subFilterFrom","subFilterTo","ovFrom","ovTo"].forEach(unlockInput);
+      hideAllBtn();
+      return;
+    }
+    var subCh=lockInput("subFilterFrom", t)|lockInput("subFilterTo", t);
+    var ovCh=lockInput("ovFrom", t)|lockInput("ovTo", t);
+    try{ if(ovCh && typeof applyOverviewFilter==="function") applyOverviewFilter(); }catch(e){}
+    try{ if(subCh && typeof applySubFilter==="function") applySubFilter(); }catch(e){}
+    hideAllBtn();
+    note("tabSubmissions", t);
+    note("tabOverview", t);
+    if(t!==lastDay){
+      lastDay=t;
+      if(typeof loadSupervisorData==="function") loadSupervisorData();
+    }
+    var rows=compute();
+    var sig=t+"|"+kind()+"|"+JSON.stringify(rows);
+    var p1=mountPanel("tabSubmissions","submissionsList");
+    var p2=mountPanel("tabOverview","overallSummary");
+    if(sig===lastSig && p1 && p1.innerHTML && p2 && p2.innerHTML) return;
+    lastSig=sig;
+    var html=panelHtml(rows, t);
+    if(p1) p1.innerHTML=html;
+    if(p2) p2.innerHTML=html;
+  }
+  window.renderSupervisorDay=function(){ lastSig=""; tick(); };
+
+  /* "Цэвэрлэх" on the Илгээлт filter must not open other days for ахлах */
+  function wrapClear(){
+    var f=window.clearSubFilter;
+    if(typeof f!=="function" || f._supDay) return;
+    var w=function(){ var r=f.apply(this, arguments); if(isSup()) window.renderSupervisorDay(); return r; };
+    if(U().copyFlags) U().copyFlags(f, w);
+    w._supDay=true;
+    window.clearSubFilter=w;
+  }
+
+  tick();
+  setInterval(function(){ wrapClear(); tick(); }, 1000);
+})();
