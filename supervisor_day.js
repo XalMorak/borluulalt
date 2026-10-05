@@ -1,6 +1,7 @@
 /* supervisor_day.js — Ахлах: only today's submissions + per-employee илүү/дутуу for today.
    Data filter itself lives in accountant.js (_supTodayFilter); this file locks the date inputs
-   to today and draws the илүү/дутуу panel on Тойм and Илгээлт tabs. */
+   to today (Тойм, Илгээлт, Тайлан), hides the multi-day period buttons and chart on Тайлан, and
+   draws the илүү/дутуу panel on Тойм and Илгээлт tabs. */
 (function(){
   if(window._supDay) return;
   window._supDay=true;
@@ -110,11 +111,42 @@
     return el;
   }
 
+  /* Тайлан: guard.js re-installs its own runReport every 700ms and reads reportFrom/reportTo from
+     the DOM, so the lock is done on those inputs. Multi-day buttons and the chart are hidden. */
+  var REPORT_KEEP=/runReport|exportCSV|printReport/;
+  function lockReport(t){
+    var ch=lockInput("reportFrom", t)|lockInput("reportTo", t);
+    var sup=isSup();
+    document.querySelectorAll("#tabReports .period-btns button").forEach(function(b){
+      var keep=REPORT_KEEP.test(b.getAttribute("onclick")||"");
+      if(!keep) b.style.display=sup?"none":"";
+    });
+    var chart=document.getElementById("chartArea");
+    if(chart) chart.style.display=sup?"none":"";
+    return ch;
+  }
+  function unlockReport(){
+    unlockInput("reportFrom"); unlockInput("reportTo");
+    document.querySelectorAll("#tabReports .period-btns button").forEach(function(b){ b.style.display=""; });
+    var chart=document.getElementById("chartArea"); if(chart) chart.style.display="";
+  }
+  function wrapReportDays(){
+    var f=window.setReportDays;
+    if(typeof f!=="function" || f._supDay) return;
+    var w=function(n){
+      if(isSup()){ lockReport(today()); if(typeof runReport==="function") runReport(); return; }
+      return f.apply(this, arguments);
+    };
+    w._supDay=true;
+    window.setReportDays=w;
+  }
+
   var lastSig="", lastDay=today();
   function tick(){
     var t=today();
     if(!isSup()){
       ["subFilterFrom","subFilterTo","ovFrom","ovTo"].forEach(unlockInput);
+      unlockReport();
       hideAllBtn();
       return;
     }
@@ -122,6 +154,9 @@
     var ovCh=lockInput("ovFrom", t)|lockInput("ovTo", t);
     try{ if(ovCh && typeof applyOverviewFilter==="function") applyOverviewFilter(); }catch(e){}
     try{ if(subCh && typeof applySubFilter==="function") applySubFilter(); }catch(e){}
+    var repCh=lockReport(t);
+    try{ if(repCh && typeof runReport==="function") runReport(); }catch(e){}
+    note("tabReports", t);
     hideAllBtn();
     note("tabSubmissions", t);
     note("tabOverview", t);
@@ -152,5 +187,11 @@
   }
 
   tick();
-  setInterval(function(){ wrapClear(); tick(); }, 1000);
+  wrapReportDays();
+  setInterval(function(){ wrapClear(); wrapReportDays(); tick(); }, 1000);
+  /* re-lock right after any click inside Тайлан (period buttons set dates programmatically) */
+  document.addEventListener("click", function(ev){
+    if(!isSup() || !ev.target || !ev.target.closest || !ev.target.closest("#tabReports")) return;
+    setTimeout(function(){ if(lockReport(today()) && typeof runReport==="function") runReport(); }, 0);
+  }, false);
 })();

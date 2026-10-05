@@ -144,9 +144,12 @@
       var res=await Promise.all([
         base.ref("borluulalt/submissions").once("value"),
         base.ref("borluulalt/inbox").once("value"),
-        base.ref("borluulalt/payments").once("value")
+        base.ref("borluulalt/payments").once("value"),
+        base.ref("borluulalt/deleted").once("value")
       ]);
+      var tombs=Object.assign({}, res[3].val()||{}, window._tombs||{});
       _all=mergeAll(listOf(res[0].val()).concat(listOf(res[1].val())));
+      if(window._tombMatch) _all=_all.filter(function(s){ return !window._tombMatch(s, tombs); });
       _pays=res[2].val()||{};
       _loadedAt=Date.now();
     }catch(e){
@@ -451,7 +454,18 @@
   function wrapHeader(){
     if(typeof window.exportCSV==="function" && !window.exportCSV._acctCsv){
       var pe=window.exportCSV;
-      var fe=function(){ if(role()==="accountant") return window.exportAccountantCSV(); return pe.apply(this, arguments); };
+      var fe=function(){
+        if(role()==="accountant") return window.exportAccountantCSV();
+        if(role()==="supervisor"){
+          /* ахлах: export only today's rows (never fall back to all submissions) */
+          var g=window.getSubs, rr=window._reportRows;
+          var todayOnly=function(l){ return filterSubs(l||[]); };
+          window._reportRows=todayOnly(rr&&rr.length?rr:(typeof g==="function"?g():[]));
+          window.getSubs=function(){ return todayOnly(g.apply(this, arguments)); };
+          try{ return pe.apply(this, arguments); } finally { window.getSubs=g; window._reportRows=rr; }
+        }
+        return pe.apply(this, arguments);
+      };
       copyFlags(pe, fe); fe._acctCsv=true; window.exportCSV=fe;
     }
     if(typeof window.refreshData==="function" && !window.refreshData._acct){
