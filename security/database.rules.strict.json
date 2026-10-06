@@ -1,0 +1,76 @@
+{
+  "rules": {
+    "borluulalt": {
+      "_meta": {
+        ".read": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true)",
+        ".write": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'supervisor' || root.child('borluulalt/users/'+auth.uid).child('role').val() === 'accountant'))"
+      },
+      "updatedAt": {
+        ".read": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true)",
+        ".write": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'supervisor'))"
+      },
+      "users": {
+        ".read": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true)",
+        "$uid": {
+          ".write": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'accountant'))",
+          ".validate": "!newData.exists() || (newData.child('name').isString() && newData.child('name').val().length > 0 && newData.child('name').val().length <= 80 && newData.child('role').isString() && newData.child('role').val().matches(/^(employee|supervisor|accountant)$/) && !newData.hasChild('pin'))"
+        }
+      },
+      "products": {
+        ".read": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true)",
+        ".write": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'supervisor'))"
+      },
+      "wines": {
+        ".read": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true)",
+        ".write": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'supervisor'))"
+      },
+      "submissions": {
+        ".read": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'supervisor' || root.child('borluulalt/users/'+auth.uid).child('role').val() === 'accountant'))",
+        ".write": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'supervisor'))"
+      },
+      "logs": {
+        ".read": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'supervisor' || root.child('borluulalt/users/'+auth.uid).child('role').val() === 'accountant'))",
+        ".write": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'supervisor'))"
+      },
+      "inbox": {
+        ".read": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true)",
+        ".indexOn": [
+          "submittedAt"
+        ],
+        "$sid": {
+          ".write": "((auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'supervisor')) && !newData.exists()) || ((auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'employee')) && newData.exists() && newData.child('employeeId').val() === auth.uid && (!data.exists() || data.child('employeeId').val() === auth.uid))",
+          ".validate": "!newData.exists() || (newData.child('employeeId').isString() && newData.child('submittedAt').isString())"
+        }
+      },
+      "deleted": {
+        ".read": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true)",
+        ".indexOn": [
+          "at"
+        ],
+        "$k": {
+          ".write": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'supervisor'))"
+        }
+      },
+      "rosters": {
+        ".read": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'supervisor' || root.child('borluulalt/users/'+auth.uid).child('role').val() === 'accountant'))",
+        "$id": {
+          ".write": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'accountant'))"
+        }
+      },
+      "payments": {
+        ".read": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'supervisor' || root.child('borluulalt/users/'+auth.uid).child('role').val() === 'accountant'))",
+        "$k": {
+          ".write": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'accountant'))"
+        }
+      },
+      "$other": {
+        ".read": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'supervisor' || root.child('borluulalt/users/'+auth.uid).child('role').val() === 'accountant'))",
+        ".write": false
+      }
+    },
+    "borluulalt_secret": {
+      ".read": false,
+      ".write": false
+    }
+  }
+}

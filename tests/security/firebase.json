@@ -1,0 +1,16 @@
+{
+  "emulators": {
+    "database": {
+      "host": "127.0.0.1",
+      "port": 9400
+    },
+    "auth": {
+      "host": "127.0.0.1",
+      "port": 9499
+    },
+    "ui": {
+      "enabled": false
+    },
+    "singleProjectMode": true
+  }
+}

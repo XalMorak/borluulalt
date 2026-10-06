@@ -1,0 +1,16 @@
+{
+  "name": "borluulalt-security-tests",
+  "private": true,
+  "description": "Rules, login function and migration tests against the local Firebase emulators (never production)",
+  "scripts": {
+    "emulators": "firebase emulators:start --only database,auth --project demo-borluulalt --config firebase.json",
+    "test": "node --test --test-concurrency=1 rules.test.js login.test.js migrate.test.js",
+    "e2e": "node e2e-browser.js all"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^3.0.0",
+    "firebase": "10.14.1",
+    "firebase-tools": "^13.35.1",
+    "puppeteer-core": "^23.0.0"
+  }
+}
