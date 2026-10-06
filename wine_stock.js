@@ -1,7 +1,7 @@
 /* wine stock by location — does not touch beer products */
 (function(){
   if(window._wineStock)return; window._wineStock=true;
-  var LOCS=["\u041e\u044e\u0443\u0442 \u0431\u0430\u0440","\u041c\u0430\u043d\u043b\u0430\u0439 \u0431\u0430\u0440","POWER"];
+  var LOCS=["\u041e\u044e\u0443\u0442 \u0431\u0430\u0440","\u041c\u0430\u043d\u043b\u0430\u0439 \u0431\u0430\u0440","VIP","POWER"]; /* same 4 locations as STOCK_LOCS (beer) */
   function ensure(w){
     if(!w.stockByLoc||typeof w.stockByLoc!=="object") w.stockByLoc={};
     LOCS.forEach(function(l){ if(w.stockByLoc[l]==null) w.stockByLoc[l]=0; });

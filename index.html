@@ -60,7 +60,9 @@
       + '<script src="dedupe_fix.js"><\/script>'
       + '<script src="accountant.js"><\/script>'
       + '<script src="sync_stable.js"><\/script>'
-      + '<script src="supervisor_day.js"><\/script>';
+      + '<script src="supervisor_day.js"><\/script>'
+      + '<script src="acct_users.js"><\/script>'
+      + '<script src="stock_merged.js"><\/script>';
     html=html.replace('</body>', inject+'</body>');
     document.open(); document.write(html); document.close();
   }catch(e){

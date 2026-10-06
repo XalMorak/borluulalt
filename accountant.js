@@ -169,7 +169,14 @@
     el.id="accountantView";
     el.className="hidden";
     el.innerHTML=
-      '<div class="card" style="padding:14px;margin-bottom:12px;box-shadow:none;border:1px solid #e5e7eb">'
+      '<div class="tabs acct-tabs no-print" id="acctTabs">'
+      +'<button type="button" class="tab-btn active" data-acct-tab="subs">Илгээлт</button>'
+      +'<button type="button" class="tab-btn" data-acct-tab="users">Хэрэглэгч</button>'
+      +'<button type="button" class="tab-btn" data-acct-tab="roster">Ростер</button>'
+      +'</div>'
+      +'<div id="acctPaneUsers" class="hidden"></div>'
+      +'<div id="acctPaneRoster" class="hidden">'
+      +'<div class="card" style="padding:14px;margin-bottom:12px;box-shadow:none;border:1px solid #e5e7eb">'
       +'<h3 style="margin:0 0 8px">Ростер тохируулах — 14 хоног</h3>'
       +'<p style="margin:0 0 10px;color:#5b6570;font-size:.85rem">Ростер нь байршил биш. 14 хоног ирж очих ээлж. Эхлэх өдөр сонгоход дуусах өдөр автоматаар +13 хоног.</p>'
       +'<div class="header-info">'
@@ -181,6 +188,8 @@
       +'<div id="rosterMembers" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"></div>'
       +'<div id="rosterList" style="margin-top:10px;font-size:.85rem"></div>'
       +'</div>'
+      +'</div>'
+      +'<div id="acctPaneSubs">'
       +'<h3 style="margin:6px 0 8px">Бүх илгээлт</h3>'
       +'<div class="header-info no-print">'
       +'<div><label>Ростер</label><select id="acctRoster"></select></div>'
@@ -203,8 +212,13 @@
       +'<div class="table-wrap"><table><thead><tr><th>Ажилтан</th><th>Илгээлт</th><th>Бодолт</th><th>Цуглуулсан</th><th>Илүү</th><th>Дутуу</th><th>Цэвэр</th><th>Төлсөн</th></tr></thead><tbody id="acctEmpBody"></tbody></table></div>'
       +'<div id="acctDetail"></div>'
       +'<h4 style="margin:14px 0 4px">Илгээлтүүд <small style="font-weight:400;color:#666">(мөр дээр дарж дэлгэрэнгүй харна)</small></h4>'
-      +'<div class="table-wrap"><table><thead><tr><th>Огноо</th><th>Ээлж</th><th>Ажилтан</th><th>Байршил</th><th>Тек</th><th>Төрөл</th><th>Бодолт</th><th>Цуглуулсан</th><th>Зөрүү</th><th>Төлсөн</th><th>Дүн</th><th></th></tr></thead><tbody id="acctBody"></tbody></table></div>';
+      +'<div class="table-wrap"><table><thead><tr><th>Огноо</th><th>Ээлж</th><th>Ажилтан</th><th>Байршил</th><th>Тек</th><th>Төрөл</th><th>Бодолт</th><th>Цуглуулсан</th><th>Зөрүү</th><th>Төлсөн</th><th>Дүн</th><th></th></tr></thead><tbody id="acctBody"></tbody></table></div>'
+      +'</div>';
     host.appendChild(el);
+    document.getElementById("acctTabs").addEventListener("click", function(ev){
+      var b=ev.target.closest("button[data-acct-tab]");
+      if(b) window.showAcctTab(b.getAttribute("data-acct-tab"));
+    });
     document.getElementById("rosterStart").onchange=function(){
       var v=this.value;
       if(v) document.getElementById("rosterEnd").value=addDays(v, 13);
@@ -235,6 +249,23 @@
       if(tr) showDetail(Number(tr.getAttribute("data-i")));
     });
   }
+
+  /* Нягтлан page tabs: Илгээлт | Хэрэглэгч | Ростер */
+  window.showAcctTab=function(name){
+    var panes={subs:"acctPaneSubs", users:"acctPaneUsers", roster:"acctPaneRoster"};
+    if(!panes[name]) name="subs";
+    Object.keys(panes).forEach(function(k){
+      var p=document.getElementById(panes[k]);
+      if(p) p.classList.toggle("hidden", k!==name);
+    });
+    var bar=document.getElementById("acctTabs");
+    if(bar) Array.prototype.forEach.call(bar.querySelectorAll("button[data-acct-tab]"), function(b){
+      b.classList.toggle("active", b.getAttribute("data-acct-tab")===name);
+    });
+    window._acctTab=name;
+    if(name==="users" && typeof window.renderAcctUsers==="function") window.renderAcctUsers();
+    if(name==="roster") try{ drawMembers(); }catch(e){}
+  };
 
   function drawMembers(selected){
     var box=document.getElementById("rosterMembers");

@@ -138,7 +138,7 @@
     try{
       if(!s.items || typeof getProducts!=="function" || typeof setProducts!=="function") return;
       var products=getProducts();
-      var LOCS=["Оюут бар","Манлай бар","POWER"];
+      var LOCS=(window.STOCK_LOCS&&window.STOCK_LOCS.length)?window.STOCK_LOCS:["Оюут бар","Манлай бар","VIP","POWER"];
       var loc=LOCS.indexOf(s.location)>=0?s.location:"Оюут бар";
       s.items.forEach(function(it){
         if(!(Number(it&&it.sold)>0)) return;
