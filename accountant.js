@@ -226,7 +226,7 @@
     document.getElementById("rosterStart").value=today();
     document.getElementById("rosterEnd").value=addDays(today(), 13);
     document.getElementById("rosterSave").onclick=function(){ window.saveRoster(); };
-    document.getElementById("acctReload").onclick=function(){ window.renderAccountant({reload:true}); };
+    document.getElementById("acctReload").onclick=function(){ if(typeof window.refreshData==="function") window.refreshData(); else window.renderAccountant({reload:true}); };
     document.getElementById("acctClear").onclick=function(){
       ["acctFrom","acctTo","acctEmp","acctLoc","acctTek"].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=""; });
       document.getElementById("acctRoster").value="";
@@ -565,11 +565,6 @@
     });
   }
 
-  function accountantVisible(){
-    var av=document.getElementById("accountantView");
-    return role()==="accountant" && av && !av.classList.contains("hidden") && !document.hidden;
-  }
-
   wrapList("renderSubmissionsList");
   wrapList("renderSubmissionsListEnhanced");
   wrapList("renderOverview");
@@ -580,11 +575,5 @@
     wrapList("renderSubmissionsListEnhanced");
     wrapHeader();
   }, 1500);
-  /* accountant auto-refresh every 60s, but never while typing or with unsaved payment edits */
-  setInterval(function(){
-    if(!accountantVisible() || window._acctDirty) return;
-    var a=document.activeElement;
-    if(a && a.closest && a.closest("#accountantView") && /INPUT|SELECT|TEXTAREA/.test(a.tagName)) return;
-    window.renderAccountant({reload:true});
-  }, 60000);
+  /* no auto-refresh: data is read only on login and on "Шинэчлэх" / "Мэдээлэл шинэчлэх" (delta, see net_gate.js) */
 })();

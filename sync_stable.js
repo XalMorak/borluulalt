@@ -210,6 +210,10 @@
       try{ if(typeof ensureFirebaseAuth==="function") await ensureFirebaseAuth(); }catch(e){}
       var base=db();
       if(!base) throw new Error("no db");
+      /* reads are served from the local mirror (net_gate.js); refresh only what changed first */
+      if(typeof window._deltaSync==="function"){
+        try{ await window._deltaSync({nodes:["submissions","inbox","deleted","products","wines","logs"], reason:"pre-push"}); }catch(e){ console.warn("pre-push delta", e); }
+      }
       var local=(typeof packAll==="function"?packAll():null)||{};
       var cloud=(await base.ref("borluulalt").once("value")).val()||{};
       var tombs=Object.assign({}, cloud.deleted||{}, window._tombs||{});
