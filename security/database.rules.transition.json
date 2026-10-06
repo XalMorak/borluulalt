@@ -1,0 +1,53 @@
+{
+  "rules": {
+    "borluulalt": {
+      ".read": "auth != null",
+      "_meta": {
+        ".write": "auth != null"
+      },
+      "updatedAt": {
+        ".write": "auth != null"
+      },
+      "users": {
+        ".write": "auth != null"
+      },
+      "products": {
+        ".write": "auth != null"
+      },
+      "wines": {
+        ".write": "auth != null"
+      },
+      "submissions": {
+        ".write": "auth != null"
+      },
+      "logs": {
+        ".write": "auth != null"
+      },
+      "rosters": {
+        ".write": "auth != null"
+      },
+      "payments": {
+        ".write": "auth != null"
+      },
+      "inbox": {
+        ".write": "auth != null",
+        ".indexOn": [
+          "submittedAt"
+        ]
+      },
+      "deleted": {
+        ".write": "auth != null",
+        ".indexOn": [
+          "at"
+        ]
+      },
+      "$other": {
+        ".write": "auth != null"
+      }
+    },
+    "borluulalt_secret": {
+      ".read": false,
+      ".write": false
+    }
+  }
+}

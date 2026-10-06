@@ -83,6 +83,12 @@ Firebase зангилаа `borluulalt`. Илгээлт: ажилтан + огн�
 - `products` — пиво/бар бараа (`stockByLoc`, `stock` = нийлбэр)
 - `wines` — вино/бусад бараа, id ≥ 100 (`stockByLoc`, `stock`)
 
+## Нэвтрэлт ба аюулгүй байдал
+
+`api/` дахь Vercel function-ууд (`/api/login`, `/api/pin`, `/api/config`) PIN-ийг серверт hash-аар шалгаж Firebase custom token өгнө.
+`sec_login.js` нь `LOGIN_MODE` (legacy → transition → secure) feature flag-ээр асаана; env тохируулаагүй бол хуучин нэвтрэлт хэвээр.
+Rules (`security/`), PIN migration, нэвтрүүлэх дараалал: [security/README.md](security/README.md).
+
 ## License
 
 MIT — дэлгэрэх `LICENSE`.

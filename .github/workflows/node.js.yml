@@ -22,3 +22,21 @@ jobs:
           node-version: "20"
       - name: Syntax and required files
         run: node scripts/syntax-check.js
+
+  security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Install
+        run: npm ci && (cd tests/security && npm ci)
+      - name: Rules + login function + migration tests (local emulators only)
+        working-directory: tests/security
+        run: npx firebase emulators:exec --only database,auth --project demo-borluulalt "npm test"

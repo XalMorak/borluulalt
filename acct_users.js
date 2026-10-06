@@ -2,7 +2,11 @@
    Writes ONLY borluulalt/users/<id> through update() on that one key.
    Never replaces the whole users node or any other node.
    Guards: cannot delete yourself, cannot change your own role,
-   cannot delete or demote the last Ахлах (supervisor). */
+   cannot delete or demote the last Ахлах (supervisor).
+   Secure login (sec_login.js): in "secure" mode the record has no "pin" field (the
+   strict rules refuse it); PINs go to POST /api/pin and are stored only as hashes.
+   In "transition" mode the plain PIN is kept (old devices still check it) and the
+   hash is updated too. */
 (function(){
   if(window._acctUsers) return;
   window._acctUsers=true;
@@ -68,10 +72,21 @@
     if(rec ? !(back && back.name===rec.name && (back.role||"")===rec.role) : back!=null) throw new Error("verify");
   }
 
+  function secMode(){ try{ return typeof window._secMode==="function" ? window._secMode() : "legacy"; }catch(e){ return "legacy"; } }
+  function secure(){ return secMode()==="secure"; }
+  function tokenOn(){ return !!window._secSession && typeof window._secApi==="function"; }
+  /* PIN hash on the server. Returns "" on success, otherwise an error text */
+  async function serverPin(body){
+    if(!tokenOn()) return secure() ? "Серверээр нэвтрээгүй байна. Гараад дахин нэвтэрнэ үү." : "";
+    var r=await window._secApi("/api/pin", body);
+    return r.status===200 ? "" : ((r.body && r.body.error) || ("Алдаа "+r.status));
+  }
+
   function validId(id){ return /^[a-z0-9_-]{2,32}$/.test(id); }
-  function validPin(pin, role){
+  function validPin(pin, role, cur){
+    if(!pin && secure() && cur && cur.pinSet) return "";      // empty = keep the current (hashed) PIN
     if(!pin) return role==="employee" ? "" : "Ахлах / Нягтлан эрхтэй хэрэглэгчид PIN заавал";
-    if(!/^[0-9A-Za-z]{3,12}$/.test(pin)) return "PIN 3–12 тэмдэгт (тоо/үсэг), зай байж болохгүй";
+    if(!/^[0-9A-Za-z]{4,12}$/.test(pin)) return "PIN 4–12 тэмдэгт (тоо/үсэг), зай байж болохгүй";
     return "";
   }
 
@@ -88,9 +103,15 @@
       var cloud=await readCloud();
       if(cloud[id]) return alertMsg("Ийм ID аль хэдийн байна: "+id,"error");
       var rec={name:name, role:role, pin:pin, createdAt:new Date().toISOString(), createdBy:me().id};
+      if(secure()) delete rec.pin;
       await writeOne(id, rec);
       setLocal(id, rec); _cloud[id]=rec;
       log("user_add", id+" ("+roleLabel(role)+")");
+      if(pin){
+        var pe2=await serverPin({id:id, pin:pin});
+        if(pe2 && secure()) return alertMsg(name+" ("+id+") нэмэгдсэн боловч PIN тохируулагдсангүй: "+pe2,"error"), draw();
+        if(!pe2 && tokenOn()) rec.pinSet=true;
+      }
       ["auNewId","auNewName","auNewPin"].forEach(function(k){ document.getElementById(k).value=""; });
       document.getElementById("auNewRole").value="employee";
       alertMsg(name+" ("+id+") нэмэгдлээ","success");
@@ -106,18 +127,31 @@
     var role=tr.querySelector(".au-role").value||"employee";
     var pin=(tr.querySelector(".au-pin").value||"").trim();
     if(!name) return alertMsg("Нэр хоосон байж болохгүй","error");
-    var pe=validPin(pin, role); if(pe) return alertMsg(pe,"error");
     try{
       var cloud=await readCloud();
       var cur=cloud[id];
+      var pe=validPin(pin, role, cur); if(pe) return alertMsg(pe,"error");
       if(!cur) return alertMsg("Энэ хэрэглэгч серверт алга (өөр төхөөрөмжөөс устгагдсан байж магадгүй)","error"), draw();
       if(id===me().id && role!==(cur.role||"")) return alertMsg("Өөрийн эрхийг өөрчлөх боломжгүй","error");
       if((cur.role||"")==="supervisor" && role!=="supervisor" && supervisors(cloud).length<=1)
         return alertMsg("Сүүлийн Ахлахын эрхийг өөрчлөх боломжгүй. Эхлээд өөр Ахлах нэмнэ үү.","error");
       var rec=Object.assign({}, cur, {name:name, role:role, pin:pin, updatedAt:new Date().toISOString(), updatedBy:me().id});
+      if(secure()){
+        delete rec.pin;
+        if(pin){   // hash first: the record write below removes any old plain-text PIN
+          var pe3=await serverPin({id:id, pin:pin});
+          if(pe3) return alertMsg("PIN тохируулагдсангүй: "+pe3,"error");
+          rec.pinSet=true;
+        }
+      }
       await writeOne(id, rec);
       setLocal(id, rec); _cloud[id]=rec;
       log("user_edit", id);
+      if(!secure() && tokenOn() && (pin || cur.pinSet)){
+        /* transition: keep the server hash equal to the plain PIN (empty = no PIN) */
+        var pe4=await serverPin(pin ? {id:id, pin:pin} : {id:id, remove:true});
+        if(pe4) console.warn("server PIN", pe4);
+      }
       alertMsg(name+" ("+id+") хадгалагдлаа","success");
     }catch(e){ console.warn("acctSaveUser",e); alertMsg("Серверт хадгалагдсангүй. Дахин оролдоно уу.","error"); }
     draw();
@@ -135,6 +169,7 @@
       if(!confirm((cur.name||id)+" ("+id+", "+roleLabel(cur.role)+")\nхэрэглэгчийг устгах уу? Энэ хэрэглэгч дахин нэвтэрч чадахгүй.")) return;
       await writeOne(id, null);
       setLocal(id, null); delete _cloud[id];
+      if(tokenOn()){ var pe5=await serverPin({id:id, remove:true}); if(pe5) console.warn("server PIN remove", pe5); }
       log("user_delete", id);
       alertMsg((cur.name||id)+" устгагдлаа","success");
     }catch(e){ console.warn("acctDeleteUser",e); alertMsg("Серверт устгагдсангүй. Дахин оролдоно уу.","error"); }
@@ -173,14 +208,14 @@
       +'<div><label>PIN</label><input id="auNewPin" type="password" inputmode="numeric" autocomplete="new-password" placeholder="1234"></div>'
       +'<div style="display:flex;align-items:flex-end"><button type="button" class="btn btn-success btn-sm" id="auAdd">+ Нэмэх</button></div>'
       +'</div>'
-      +'<p style="margin:0;color:#5b6570;font-size:.8rem">ID нь нэвтрэх нэр. Ахлах / Нягтлан эрхэд PIN заавал.</p>'
+      +'<p style="margin:0;color:#5b6570;font-size:.8rem">ID нь нэвтрэх нэр. Ахлах / Нягтлан эрхэд PIN заавал. <span id="auSecNote"></span></p>'
       +'</div>'
       +'<div id="auAlert"></div>'
       +'<h3 style="margin:6px 0 4px">Хэрэглэгчид <small id="auCount" style="font-weight:400;color:#666"></small></h3>'
       +'<div class="au-toolbar">'
       +'<input id="auSearch" placeholder="Хайх (ID / нэр)">'
       +'<select id="auRoleFilter"><option value="">Бүх эрх</option>'+opts+'</select>'
-      +'<label style="font-size:.85rem"><input type="checkbox" id="auShowPin"> PIN харуулах</label>'
+      +'<label style="font-size:.85rem" id="auShowPinLbl"><input type="checkbox" id="auShowPin"> PIN харуулах</label>'
       +'<button type="button" class="btn btn-outline btn-sm" id="auReload">Шинэчлэх</button>'
       +'</div>'
       +'<div class="table-wrap"><table class="au-table"><thead><tr><th>ID</th><th>Нэр</th><th>Эрх</th><th>PIN</th><th></th></tr></thead><tbody id="auBody"></tbody></table></div>';
@@ -212,6 +247,10 @@
     var q=((document.getElementById("auSearch")||{}).value||"").trim().toLowerCase();
     var rf=(document.getElementById("auRoleFilter")||{}).value||"";
     var show=(document.getElementById("auShowPin")||{}).checked;
+    var sec=secure();
+    var lbl=document.getElementById("auShowPinLbl"); if(lbl) lbl.style.display=sec?"none":"";
+    var note=document.getElementById("auSecNote");
+    if(note) note.textContent=sec?"🔒 PIN серверт зөвхөн hash хэлбэрээр хадгалагдана: шинэ PIN бичвэл солигдоно, хоосон орхивол хэвээр.":"";
     var myId=me().id;
     var sups=supervisors(users).length;
     var order={accountant:0,supervisor:1,employee:2};
@@ -233,7 +272,9 @@
         +'<td style="text-align:left"><b class="au-role-'+esc(r)+'">'+esc(id)+'</b>'+(self?'<span class="au-me">та</span>':'')+(u.disabled?' <small style="color:#999">(идэвхгүй)</small>':'')+'</td>'
         +'<td><input class="au-name" value="'+esc(u.name||"")+'"></td>'
         +'<td><select class="au-role"'+(self?' disabled title="Өөрийн эрхийг өөрчлөх боломжгүй"':'')+'>'+opts+'</select></td>'
-        +'<td><input class="au-pin" type="'+(show?"text":"password")+'" inputmode="numeric" autocomplete="new-password" value="'+esc(u.pin||"")+'" placeholder="—"></td>'
+        +(sec
+          ? '<td><input class="au-pin" type="password" inputmode="numeric" autocomplete="new-password" value="" placeholder="'+(u.pinSet?"•••• тохируулсан":"PIN алга")+'"></td>'
+          : '<td><input class="au-pin" type="'+(show?"text":"password")+'" inputmode="numeric" autocomplete="new-password" value="'+esc(u.pin||"")+'" placeholder="'+(u.pinSet&&!u.pin?"(серверт)":"—")+'"></td>')
         +'<td class="au-act"><button type="button" class="btn btn-success btn-sm" data-act="save">Хадгалах</button>'
         +'<button type="button" class="btn btn-danger btn-sm" data-act="del"'+(why?' disabled title="'+why+'" style="opacity:.45;cursor:not-allowed"':'')+'>Устгах</button></td>'
         +'</tr>';

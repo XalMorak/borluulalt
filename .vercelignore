@@ -1,0 +1,5 @@
+# not needed by the site or the /api functions
+tests/
+scripts/
+security/
+*.md

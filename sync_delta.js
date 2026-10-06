@@ -1,5 +1,5 @@
 /* sync_delta.js — loaded LAST. Wires net_gate.js into the app:
-   - login: users (version check) -> PIN ok -> one delta sync of the role's nodes
+   - login: [server login + custom token, see sec_login.js] -> users (version check) -> PIN ok -> one delta sync of the role's nodes
             (full the first time on this device), then the normal login runs and
             reads everything from the local mirror
    - "Мэдээлэл шинэчлэх": one delta sync, then the normal refresh renders from the mirror
@@ -27,6 +27,18 @@
     var fn=async function(){
       var id=((document.getElementById("loginId")||{}).value||"").trim().toLowerCase();
       var pin=((document.getElementById("loginPin")||{}).value||"").trim();
+      var sec=null;
+      var la=document.getElementById("loginAlert"); if(la) la.innerHTML="";   // no stale error from the previous try
+      if(id && typeof window._secSignIn==="function"){
+        /* server login (sec_login.js): token modes check the PIN on the server first */
+        badge("busy");
+        try{ sec=await window._secSignIn(id, pin); }catch(e){ sec={error:"Нэвтрэхэд алдаа гарлаа"}; }
+        if(sec && sec.error){
+          badge("ok");
+          if(typeof showAlert==="function") showAlert("loginAlert", sec.error, "error");
+          return;
+        }
+      }
       if(id && typeof window._deltaSync==="function"){
         badge("busy");
         try{
@@ -40,7 +52,13 @@
           } else badge("ok");
         }catch(e){ console.warn("login delta", e); badge("err"); }
       }
-      return prev.apply(this, arguments);
+      var out=await prev.apply(this, arguments);
+      /* the token's uid is the exact users key; inbox rules compare employeeId with it */
+      if(sec && sec.ok && window.currentUser && String(window.currentUser.id).toLowerCase()===String(sec.user.id).toLowerCase()){
+        window.currentUser.id=sec.user.id;
+        window.currentUser.role=sec.user.role;
+      }
+      return out;
     };
     copyFlags(prev, fn); fn._delta=true; fn._loginFix=true;
     window.doLogin=fn;
