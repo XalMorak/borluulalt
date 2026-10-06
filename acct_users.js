@@ -51,6 +51,7 @@
     await auth();
     var base=db();
     if(!base) throw new Error("no-db");
+    if(typeof window._deltaSync==="function") await window._deltaSync({nodes:["users"], reason:"users"});
     var snap=await base.ref("borluulalt/users").once("value");
     _cloud=asUsers(snap.val());
     return _cloud;

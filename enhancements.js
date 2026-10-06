@@ -24,14 +24,8 @@ function startRealtimeSync(){
 }
 
 (function(){
-  function tryRt(){
-    if(window._fbDb||(typeof initFirebase==="function"&&initFirebase()))startRealtimeSync();
-  }
-  tryRt();
-  setInterval(tryRt,1000);
-  var t=setInterval(function(){
-    if(window.currentUser){startRealtimeSync();clearInterval(t);}
-  },500);
+  /* Realtime .on("value") on the whole borluulalt node removed (it re-downloaded
+     everything on every change). Data is read only on login / "Мэдээлэл шинэчлэх". */
 })();
 
 function exportCSVEnhanced(){
