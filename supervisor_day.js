@@ -93,6 +93,35 @@
       +'<tr style="font-weight:700;background:#e8f0fe"><td>НИЙТ</td><td>'+tot.n+'</td><td>'+money(tot.calc)+'</td><td>'+money(tot.col)+'</td><td class="diff-over">'+signed(tot.over)+'</td><td class="diff-short">'+signed(tot.short)+'</td><td class="'+diffCls(tot.over+tot.short)+'">'+signed(tot.over+tot.short)+'</td></tr>'
       +'</tbody></table></div>';
   }
+
+  function soldHtml(t){
+    var kindOf=U().kindOf||function(s){ return "bar"; };
+    var map={};
+    todayRows().forEach(function(s){
+      var kind=kindOf(s)==="wine"?"Вино":"Пиво";
+      (s.items||[]).forEach(function(it){
+        if(!it) return;
+        var qty=num(it.sold);
+        var inc=num(it.income)||qty*num(it.price);
+        if(!qty && !inc) return;
+        var name=String(it.name||it.id||"Бараа");
+        var k=kind+"|"+name;
+        if(!map[k]) map[k]={name:name, kind:kind, qty:0, income:0};
+        map[k].qty+=qty; map[k].income+=inc;
+      });
+    });
+    var arr=Object.keys(map).map(function(k){ return map[k]; }).sort(function(a,b){ return b.income-a.income || b.qty-a.qty; });
+    var qty=arr.reduce(function(a,it){ return a+it.qty; },0);
+    var inc=arr.reduce(function(a,it){ return a+it.income; },0);
+    var body=arr.map(function(it){
+      return '<tr><td style="text-align:left">'+esc(it.name)+'</td><td>'+esc(it.kind)+'</td><td>'+it.qty.toLocaleString()+'</td><td>'+money(it.income)+'</td></tr>';
+    }).join("")||'<tr><td colspan="4">Өнөөдөр зарсан бараа алга</td></tr>';
+    return '<h4 style="margin:8px 0 6px">Өнөөдөр зарагдсан — '+esc(t)+'</h4>'
+      +'<div class="table-wrap"><table style="margin:4px 0 14px"><thead><tr><th>Бараа</th><th>Төрөл</th><th>Тоо</th><th>Нийт дүн</th></tr></thead><tbody>'
+      +body
+      +'<tr style="font-weight:700;background:#e8f0fe"><td colspan="2">НИЙТ</td><td>'+qty.toLocaleString()+'</td><td>'+money(inc)+'</td></tr>'
+      +'</tbody></table></div>';
+  }
   function mountPanel(tabId, beforeId){
     var tab=document.getElementById(tabId);
     if(!tab) return null;
@@ -162,12 +191,12 @@
       if(typeof loadSupervisorData==="function") loadSupervisorData();
     }
     var rows=compute();
-    var sig=t+"|"+kind()+"|"+JSON.stringify(rows);
+    var sig=t+"|"+kind()+"|"+JSON.stringify(rows)+"|"+todayRows().length;
     var p1=mountPanel("tabSubmissions","submissionsList");
     var p2=mountPanel("tabOverview","overallSummary");
     if(sig===lastSig && p1 && p1.innerHTML && p2 && p2.innerHTML) return;
     lastSig=sig;
-    var html=panelHtml(rows, t);
+    var html=panelHtml(rows, t)+soldHtml(t);
     if(p1) p1.innerHTML=html;
     if(p2) p2.innerHTML=html;
   }
