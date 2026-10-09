@@ -173,13 +173,18 @@
       return;
     }
     window._tombs=Object.assign({}, window._tombs||{}); window._tombs[key]=tomb;
-    if(s.id){
-      try{
-        var ref=base.ref("borluulalt/inbox/"+safeKey(s.id));
-        var cur=(await ref.once("value")).val();
-        if(cur && String(cur.submittedAt||"")<=tomb.at) await ref.remove();
-      }catch(e){}
-    }
+    try{
+      var keys={};
+      if(s.id) keys[safeKey(s.id)]=1;
+      var tek=tekOf(s), kind=(s.kind==="wine"||s.sheet==="wine")?"wine":"bar";
+      var alt=["s", s.employeeId||"", s.date||"", s.shift||"", s.location||"", tek, kind].join("_").replace(/[.#$\[\]\/]/g,"_");
+      keys[safeKey(alt)]=1;
+      var live=typeof window._realDb==="function"?window._realDb():base;
+      for(var ik in keys){
+        if(!ik) continue;
+        await live.ref("borluulalt/inbox/"+ik).remove();
+      }
+    }catch(e){}
     restoreStock(s);
     if(typeof setSubs==="function") setSubs(dropTombed(rawSubs()));
     try{ await window.cloudPush(); }catch(e){}

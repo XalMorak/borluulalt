@@ -67,7 +67,8 @@ function renderSubmissionsListEnhanced(all){
       (s.locked?" 🔒":"")+
       (locLine?'<br><span style="color:#2980b9;font-weight:600">'+locLine+'</span>':'')+
       '<br><small>'+(s.submittedAt?new Date(s.submittedAt).toLocaleString("mn-MN"):"")+' | '+
-      Number(calc).toLocaleString()+'₮ | <span class="'+diffCls+'">'+diffTxt+'</span></small></div>';
+      Number(calc).toLocaleString()+'₮ | <span class="'+diffCls+'">'+diffTxt+'</span></small>'+
+      '<div class="no-print" style="margin-top:6px"><button type="button" class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteSubmission('+idx+')">Устгах</button></div></div>';
   }).join("");
 }
 

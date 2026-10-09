@@ -35,8 +35,12 @@
     add(list, cloud); add(list, inbox);
     try { add(list, typeof getSubs === "function" ? getSubs() : []); } catch (e3) {}
     var map = {};
+    var tombs = {};
+    try { Object.keys(window._tombs || {}).forEach(function (k) { var tb = window._tombs[k] || {}; if (tb.id) tombs[tb.id] = 1; if (tb.biz) tombs[tb.biz] = 1; }); } catch (e4) {}
     list.forEach(function (s) {
       if (!s || s.deleted) return;
+      var biz = [s.employeeId, s.date, s.shift, s.location, s.receiverName || "", s.kind || ""].join("|").toLowerCase();
+      if (tombs[s.id] || tombs[biz]) return;
       var k = s.id || [s.employeeId, s.date, s.shift, s.location, s.receiverName || "", s.kind || ""].join("|");
       var cur = map[k];
       if (!cur || String(s.submittedAt || "") >= String(cur.submittedAt || "")) map[k] = s;
