@@ -96,8 +96,10 @@
 
   function soldHtml(t){
     var kindOf=U().kindOf||function(s){ return "bar"; };
-    var map={};
+    var map={}, cash=0, card=0, start=0, calc=0, n=0;
     todayRows().forEach(function(s){
+      n++;
+      cash+=num(s.cashAmount); card+=num(s.cardTotal); start+=num(s.cashBalance); calc+=num(s.calcTotal);
       var kind=kindOf(s)==="wine"?"Вино":"Пиво";
       (s.items||[]).forEach(function(it){
         if(!it) return;
@@ -116,7 +118,9 @@
     var body=arr.map(function(it){
       return '<tr><td style="text-align:left">'+esc(it.name)+'</td><td>'+esc(it.kind)+'</td><td>'+it.qty.toLocaleString()+'</td><td>'+money(it.income)+'</td></tr>';
     }).join("")||'<tr><td colspan="4">Өнөөдөр зарсан бараа алга</td></tr>';
-    return '<h4 style="margin:8px 0 6px">Өнөөдөр зарагдсан — '+esc(t)+'</h4>'
+    var collected=Math.max(0, cash-start)+card;
+    var sum='<div class="summary-box" style="margin:0 0 12px"><div class="summary-item"><div class="label">Илгээлт</div><div class="value">'+n+'</div></div><div class="summary-item"><div class="label">Бодолт</div><div class="value">'+money(calc)+'</div></div><div class="summary-item"><div class="label">Бэлэн</div><div class="value">'+money(cash)+'</div></div><div class="summary-item"><div class="label">Карт</div><div class="value">'+money(card)+'</div></div><div class="summary-item"><div class="label">Цуглуулсан</div><div class="value">'+money(collected)+'</div></div><div class="summary-item"><div class="label">Зөрүү</div><div class="value '+diffCls(collected-calc)+'">'+signed(collected-calc)+'</div></div></div>';
+    return sum+'<h4 style="margin:8px 0 6px">Өнөөдөр зарагдсан — '+esc(t)+'</h4>'
       +'<div class="table-wrap"><table style="margin:4px 0 14px"><thead><tr><th>Бараа</th><th>Төрөл</th><th>Тоо</th><th>Нийт дүн</th></tr></thead><tbody>'
       +body
       +'<tr style="font-weight:700;background:#e8f0fe"><td colspan="2">НИЙТ</td><td>'+qty.toLocaleString()+'</td><td>'+money(inc)+'</td></tr>'
@@ -196,7 +200,7 @@
     var p2=mountPanel("tabOverview","overallSummary");
     if(sig===lastSig && p1 && p1.innerHTML && p2 && p2.innerHTML) return;
     lastSig=sig;
-    var html=panelHtml(rows, t)+soldHtml(t);
+    var html=soldHtml(t)+panelHtml(rows, t);
     if(p1) p1.innerHTML=html;
     if(p2) p2.innerHTML=html;
   }
