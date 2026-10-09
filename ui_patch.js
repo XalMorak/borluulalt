@@ -48,7 +48,6 @@
   function apply(){
     addVip(document.getElementById("stockLocSelect"));
     addVip(document.getElementById("wineStockLoc"));
-    ensureLogTab();
     hideLowStockWarn();
     wrapOverview();
   }

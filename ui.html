@@ -56,7 +56,7 @@ body.dark .btn-outline{background:#1e1e2a;color:#8ab4f8;border-color:#8ab4f8}
           <option value="POWER">POWER</option>
         </select>
       </div>
-      <div><label>Ээлж</label><select id="shiftType"><option>Өглөө</option><option>Орой</option><option>Бүтэн</option></select></div>
+      <div><label>Ээлж</label><select id="shiftType"><option>Өглөө</option><option>Орой</option></select></div>
       <div><label>Шалгагч</label><input type="text" id="checkerName"></div>
       <div><label>Тек номер</label>
         <select id="receiverName"><option value="">— Эхлээд байршил сонго —</option></select>
@@ -84,16 +84,14 @@ body.dark .btn-outline{background:#1e1e2a;color:#8ab4f8;border-color:#8ab4f8}
   </div>
   <div id="supervisorView" class="hidden">
     <div class="tabs no-print">
-      <button class="tab-btn active" id="tabBtnOverview" onclick="showTab('overview')">Тойм</button>
-      <button class="tab-btn" id="tabBtnSubs" onclick="showTab('submissions')">Илгээлт</button>
-      <button class="tab-btn" id="tabBtnReports" onclick="showTab('reports')">Тайлан</button>
+      <button class="tab-btn active" id="tabBtnSubs" onclick="showTab('submissions')">Илгээлт</button>
       <button class="tab-btn" id="tabBtnStock" onclick="showTab('stock')">Нөөц</button>
       <button class="tab-btn" id="tabBtnUsers" onclick="showTab('users')">Хэрэглэгч</button>
     </div>
-    <div id="tabOverview"><div id="overallSummary" class="summary-box"></div><div id="lowStockWarn"></div>
+    <div id="tabOverview" class="hidden"><div id="overallSummary" class="summary-box"></div><div id="lowStockWarn"></div>
       <table><thead><tr><th>#</th><th>Бараа</th><th>Үнэ</th><th>Нөөц</th><th>Зарсан</th><th>Орлого</th></tr></thead><tbody id="productTotalsBody"></tbody></table>
     </div>
-    <div id="tabSubmissions" class="hidden">
+    <div id="tabSubmissions">
       <div class="header-info no-print" style="margin-bottom:10px">
         <div><label>Эхлэх огноо</label><input type="date" id="subFilterFrom" onchange="applySubFilter()"></div>
         <div><label>Дуусах огноо</label><input type="date" id="subFilterTo" onchange="applySubFilter()"></div>
