@@ -151,6 +151,7 @@
       _all=mergeAll(listOf(res[0].val()).concat(listOf(res[1].val())));
       if(window._tombMatch) _all=_all.filter(function(s){ return !window._tombMatch(s, tombs); });
       _pays=res[2].val()||{};
+      window._payLedger=_pays._ledger||{};
       _loadedAt=Date.now();
     }catch(e){
       _loadErr="Серверээс уншиж чадсангүй — энэ төхөөрөмжийн өгөгдлийг харуулж байна.";
@@ -405,16 +406,37 @@
     var body=document.getElementById("acctBody");
     body.innerHTML=html||'<tr><td colspan="12">Илгээлт алга</td></tr>';
 
+    function adjOf(id){
+      var node=(_pays&&_pays._ledger)||{};
+      var a={pay:0,short_add:0,short_sub:0,over_add:0,over_sub:0};
+      Object.keys(node).forEach(function(k){
+        var r=node[k]; if(!r||r.employeeId!==id) return;
+        var tp=r.type||"pay"; if(a[tp]==null) tp="pay";
+        a[tp]+=num(r.amount);
+      });
+      return a;
+    }
+    function netEmp(e){
+      var a=adjOf(e.id);
+      var over=e.over+a.over_add-a.over_sub;
+      var short=e.short-a.short_add+a.short_sub+a.pay;
+      if(short>0){ over+=short; short=0; }
+      if(over<0){ short+=over; over=0; }
+      return {over:over, short:short, paid:e.paid+a.pay};
+    }
     var eb=document.getElementById("acctEmpBody");
     var erows=Object.keys(emp).map(function(k){ return emp[k]; }).sort(function(a,b){ return (a.over+a.short)-(b.over+b.short) || String(a.name).localeCompare(String(b.name)); });
+    var nOver=0, nShort=0, nPaid=0;
     eb.innerHTML=erows.map(function(e){
-      var net=e.over+e.short;
+      var n=netEmp(e); nOver+=n.over; nShort+=n.short; nPaid+=n.paid;
+      var net=n.over+n.short;
       return '<tr><td style="text-align:left">'+esc(e.name)+(e.id?' <small style="color:#888">('+esc(e.id)+')</small>':'')+'</td><td>'+e.n+'</td><td>'+money(e.calc)+'</td><td>'+money(e.col)+'</td>'
-        +'<td class="diff-over">'+signed(e.over)+'</td><td class="diff-short">'+signed(e.short)+'</td><td class="'+diffCls(net)+'"><strong>'+signed(net)+'</strong></td><td>'+money(e.paid)+'</td></tr>';
+        +'<td class="diff-over">'+signed(n.over)+'</td><td class="diff-short">'+signed(n.short)+'</td><td class="'+diffCls(net)+'"><strong>'+signed(net)+'</strong></td><td>'+money(n.paid)+'</td></tr>';
     }).join("")||'<tr><td colspan="8">—</td></tr>';
     if(erows.length>1){
-      eb.innerHTML+='<tr style="font-weight:700;background:#e8f0fe"><td>НИЙТ</td><td>'+rows.length+'</td><td>'+money(calcSum)+'</td><td>'+money(colSum)+'</td><td class="diff-over">'+signed(overSum)+'</td><td class="diff-short">'+signed(shortSum)+'</td><td class="'+diffCls(overSum+shortSum)+'">'+signed(overSum+shortSum)+'</td><td>'+money(paidSum)+'</td></tr>';
+      eb.innerHTML+='<tr style="font-weight:700;background:#e8f0fe"><td>НИЙТ</td><td>'+rows.length+'</td><td>'+money(calcSum)+'</td><td>'+money(colSum)+'</td><td class="diff-over">'+signed(nOver)+'</td><td class="diff-short">'+signed(nShort)+'</td><td class="'+diffCls(nOver+nShort)+'">'+signed(nOver+nShort)+'</td><td>'+money(nPaid)+'</td></tr>';
     }
+    overSum=nOver; shortSum=nShort; paidSum=nPaid;
 
     var r=f.roster?rosterById(f.roster):null;
     var sum=document.getElementById("acctSummary");

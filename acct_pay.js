@@ -121,10 +121,25 @@
     var sel = document.getElementById("payEmp");
     if (!dueBox || !hist) return;
     var rows = empRows();
+    var dueMap = {};
+    rows.forEach(function (e) { dueMap[e.id] = e; });
+    var people = [];
+    var seen = {};
+    if (typeof getUsers === "function") {
+      var us = getUsers() || {};
+      Object.keys(us).forEach(function (id) {
+        var u = us[id] || {};
+        if (u.role === "accountant" || u.role === "supervisor") return;
+        seen[id] = 1;
+        people.push({ id: id, name: u.name || id, due: dueMap[id] ? dueMap[id].due : 0 });
+      });
+    }
+    rows.forEach(function (e) { if (!seen[e.id]) people.push(e); });
+    people.sort(function (a, b) { return String(a.name).localeCompare(String(b.name)); });
     var cur = sel ? sel.value : "";
     if (sel) {
-      sel.innerHTML = '<option value="">Ажилтан сонго</option>' + rows.map(function (e) {
-        return '<option value="' + esc(e.id) + '">' + esc(e.name) + " · үлдэгдэл " + money(e.due) + "</option>";
+      sel.innerHTML = '<option value="">Ажилтан сонго</option>' + people.map(function (e) {
+        return '<option value="' + esc(e.id) + '">' + esc(e.name) + (e.due ? " · дутуу " + money(e.due) : "") + "</option>";
       }).join("");
       if (cur) sel.value = cur;
     }
@@ -137,11 +152,12 @@
       + "</tbody></table></div>";
     var filter = (document.getElementById("payHistEmp") || {}).value || "";
     var list = _ledger.filter(function (r) { return !filter || r.employeeId === filter; });
-    hist.innerHTML = '<div class="table-wrap"><table><thead><tr><th>Огноо</th><th>Ажилтан</th><th>Дүн</th><th>Тэмдэглэл</th><th>Бүртгэсэн</th><th>Цаг</th><th></th></tr></thead><tbody>'
+    hist.innerHTML = '<div class="table-wrap"><table><thead><tr><th>Огноо</th><th>Ажилтан</th><th>Үйлдэл</th><th>Дүн</th><th>Тэмдэглэл</th><th>Бүртгэсэн</th><th>Цаг</th><th></th></tr></thead><tbody>'
       + (list.map(function (r) {
         var when = r.at ? new Date(r.at).toLocaleString("mn-MN") : "—";
-        return "<tr><td>" + esc(r.date || "—") + "</td><td style=\"text-align:left\">" + esc(r.employeeName || r.employeeId) + "</td><td>" + money(r.amount) + "</td><td style=\"text-align:left\">" + esc(r.note || "—") + "</td><td>" + esc(r.byName || r.by || "—") + "</td><td>" + esc(when) + '</td><td><button type="button" class="btn btn-outline btn-sm" data-paydel="' + esc(r.id) + '">Устгах</button></td></tr>';
-      }).join("") || '<tr><td colspan="7">Төлөлт алга</td></tr>')
+        var labels = { pay: "Төлөлт", short_add: "Дутуу нэмэх", short_sub: "Дутуу хасах", over_add: "Илүү нэмэх", over_sub: "Илүү хасах" };
+        return "<tr><td>" + esc(r.date || "—") + "</td><td style=\"text-align:left\">" + esc(r.employeeName || r.employeeId) + "</td><td>" + esc(labels[r.type] || "Төлөлт") + "</td><td>" + money(r.amount) + "</td><td style=\"text-align:left\">" + esc(r.note || "—") + "</td><td>" + esc(r.byName || r.by || "—") + "</td><td>" + esc(when) + '</td><td><button type="button" class="btn btn-outline btn-sm" data-paydel="' + esc(r.id) + '">Устгах</button></td></tr>';
+      }).join("") || '<tr><td colspan="8">Төлөлт алга</td></tr>')
       + "</tbody></table></div>";
     var stamp = document.getElementById("payStamp");
     if (stamp) stamp.textContent = _loaded ? "Уншсан: " + new Date(_loaded).toLocaleTimeString("mn-MN") : "";
@@ -175,18 +191,21 @@
     var amount = Math.round(num((document.getElementById("payAmt") || {}).value));
     var date = (document.getElementById("payDate") || {}).value || today();
     var note = ((document.getElementById("payNote") || {}).value || "").trim();
+    var type = (document.getElementById("payType") || {}).value || "pay";
     var who = empRows().filter(function (e) { return e.id === emp; })[0];
-    if (!emp || !who) { if (typeof showAlert === "function") showAlert("payAlert", "Ажилтан сонго", "error"); return; }
+    var uname = who ? who.name : emp;
+    if (typeof getUsers === "function" && getUsers()[emp]) uname = getUsers()[emp].name || uname;
+    if (!emp) { if (typeof showAlert === "function") showAlert("payAlert", "Ажилтан сонго", "error"); return; }
     if (amount <= 0) { if (typeof showAlert === "function") showAlert("payAlert", "Дүн оруул", "error"); return; }
-    if (amount > who.due + 0.5) { if (typeof showAlert === "function") showAlert("payAlert", "Дүн үлдэгдлээс их байна", "error"); return; }
+    if (type === "pay" && who && amount > who.due + 0.5) { if (typeof showAlert === "function") showAlert("payAlert", "Төлөлт үлдэгдлээс их байна. Илүү нэмэх гэж байвал үйлдлээ солино уу.", "error"); return; }
     var base = await authed();
     if (!base) { if (typeof showAlert === "function") showAlert("payAlert", "Сервер алга", "error"); return; }
     var u = me();
-    var rec = { employeeId: emp, employeeName: who.name, amount: amount, date: date, note: note, at: new Date().toISOString(), by: u.id || "", byName: u.name || u.id || "" };
+    var rec = { employeeId: emp, employeeName: uname, amount: amount, date: date, note: note, type: type, at: new Date().toISOString(), by: u.id || "", byName: u.name || u.id || "" };
     try {
       var ref = await base.ref("borluulalt/payments/_ledger").push(rec);
       rec.id = ref.key;
-      await allocate(emp, amount, 1);
+      if (type === "pay" || type === "short_sub") await allocate(emp, amount, 1);
       _ledger.unshift(rec);
       if (typeof showAlert === "function") showAlert("payAlert", who.name + " " + money(amount) + " төлөлт бүртгэгдлээ", "success");
       var noteEl = document.getElementById("payNote");
@@ -195,7 +214,7 @@
       fillForm(emp);
       if (typeof window.renderAccountant === "function") window.renderAccountant({ reload: true });
     } catch (e) {
-      if (typeof showAlert === "function") showAlert("payAlert", "Бүртгэгдсэнгүй", "error");
+      if (typeof showAlert === "function") showAlert("payAlert", "Бүртгэгдсэнгүй: " + (e && e.message ? e.message : "алдаа"), "error");
     }
   }
 
@@ -241,6 +260,7 @@
       + '<div id="payDue"></div>'
       + '<div class="header-info" style="margin-top:10px">'
       + '<div><label>Ажилтан</label><select id="payEmp"></select></div>'
+      + '<div><label>Үйлдэл</label><select id="payType"><option value="pay">Дутуу хасах (төлөлт)</option><option value="short_add">Дутуу нэмэх</option><option value="short_sub">Дутуу хасах</option><option value="over_add">Илүү нэмэх</option><option value="over_sub">Илүү хасах</option></select></div>'
       + '<div><label>Дүн</label><input type="number" id="payAmt" min="0" step="1"></div>'
       + '<div><label>Огноо</label><input type="date" id="payDate"></div>'
       + '<div><label>Тэмдэглэл</label><input id="payNote" placeholder="Жишээ: бэлнээр"></div>'
