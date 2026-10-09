@@ -64,13 +64,10 @@
     var colOf=U().collectedOf||function(s){ return num(s.collected); };
     var diffOf=U().diffOf||function(s){ return num(s.diff); };
     var emp={};
-    Object.keys(users).forEach(function(id){
-      var u=users[id]||{};
-      if(u.role==="employee" && !u.disabled) emp[id]={id:id, name:u.name||id, n:0, calc:0, col:0, over:0, short:0};
-    });
     todayRows().forEach(function(s){
       var id=s.employeeId||"?";
-      var e=emp[id]||(emp[id]={id:id, name:s.employeeName||id, n:0, calc:0, col:0, over:0, short:0});
+      var known=users[id]||{};
+      var e=emp[id]||(emp[id]={id:id, name:s.employeeName||known.name||id, n:0, calc:0, col:0, over:0, short:0});
       var d=diffOf(s);
       e.n++; e.calc+=calcOf(s); e.col+=colOf(s);
       if(d<0) e.short+=d; else e.over+=d;
@@ -81,18 +78,18 @@
     });
   }
   function panelHtml(rows, t){
-    var tot={n:0,calc:0,col:0,over:0,short:0}, missing=0;
-    var body=rows.map(function(e){
-      if(!e.n){ missing++; return '<tr style="color:#999"><td style="text-align:left">'+esc(e.name)+' <small>('+esc(e.id)+')</small></td><td>0</td><td colspan="5">Илгээгээгүй</td></tr>'; }
+    var tot={n:0,calc:0,col:0,over:0,short:0};
+    var sent=rows.filter(function(e){ return e.n; });
+    var body=sent.map(function(e){
       tot.n+=e.n; tot.calc+=e.calc; tot.col+=e.col; tot.over+=e.over; tot.short+=e.short;
       var net=e.over+e.short;
       return '<tr><td style="text-align:left">'+esc(e.name)+' <small style="color:#888">('+esc(e.id)+')</small></td><td>'+e.n+'</td><td>'+money(e.calc)+'</td><td>'+money(e.col)+'</td>'
         +'<td class="diff-over">'+signed(e.over)+'</td><td class="diff-short">'+signed(e.short)+'</td><td class="'+diffCls(net)+'"><strong>'+signed(net)+'</strong></td></tr>';
     }).join("");
     var kl={all:"Нэгдсэн",bar:"Пиво",wine:"Вино"}[kind()]||"";
-    return '<h4 style="margin:4px 0 6px">Өнөөдрийн илүү / дутуу — '+esc(t)+(kl?' · '+kl:'')+(missing?' <small style="font-weight:400;color:#c0392b">· '+missing+' ажилтан илгээгээгүй</small>':'')+'</h4>'
+    return '<h4 style="margin:4px 0 6px">Өнөөдрийн илүү / дутуу — '+esc(t)+(kl?' · '+kl:'')+' <small style="font-weight:400;color:#666">· '+sent.length+' ажилтан илгээсэн</small></h4>'
       +'<div class="table-wrap"><table style="margin:4px 0 14px"><thead><tr><th>Ажилтан</th><th>Илгээлт</th><th>Бодолт</th><th>Цуглуулсан</th><th>Илүү</th><th>Дутуу</th><th>Цэвэр</th></tr></thead><tbody>'
-      +(body||'<tr><td colspan="7">Ажилтан алга</td></tr>')
+      +(body||'<tr><td colspan="7">Өнөөдөр илгээлт алга</td></tr>')
       +'<tr style="font-weight:700;background:#e8f0fe"><td>НИЙТ</td><td>'+tot.n+'</td><td>'+money(tot.calc)+'</td><td>'+money(tot.col)+'</td><td class="diff-over">'+signed(tot.over)+'</td><td class="diff-short">'+signed(tot.short)+'</td><td class="'+diffCls(tot.over+tot.short)+'">'+signed(tot.over+tot.short)+'</td></tr>'
       +'</tbody></table></div>';
   }
