@@ -1,5 +1,5 @@
 /* roster_cycle.js — 4 ростер, 7 хоногоор зөрүүлсэн 14/14 мөчлөг.
-   А эхлэх өдрөөс: А +0, Б +7, В +14, Г +21. Тус бүр 14 ажил, 14 амралт.
+   A эхлэх өдрөөс: A +0, B +7, C +14, D +21. Тус бүр 14 ажил, 14 амралт.
    Заримдаа ажилтан 7 хоног өмнө эсвэл хойш сунана — тухайн ээлж дээр тэмдэглэнэ.
    Хадгалалт: borluulalt/rosters/_cycle (start/end байхгүй тул гарын ростерт орохгүй). */
 (function () {
@@ -9,10 +9,10 @@
   var PERIOD = 28, WORK = 14, STAGGER = 7, EXT = 7;
   var COLORS = { A: "#1d4ed8", B: "#047857", C: "#b45309", D: "#6d28d9" };
   var DEFAULT_TEAMS = [
-    { id: "A", name: "А ростер", offset: 0 },
-    { id: "B", name: "Б ростер", offset: 7 },
-    { id: "C", name: "В ростер", offset: 14 },
-    { id: "D", name: "Г ростер", offset: 21 }
+    { id: "A", name: "A", offset: 0 },
+    { id: "B", name: "B", offset: 7 },
+    { id: "C", name: "C", offset: 14 },
+    { id: "D", name: "D", offset: 21 }
   ];
   var cfg = null;
 
@@ -60,7 +60,7 @@
     (raw.teams || []).forEach(function (t) { if (t && t.id) byId[t.id] = t; });
     b.teams = DEFAULT_TEAMS.map(function (t) {
       var s = byId[t.id] || {};
-      return { id: t.id, name: s.name || t.name, offset: t.offset, members: s.members || {} };
+      return { id: t.id, name: t.name, offset: t.offset, members: s.members || {} };
     });
     b.stretches = (raw.stretches || []).filter(function (s) { return s && s.employeeId && s.teamId && s.blockStart; });
     return b;
@@ -336,10 +336,10 @@
     card.className = "card";
     card.style.cssText = "padding:14px;margin-bottom:12px;box-shadow:none;border:1px solid #e5e7eb";
     card.innerHTML = ''
-      + '<h3 style="margin:0 0 6px">Автомат мөчлөг — А Б В Г</h3>'
-      + '<p style="margin:0 0 8px;color:#5b6570;font-size:.85rem">Жишээний загвар: А-ийн эхлэх өдрөөс 7 хоног тутамд дараагийн ростер орно. Тус бүр 14 хоног ажиллаад 14 хоног амрана. Нэг өдөр хоёр ростер давхцана. Ажилтан заримдаа тухайн ээлжээ 7 хоног өмнө эсвэл хойш сунгана.</p>'
+      + '<h3 style="margin:0 0 6px">Автомат мөчлөг — A B C D</h3>'
+      + '<p style="margin:0 0 8px;color:#5b6570;font-size:.85rem">Жишээний загвар: A-ийн эхлэх өдрөөс 7 хоног тутамд дараагийн ростер орно. Тус бүр 14 хоног ажиллаад 14 хоног амрана. Нэг өдөр хоёр ростер давхцана. Ажилтан заримдаа тухайн ээлжээ 7 хоног өмнө эсвэл хойш сунгана.</p>'
       + '<div class="header-info">'
-      + '<div><label>А ростер эхлэх</label><input type="date" id="cycleAnchor"></div>'
+      + '<div><label>A эхлэх</label><input type="date" id="cycleAnchor"></div>'
       + '<div style="display:flex;align-items:flex-end"><button type="button" class="btn btn-success btn-sm" id="cycleSave">Мөчлөг хадгалах</button></div>'
       + "</div>"
       + '<div id="cycleTeams" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"></div>'
