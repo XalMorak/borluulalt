@@ -447,6 +447,7 @@
   }
 
   async function refresh() {
+    window._cycleRefresh = refresh;
     ensureUi();
     if (!document.getElementById("cycleCard")) return;
     if (!cfg) await loadCfg();

@@ -296,6 +296,7 @@
   }
 
   async function openPay(reload) {
+    window.openAcctPay = openPay;
     ensure();
     ["acctPaneSubs", "acctPaneUsers", "acctPaneRoster", "acctPaneReport"].forEach(function (id) {
       var p = document.getElementById(id); if (p) p.classList.add("hidden");
