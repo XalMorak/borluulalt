@@ -49,7 +49,8 @@
     return {
       anchor: "2026-10-01",
       teams: DEFAULT_TEAMS.map(function (t) { return { id: t.id, name: t.name, offset: t.offset, members: {} }; }),
-      stretches: []
+      stretches: [],
+      overrides: {}
     };
   }
   function normalize(raw) {
@@ -63,6 +64,7 @@
       return { id: t.id, name: t.name, offset: t.offset, members: s.members || {} };
     });
     b.stretches = (raw.stretches || []).filter(function (s) { return s && s.employeeId && s.teamId && s.blockStart; });
+    b.overrides = raw.overrides && typeof raw.overrides === "object" ? raw.overrides : {};
     return b;
   }
 
@@ -99,8 +101,15 @@
     var late = st && st.late ? EXT : 0;
     return { start: start, end: addDays(start, WORK - 1), from: addDays(start, -early), to: addDays(addDays(start, WORK - 1), late), early: early, late: late };
   }
+  function membersFor(team, start) {
+    var key = team.id + "|" + start;
+    var ov = cfg && cfg.overrides && cfg.overrides[key];
+    if (ov && typeof ov === "object") return ov;
+    return team.members || {};
+  }
   function onBlock(empId, team, start, date) {
-    if (!team.members || !team.members[empId]) return false;
+    var members = membersFor(team, start);
+    if (!members[empId]) return false;
     var w = windowOf(empId, team, start);
     return date >= w.from && date <= w.to;
   }
@@ -127,8 +136,9 @@
         if (i < 0) continue;
         var start = blockStart(team, i);
         var end = addDays(start, WORK - 1);
-        var n = Object.keys(team.members || {}).length;
-        out.push({ id: "cyc_" + team.id + "_" + start.replace(/-/g, ""), name: team.name + (n ? "" : " · гишүүн алга"), start: start, end: end, members: team.members || {}, _cycle: true });
+        var mem = membersFor(team, start);
+        var n = Object.keys(mem).length;
+        out.push({ id: "cyc_" + team.id + "_" + start.replace(/-/g, ""), name: team.name + (n ? "" : " · гишүүн алга"), start: start, end: end, members: mem, _cycle: true });
       }
     });
     out.sort(function (a, b) { return a.start.localeCompare(b.start) || a.name.localeCompare(b.name); });
@@ -145,7 +155,7 @@
       [idx - 1, idx, idx + 1].forEach(function (i) {
         if (i < 0) return;
         var start = blockStart(team, i);
-        Object.keys(team.members || {}).forEach(function (empId) {
+        Object.keys(membersFor(team, start)).forEach(function (empId) {
           if (!onBlock(empId, team, start, date)) return;
           var w = windowOf(empId, team, start);
           var stretched = date < w.start || date > w.end;
@@ -171,16 +181,18 @@
     var body = cfg.teams.map(function (team) {
       var cells = days.map(function (d) {
         var on = false, stretch = false;
-        Object.keys(team.members || {}).forEach(function (empId) {
+        [0].forEach(function () {
           var first = addDays(cfg.anchor, team.offset);
           var idx = Math.floor(daysBetween(first, d) / PERIOD);
           [idx - 1, idx, idx + 1].forEach(function (k) {
             if (k < 0) return;
             var start = blockStart(team, k);
-            if (!onBlock(empId, team, start, d)) return;
-            on = true;
-            var w = windowOf(empId, team, start);
-            if (d < w.start || d > w.end) stretch = true;
+            Object.keys(membersFor(team, start)).forEach(function (empId) {
+              if (!onBlock(empId, team, start, d)) return;
+              on = true;
+              var w = windowOf(empId, team, start);
+              if (d < w.start || d > w.end) stretch = true;
+            });
           });
         });
         var base = false;
@@ -307,6 +319,7 @@
       if (typeof showAlert === "function") showAlert("acctAlert", "Мөчлөг хадгаллаа. Илгээлт/Тайлангийн ростер шүүлтэд гарсан.", "success");
       paint();
       drawStretches();
+      drawSaved();
       if (typeof window.renderAccountant === "function") window.renderAccountant();
     } catch (e2) {
       if (typeof showAlert === "function") showAlert("acctAlert", "Мөчлөг хадгалагдсангүй", "error");
@@ -328,6 +341,54 @@
     saveCfg();
   }
 
+
+  var _editKey = "";
+  function drawSaved() {
+    var box = document.getElementById("cycleSaved");
+    if (!box || !cfg) return;
+    var rows = window._cycleRosterOptions().filter(function (r) { return r.end >= addDays(today(), -14); }).slice(0, 12);
+    box.innerHTML = rows.map(function (r) {
+      var teamId = r.id.split("_")[1];
+      var key = teamId + "|" + r.start;
+      var names = Object.keys(r.members || {}).map(uname).sort().join(", ") || "гишүүн алга";
+      var edited = cfg.overrides && cfg.overrides[key];
+      return '<div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;margin:6px 0;padding:6px 0;border-bottom:1px solid #eee">'
+        + '<strong style="color:' + (COLORS[teamId] || "#111") + '">' + esc(r.name.split(" · ")[0]) + '</strong>'
+        + '<span>' + esc(r.start) + ' — ' + esc(r.end) + (edited ? ' · <em>зассан</em>' : '') + '</span>'
+        + '<span style="flex:1;color:#444">' + esc(names) + '</span>'
+        + '<button type="button" class="btn btn-outline btn-sm" data-cedit="' + esc(r.id) + '">Засах</button></div>';
+    }).join("") || "<div>Хадгалсан ростер алга. A B C D-г сонгоод хадгал.</div>";
+  }
+  function openEdit(rosterId) {
+    var parts = String(rosterId || "").split("_");
+    var team = teamById(parts[1]);
+    var start = parts[2] ? parts[2].slice(0, 4) + "-" + parts[2].slice(4, 6) + "-" + parts[2].slice(6, 8) : "";
+    if (!team || !start) return;
+    _editKey = team.id + "|" + start;
+    var mem = membersFor(team, start);
+    var box = document.getElementById("cycleEdit");
+    var title = document.getElementById("cycleEditTitle");
+    var host = document.getElementById("cycleEditMembers");
+    if (title) title.textContent = team.name + " засах — " + start + " — " + addDays(start, WORK - 1);
+    if (host) host.innerHTML = employees().map(function (e) {
+      return '<label style="border:1px solid #e5e7eb;border-radius:8px;padding:6px 8px"><input type="checkbox" class="cyc-edit" value="' + esc(e.id) + '"' + (mem[e.id] ? " checked" : "") + "> " + esc(e.name) + "</label>";
+    }).join("") || "Ажилтан алга";
+    if (box) { box.classList.remove("hidden"); box.scrollIntoView({ behavior: "smooth", block: "start" }); }
+  }
+  function saveEdit() {
+    if (!_editKey || !cfg) return;
+    var members = {};
+    document.querySelectorAll(".cyc-edit:checked").forEach(function (el) { members[el.value] = true; });
+    cfg.overrides = cfg.overrides || {};
+    cfg.overrides[_editKey] = members;
+    saveCfg();
+  }
+  function clearEdit() {
+    if (!_editKey || !cfg || !cfg.overrides) return;
+    delete cfg.overrides[_editKey];
+    saveCfg();
+  }
+
   function ensureUi() {
     var pane = document.getElementById("acctPaneRoster");
     if (!pane || document.getElementById("cycleCard")) return;
@@ -343,6 +404,15 @@
       + '<div style="display:flex;align-items:flex-end"><button type="button" class="btn btn-success btn-sm" id="cycleSave">Мөчлөг хадгалах</button></div>'
       + "</div>"
       + '<div id="cycleTeams" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"></div>'
+      + '<div style="margin-top:10px"><button type="button" class="btn btn-success" id="cycleSave2">A B C D хадгалах</button></div>'
+      + '<h4 style="margin:16px 0 6px">Хадгалсан ростер</h4>'
+      + '<p style="margin:0 0 8px;color:#5b6570;font-size:.85rem">Засах нь зөвхөн тухайн 14 хоногийн бүрэлдэхүүнийг өөрчилнө. Бүх мөчлөгийг солих бол дээрх A B C D-г засаад хадгал.</p>'
+      + '<div id="cycleSaved" style="font-size:.85rem"></div>'
+      + '<div id="cycleEdit" class="hidden" style="margin-top:10px;border:1px solid #0f3460;border-radius:8px;padding:10px">'
+      + '<h4 id="cycleEditTitle" style="margin:0 0 8px">Ээлж засах</h4>'
+      + '<div id="cycleEditMembers" style="display:flex;flex-wrap:wrap;gap:8px"></div>'
+      + '<div style="margin-top:8px"><button type="button" class="btn btn-success btn-sm" id="cycleEditSave">Энэ ээлжийг хадгалах</button> <button type="button" class="btn btn-outline btn-sm" id="cycleEditClear">Засварыг арилгах</button></div>'
+      + '</div>'
       + '<h4 style="margin:14px 0 6px">7 хоногийн сунгалт</h4>'
       + '<div class="header-info">'
       + '<div><label>Ажилтан</label><select id="cycleStretchEmp"></select></div>'
@@ -354,6 +424,15 @@
       + '<div id="cycleBoard" style="margin-top:12px"></div>';
     pane.insertBefore(card, pane.firstChild);
     document.getElementById("cycleSave").onclick = function () { saveCfg(); };
+    document.getElementById("cycleSave2").onclick = function () { saveCfg(); };
+    document.getElementById("cycleSaved").addEventListener("click", function (ev) {
+      var b = ev.target.closest("[data-cedit]");
+      if (b) openEdit(b.getAttribute("data-cedit"));
+    });
+    document.getElementById("cycleEditSave").onclick = saveEdit;
+    document.getElementById("cycleEditClear").onclick = clearEdit;
+    var oldCard = document.getElementById("rosterList");
+    if (oldCard && oldCard.closest) { var card = oldCard.closest(".card"); if (card && card.id !== "cycleCard") card.style.display = "none"; }
     document.getElementById("cycleStretchAdd").onclick = function () { addStretch(); };
     document.getElementById("cycleStretchEmp").onchange = fillBlocks;
     document.getElementById("cycleAnchor").onchange = function () {
@@ -375,6 +454,7 @@
     if (anchor && document.activeElement !== anchor) anchor.value = cfg.anchor;
     drawMembers();
     drawStretches();
+    drawSaved();
     paint();
   }
 
