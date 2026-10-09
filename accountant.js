@@ -323,10 +323,14 @@
   function applyFilters(all, f){
     var r=f.roster?rosterById(f.roster):null;
     var members=r&&r.members&&Object.keys(r.members).length?r.members:null;
+    var cycle=f.roster && String(f.roster).indexOf("cyc_")==0 && typeof window._cycleMatch==="function";
     return all.filter(function(s){
       var d=s.date||"";
-      if(r && (d<r.start || d>r.end)) return false;
-      if(members && !members[s.employeeId]) return false;
+      if(cycle){ if(!window._cycleMatch(s, f.roster)) return false; }
+      else {
+        if(r && (d<r.start || d>r.end)) return false;
+        if(members && !members[s.employeeId]) return false;
+      }
       if(f.from && d<f.from) return false;
       if(f.to && d>f.to) return false;
       if(f.emp && s.employeeId!==f.emp) return false;
@@ -349,10 +353,11 @@
     var sel=document.getElementById("acctRoster");
     var cur=sel.value;
     var rosters=listRosters();
+    if(typeof window._cycleRosterOptions==="function") rosters=rosters.concat(window._cycleRosterOptions());
     sel.innerHTML='<option value="">Бүгд (бүх илгээлт)</option>'+rosters.map(function(r){
       return '<option value="'+esc(r.id)+'">'+esc(r.name)+' ('+r.start+' — '+r.end+')</option>';
     }).join("");
-    if(cur && rosterById(cur)) sel.value=cur;
+    if(cur && (rosterById(cur) || String(cur).indexOf("cyc_")==0)) sel.value=cur;
     var list=document.getElementById("rosterList");
     if(list) list.innerHTML=rosters.map(function(r){
       var n=Object.keys(r.members||{}).length;
