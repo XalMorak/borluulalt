@@ -5,7 +5,7 @@
   "scripts": {
     "emulators": "firebase emulators:start --only database,auth --project demo-borluulalt --config firebase.json",
     "test": "node --test --test-concurrency=1 rules.test.js login.test.js migrate.test.js",
-    "e2e": "node e2e-browser.js all && node e2e-flows.js && node e2e-dom.js && node e2e-stock.js && node e2e-stock.js strict"
+    "e2e": "node e2e-browser.js all && node e2e-flows.js && node e2e-dom.js && node e2e-acct.js && node e2e-stock.js && node e2e-stock.js strict"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^3.0.0",

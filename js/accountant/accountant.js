@@ -452,6 +452,14 @@
     var stamp=document.getElementById("acctStamp");
     if(stamp) stamp.textContent=_loadedAt?("Серверээс уншсан: "+new Date(_loadedAt).toLocaleTimeString("mn-MN")):"";
     if(_loadErr && typeof showAlert==="function") showAlert("acctAlert", _loadErr, "error");
+    /* acct_v2.js (dashboard, breakdowns, table tools) draws from the same rows */
+    try{ document.dispatchEvent(new CustomEvent("acct:rendered")); }catch(e){}
+  };
+  window._acct={
+    rows:function(){ return _rows; }, all:function(){ return _all; }, pays:function(){ return _pays; },
+    setPay:function(k, rec){ _pays[k]=rec; }, authed:authed, me:me,
+    kindOf:kindOf, diffOf:diffOf, calcOf:calcOf, collectedOf:collectedOf, tekOf:tekOf, keySafe:keySafe,
+    num:num, money:money, signed:signed, esc:esc, diffCls:diffCls, today:today, addDays:addDays, ymd:ymd
   };
 
   function showDetail(i){
