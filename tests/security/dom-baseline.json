@@ -21,6 +21,7 @@
  "employee": {
   "ids": [
    "button#btnTempSave",
+   "button#bugBtn",
    "button#darkBtn",
    "div#appSection",
    "div#empAlert",
@@ -56,6 +57,7 @@
    "Хадгалах",
    "Хэвлэх",
    "Цэвэрлэх",
+   "⚠ Алдаа мэдэгдэх",
    "🌙"
   ],
   "th": [
@@ -82,6 +84,7 @@
   "style": [
    "appSection|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
    "btnTempSave|inline-block,Arial,15.2px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
+   "bugBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
    "cardTotal|inline-block,Arial,16px,400,rgb(0, 0, 0),rgb(255, 255, 255),center,52px",
    "cashAmount|inline-block,Arial,16px,400,rgb(0, 0, 0),rgb(255, 255, 255),center,52px",
    "cashBalance|inline-block,Arial,16px,400,rgb(0, 0, 0),rgb(255, 255, 255),center,52px",
@@ -111,6 +114,7 @@
  },
  "supervisor": {
   "ids": [
+   "button#bugBtn",
    "button#darkBtn",
    "button#tabBtnStock",
    "button#tabBtnSubs",
@@ -143,6 +147,7 @@
    "Хэрэглэгч",
    "Цэвэрлэх",
    "Шүүх",
+   "⚠ Алдаа мэдэгдэх",
    "🌙"
   ],
   "th": [
@@ -166,6 +171,7 @@
   ],
   "style": [
    "appSection|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
+   "bugBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
    "darkBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
    "roleBadge|inline-block,\"Segoe UI\", system-ui, sans-serif,12px,600,rgb(255, 255, 255),rgb(231, 76, 60),start,0px",
    "sheetBar_tabSubmissions|flex,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgb(232, 244, 238),start,0px",
@@ -187,6 +193,7 @@
  },
  "supervisor:tabBtnSubs": {
   "ids": [
+   "button#bugBtn",
    "button#darkBtn",
    "button#tabBtnStock",
    "button#tabBtnSubs",
@@ -219,6 +226,7 @@
    "Хэрэглэгч",
    "Цэвэрлэх",
    "Шүүх",
+   "⚠ Алдаа мэдэгдэх",
    "🌙"
   ],
   "th": [
@@ -242,6 +250,7 @@
   ],
   "style": [
    "appSection|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
+   "bugBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
    "darkBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
    "roleBadge|inline-block,\"Segoe UI\", system-ui, sans-serif,12px,600,rgb(255, 255, 255),rgb(231, 76, 60),start,0px",
    "sheetBar_tabSubmissions|flex,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgb(232, 244, 238),start,0px",
@@ -263,6 +272,7 @@
  },
  "supervisor:tabBtnStock": {
   "ids": [
+   "button#bugBtn",
    "button#darkBtn",
    "button#smAddBtn",
    "button#smSave",
@@ -309,6 +319,7 @@
    "Пиво",
    "Устгах",
    "Хэрэглэгч",
+   "⚠ Алдаа мэдэгдэх",
    "🌙"
   ],
   "th": [
@@ -330,6 +341,7 @@
   ],
   "style": [
    "appSection|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
+   "bugBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
    "darkBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
    "roleBadge|inline-block,\"Segoe UI\", system-ui, sans-serif,12px,600,rgb(255, 255, 255),rgb(231, 76, 60),start,0px",
    "smAddBtn|block,Arial,12.8px,400,rgb(255, 255, 255),rgb(39, 174, 96),center,auto",
@@ -364,6 +376,7 @@
  },
  "supervisor:tabBtnUsers": {
   "ids": [
+   "button#bugBtn",
    "button#darkBtn",
    "button#supAddUser",
    "button#tabBtnStock",
@@ -388,6 +401,7 @@
    "Мэдээлэл шинэчлэх",
    "Нөөц",
    "Хэрэглэгч",
+   "⚠ Алдаа мэдэгдэх",
    "🌙"
   ],
   "th": [
@@ -402,6 +416,7 @@
   ],
   "style": [
    "appSection|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
+   "bugBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
    "darkBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
    "newUserId|inline-block,Arial,16px,400,rgb(0, 0, 0),rgb(255, 255, 255),start,0px",
    "newUserName|inline-block,Arial,16px,400,rgb(0, 0, 0),rgb(255, 255, 255),start,0px",
@@ -426,6 +441,7 @@
    "button#acctPrint",
    "button#acctReload",
    "button#acctSummaryCsv",
+   "button#bugBtn",
    "button#darkBtn",
    "div#accountantView",
    "div#acctAlert",
@@ -467,6 +483,7 @@
   ],
   "buttons": [
    "Excel",
+   "Алдаа",
    "Бүгд",
    "Гарах",
    "Илгээлт",
@@ -484,6 +501,7 @@
    "Энэ # хоног",
    "Энэ сар",
    "Өнөөдөр",
+   "⚠ Алдаа мэдэгдэх",
    "🌙"
   ],
   "th": [
@@ -550,6 +568,7 @@
    "acctTo|inline-block,monospace,16px,400,rgb(0, 0, 0),rgb(255, 255, 255),start,0px",
    "acctUnpaid|block,Arial,13.3333px,400,rgb(0, 0, 0),rgba(0, 0, 0, 0),start,auto",
    "appSection|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
+   "bugBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
    "darkBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
    "kpiCard|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgb(255, 255, 255),start,auto",
    "kpiCash|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgb(255, 255, 255),start,auto",
@@ -572,6 +591,7 @@
    "button#acctPrint",
    "button#acctReload",
    "button#acctSummaryCsv",
+   "button#bugBtn",
    "button#darkBtn",
    "div#accountantView",
    "div#acctAlert",
@@ -613,6 +633,7 @@
   ],
   "buttons": [
    "Excel",
+   "Алдаа",
    "Бүгд",
    "Гарах",
    "Илгээлт",
@@ -630,6 +651,7 @@
    "Энэ # хоног",
    "Энэ сар",
    "Өнөөдөр",
+   "⚠ Алдаа мэдэгдэх",
    "🌙"
   ],
   "th": [
@@ -696,6 +718,7 @@
    "acctTo|inline-block,monospace,16px,400,rgb(0, 0, 0),rgb(255, 255, 255),start,0px",
    "acctUnpaid|block,Arial,13.3333px,400,rgb(0, 0, 0),rgba(0, 0, 0, 0),start,auto",
    "appSection|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
+   "bugBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
    "darkBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
    "kpiCard|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgb(255, 255, 255),start,auto",
    "kpiCash|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgb(255, 255, 255),start,auto",
@@ -714,6 +737,7 @@
   "ids": [
    "button#auAdd",
    "button#auReload",
+   "button#bugBtn",
    "button#darkBtn",
    "div#accountantView",
    "div#acctPaneUsers",
@@ -738,6 +762,7 @@
   "buttons": [
    "+ Нэмэх",
    "Excel",
+   "Алдаа",
    "Гарах",
    "Илгээлт",
    "Мэдээлэл шинэчлэх",
@@ -748,6 +773,7 @@
    "Хадгалах",
    "Хэрэглэгч",
    "Шинэчлэх",
+   "⚠ Алдаа мэдэгдэх",
    "🌙"
   ],
   "th": [
@@ -784,6 +810,7 @@
    "auSecNote|inline,\"Segoe UI\", system-ui, sans-serif,12.8px,400,rgb(91, 101, 112),rgba(0, 0, 0, 0),start,0px",
    "auShowPinLbl|block,\"Segoe UI\", system-ui, sans-serif,13.6px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,auto",
    "auShowPin|inline-block,Arial,16px,400,rgb(0, 0, 0),rgba(0, 0, 0, 0),start,0px",
+   "bugBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
    "darkBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
    "roleBadge|inline-block,\"Segoe UI\", system-ui, sans-serif,12px,600,rgb(255, 255, 255),rgb(142, 68, 173),start,0px",
    "syncBadge|inline,\"Segoe UI\", system-ui, sans-serif,12px,400,rgb(21, 87, 36),rgb(212, 237, 218),start,0px",
@@ -792,6 +819,7 @@
  },
  "accountant:Ростер": {
   "ids": [
+   "button#bugBtn",
    "button#cycleSave",
    "button#cycleSave#",
    "button#cycleStretchAdd",
@@ -817,6 +845,7 @@
   "buttons": [
    "A B C D хадгалах",
    "Excel",
+   "Алдаа",
    "Гарах",
    "Илгээлт",
    "Мэдээлэл шинэчлэх",
@@ -826,6 +855,7 @@
    "Тайлан",
    "Төлөлт",
    "Хэрэглэгч",
+   "⚠ Алдаа мэдэгдэх",
    "🌙"
   ],
   "th": [],
@@ -841,6 +871,7 @@
    "acctPaneRoster|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
    "acctTabs|flex,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
    "appSection|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
+   "bugBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
    "cycleAnchor|inline-block,monospace,16px,400,rgb(0, 0, 0),rgb(255, 255, 255),start,0px",
    "cycleBoard|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
    "cycleCard|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgb(255, 255, 255),start,0px",
@@ -862,6 +893,7 @@
  },
  "accountant:Төлөлт": {
   "ids": [
+   "button#bugBtn",
    "button#darkBtn",
    "button#payReload",
    "button#paySave",
@@ -885,6 +917,7 @@
   ],
   "buttons": [
    "Excel",
+   "Алдаа",
    "Гарах",
    "Илгээлт",
    "Мэдээлэл шинэчлэх",
@@ -894,6 +927,7 @@
    "Төлөлт бүртгэх",
    "Хэрэглэгч",
    "Шинэчлэх",
+   "⚠ Алдаа мэдэгдэх",
    "🌙"
   ],
   "th": [],
@@ -910,6 +944,7 @@
    "acctPanePay|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
    "acctTabs|flex,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
    "appSection|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
+   "bugBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
    "darkBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
    "payAlert|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
    "payAmt|inline-block,Arial,16px,400,rgb(0, 0, 0),rgb(255, 255, 255),center,0px",
@@ -936,6 +971,7 @@
    "button#arToday",
    "button#arWeek",
    "button#arXls",
+   "button#bugBtn",
    "button#darkBtn",
    "div#accountantView",
    "div#acctPaneReport",
@@ -952,6 +988,7 @@
   "buttons": [
    "# хоног",
    "Excel",
+   "Алдаа",
    "Байршил",
    "Бараа",
    "Бүх хугацаа",
@@ -970,6 +1007,7 @@
    "Ээлж",
    "Өдрөөр",
    "Өнөөдөр",
+   "⚠ Алдаа мэдэгдэх",
    "🌙"
   ],
   "th": [],
@@ -989,6 +1027,60 @@
    "arToday|block,Arial,12.8px,400,rgb(255, 255, 255),rgb(15, 52, 96),center,auto",
    "arWeek|block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,auto",
    "arXls|block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,auto",
+   "bugBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
+   "darkBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
+   "roleBadge|inline-block,\"Segoe UI\", system-ui, sans-serif,12px,600,rgb(255, 255, 255),rgb(142, 68, 173),start,0px",
+   "syncBadge|inline,\"Segoe UI\", system-ui, sans-serif,12px,400,rgb(21, 87, 36),rgb(212, 237, 218),start,0px",
+   "userNameDisplay|inline,\"Segoe UI\", system-ui, sans-serif,16px,700,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px"
+  ]
+ },
+ "accountant:Алдаа": {
+  "ids": [
+   "button#bugBtn",
+   "button#bugReload",
+   "button#darkBtn",
+   "div#accountantView",
+   "div#acctPaneBugs",
+   "div#acctTabs",
+   "div#appSection",
+   "div#bugList",
+   "div#bugListAlert",
+   "select#bugF",
+   "select#bugK",
+   "span#roleBadge",
+   "span#syncBadge",
+   "strong#userNameDisplay"
+  ],
+  "buttons": [
+   "Excel",
+   "Алдаа",
+   "Гарах",
+   "Илгээлт",
+   "Мэдээлэл шинэчлэх",
+   "Ростер",
+   "Тайлан",
+   "Төлөлт",
+   "Хэрэглэгч",
+   "Шинэчлэх",
+   "⚠ Алдаа мэдэгдэх",
+   "🌙"
+  ],
+  "th": [],
+  "labels": [
+   "Төлөв",
+   "Төрөл"
+  ],
+  "style": [
+   "accountantView|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
+   "acctPaneBugs|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
+   "acctTabs|flex,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
+   "appSection|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
+   "bugBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
+   "bugF|inline-block,Arial,16px,400,rgb(0, 0, 0),rgb(239, 239, 239),start,0px",
+   "bugK|inline-block,Arial,16px,400,rgb(0, 0, 0),rgb(239, 239, 239),start,0px",
+   "bugListAlert|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
+   "bugList|block,\"Segoe UI\", system-ui, sans-serif,16px,400,rgb(51, 51, 51),rgba(0, 0, 0, 0),start,0px",
+   "bugReload|block,Arial,12.8px,400,rgb(255, 255, 255),rgb(15, 52, 96),center,auto",
    "darkBtn|inline-block,Arial,12.8px,400,rgb(15, 52, 96),rgb(255, 255, 255),center,0px",
    "roleBadge|inline-block,\"Segoe UI\", system-ui, sans-serif,12px,600,rgb(255, 255, 255),rgb(142, 68, 173),start,0px",
    "syncBadge|inline,\"Segoe UI\", system-ui, sans-serif,12px,400,rgb(21, 87, 36),rgb(212, 237, 218),start,0px",

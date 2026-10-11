@@ -1,4 +1,4 @@
-/* GET /api/config -> {mode, requirePin, configured}
+/* GET /api/config -> {mode, requirePin, configured, version}   (version = short git sha on Vercel)
    LOGIN_MODE (Vercel env, per Production / Preview):
      legacy      old client-side PIN check + anonymous auth (default)
      transition  server login first; if the server is unreachable / not configured,
@@ -14,5 +14,6 @@ module.exports = function handler(req, res) {
   let mode = String(process.env.LOGIN_MODE || "legacy").toLowerCase();
   if (["legacy", "transition", "secure"].indexOf(mode) < 0) mode = "legacy";
   if (!configured) mode = "legacy";
-  return send(res, 200, { mode: mode, requirePin: String(process.env.REQUIRE_PIN || "staff"), configured: configured });
+  return send(res, 200, { mode: mode, requirePin: String(process.env.REQUIRE_PIN || "staff"), configured: configured,
+    version: String(process.env.VERCEL_GIT_COMMIT_SHA || process.env.APP_VERSION || "").slice(0, 7) || null });
 };

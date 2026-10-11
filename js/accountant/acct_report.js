@@ -367,7 +367,7 @@
       var fn = function (name) {
         ensureReport();
         if (name === "report") {
-          ["acctPaneSubs", "acctPaneUsers", "acctPaneRoster"].forEach(function (id) {
+          ["acctPaneSubs", "acctPaneUsers", "acctPaneRoster", "acctPaneBugs"].forEach(function (id) {
             var p = document.getElementById(id); if (p) p.classList.add("hidden");
           });
           var rp = document.getElementById("acctPaneReport");

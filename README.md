@@ -71,3 +71,7 @@ Firebase зангилаа `borluulalt`.
 ## License
 
 MIT — дэлгэрэх `LICENSE`.
+
+## Алдааны мэдэгдэл
+
+«Алдаа мэдэгдэх» товч (бүх эрх) → `borluulalt/reports`; нягтлангийн «Алдаа» таб; `api/reports.js` (REPORTS_TOKEN). Дэлгэрэнгүй: [security/README.md](security/README.md#алдааны-мэдэгдэл-borluulaltreports).
