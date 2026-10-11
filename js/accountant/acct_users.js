@@ -176,27 +176,11 @@
     draw();
   };
 
-  function ensureStyle(){
-    if(document.getElementById("auStyle")) return;
-    var st=document.createElement("style");
-    st.id="auStyle";
-    st.textContent=
-      ".au-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0}"
-      +".au-toolbar input,.au-toolbar select{padding:7px;border:1px solid #ccc;border-radius:6px;font-size:16px}"
-      +".au-table{min-width:560px}.au-table td{vertical-align:middle}"
-      +".au-table input,.au-table select{width:100%;min-width:90px;padding:6px;border:1px solid #ccc;border-radius:6px;font-size:16px}"
-      +".au-table td.au-act{white-space:nowrap}.au-table .btn{margin:2px}"
-      +".au-me{display:inline-block;margin-left:4px;padding:1px 6px;border-radius:10px;background:#e8f0fe;color:#0f3460;font-size:.7rem}"
-      +".au-role-supervisor{color:#c0392b}.au-role-accountant{color:#8e44ad}"
-      +"@media(max-width:700px){.au-toolbar>*{flex:1 1 140px}}";
-    document.head.appendChild(st);
-  }
 
   function ensurePane(){
     var pane=document.getElementById("acctPaneUsers");
     if(!pane) return null;
     if(document.getElementById("auBody")) return pane;
-    ensureStyle();
     var opts=ROLES.map(function(r){ return '<option value="'+r[0]+'">'+r[1]+'</option>'; }).join("");
     pane.innerHTML=
       '<div class="card" style="padding:14px;margin-bottom:12px;box-shadow:none;border:1px solid #e5e7eb">'

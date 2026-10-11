@@ -14,70 +14,74 @@
   try{
     var html=await (await fetch('ui.html?t='+Date.now())).text();
     html=html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'');
+    /* load order matters (later files build on earlier ones); see README → Код зохион байгуулалт */
+    var SCRIPTS=[
+      "js/core/net_gate.js",
+      "js/ui/money_font.js",
+      "js/core/app.js",
+      "js/core/app2.js",
+      "js/core/app3.js",
+      "js/core/compat_fix.js",
+      "js/core/merge_fix.js",
+      "js/stock/stock_fix.js",
+      "js/supervisor/features.js",
+      "js/supervisor/enhancements.js",
+      "js/auth/firebase_auth_fix.js",
+      "js/supervisor/subs_ui.js",
+      "js/core/bugfix.js",
+      "js/supervisor/delete_fix.js",
+      "js/supervisor/edit_fix.js",
+      "js/ui/mobile_ux.js",
+      "js/employee/temp_save.js",
+      "js/supervisor/overview_date.js",
+      "js/supervisor/edit_select.js",
+      "js/employee/print_purge.js",
+      "js/stock/wine.js",
+      "js/core/runtime_fix.js",
+      "js/stock/wine_stock.js",
+      "js/stock/wine_split.js",
+      "js/stock/wine_form.js",
+      "js/stock/wine_tek.js",
+      "js/core/live_fix.js",
+      "js/stock/wine_page.js",
+      "js/reports/sheet_toggle.js",
+      "js/ui/ux_pack.js",
+      "js/reports/report_fix.js",
+      "js/core/guard.js",
+      "js/auth/user_fix.js",
+      "js/core/ui_patch.js",
+      "js/core/sync_merge.js",
+      "js/auth/login_fix.js",
+      "js/employee/edit_income.js",
+      "js/employee/emp_date.js",
+      "js/employee/emp_fields.js",
+      "js/employee/submit_fix.js",
+      "js/employee/price_lock.js",
+      "js/supervisor/dedupe_fix.js",
+      "js/accountant/accountant.js",
+      "js/core/sync_stable.js",
+      "js/supervisor/supervisor_day.js",
+      "js/accountant/acct_users.js",
+      "js/accountant/acct_user_show.js",
+      "js/accountant/acct_report.js",
+      "js/accountant/roster_cycle.js",
+      "js/accountant/acct_pay.js",
+      "js/stock/stock_merged.js",
+      "js/auth/sec_login.js",
+      "js/core/sync_delta.js",
+      "js/supervisor/sup_cut.js",
+      "js/accountant/acct_nav.js",
+      "js/core/keep_sync.js",
+      "js/supervisor/edit_clear.js",
+      "js/stock/stock_ledger.js",
+      "js/stock/stock_sync.js",
+      "js/supervisor/dedupe_edit.js"
+    ];
     var inject=''
       + '<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"><\/script>'
       + '<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"><\/script>'
       + '<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"><\/script>'
-      + '<script src="net_gate.js"><\/script>'
-      + '<script src="money_font.js"><\/script>'
-      + '<script src="app.js"><\/script>'
-      + '<script src="app2.js"><\/script>'
-      + '<script src="app3.js"><\/script>'
-      + '<script src="compat_fix.js"><\/script>'
-      + '<script src="merge_fix.js"><\/script>'
-      + '<script src="stock_fix.js"><\/script>'
-      + '<script src="features.js"><\/script>'
-      + '<script src="enhancements.js"><\/script>'
-      + '<script src="firebase_auth_fix.js"><\/script>'
-      + '<script src="subs_ui.js"><\/script>'
-      + '<script src="bugfix.js"><\/script>'
-      + '<script src="delete_fix.js"><\/script>'
-      + '<script src="edit_fix.js"><\/script>'
-      + '<script src="mobile_ux.js"><\/script>'
-      + '<script src="temp_save.js"><\/script>'
-      + '<script src="overview_date.js"><\/script>'
-      + '<script src="edit_select.js"><\/script>'
-      + '<script src="print_purge.js"><\/script>'
-      + '<script src="wine.js"><\/script>'
-      + '<script src="runtime_fix.js"><\/script>'
-      + '<script src="wine_stock.js"><\/script>'
-      + '<script src="wine_split.js"><\/script>'
-      + '<script src="wine_form.js"><\/script>'
-      + '<script src="wine_tek.js"><\/script>'
-      + '<script src="live_fix.js"><\/script>'
-      + '<script src="wine_page.js"><\/script>'
-      + '<script src="sheet_toggle.js"><\/script>'
-      + '<script src="ux_pack.js"><\/script>'
-      + '<script src="report_fix.js"><\/script>'
-      + '<script src="guard.js"><\/script>'
-      + '<script src="user_fix.js"><\/script>'
-      + '<script src="ui_patch.js"><\/script>'
-      + '<script src="sync_merge.js"><\/script>'
-      + '<script src="login_fix.js"><\/script>'
-      + '<script src="edit_income.js"><\/script>'
-      + '<script src="emp_date.js"><\/script>'
-      + '<script src="emp_fields.js"><\/script>'
-      + '<script src="submit_fix.js"><\/script>'
-      + '<script src="price_lock.js"><\/script>'
-      + '<script src="dedupe_fix.js"><\/script>'
-      + '<script src="accountant.js"><\/script>'
-      + '<script src="sync_stable.js"><\/script>'
-      + '<script src="supervisor_day.js"><\/script>'
-      + '<script src="acct_users.js"><\/script>'
-      + '<script src="acct_user_show.js"><\/script>'
-      + '<script src="acct_report.js"><\/script>'
-      + '<script src="roster_cycle.js"><\/script>'
-      + '<script src="acct_pay.js"><\/script>'
-      + '<script src="stock_merged.js"><\/script>'
-      + '<script src="sec_login.js"><\/script>'
-      + '<script src="sync_delta.js"><\/script>'
-      + '<script src="sup_cut.js"><\/script>'
-      + '<script src="acct_nav.js"><\/script>'
-      + '<script src="keep_sync.js"><\/script>'
-      + '<script src="edit_clear.js"><\/script>'
-      + '<script src="stock_ledger.js"><\/script>'
-      + '<script src="stock_sync.js"><\/script>'
-      + '<script src="dedupe_edit.js"><\/script>';
+      + SCRIPTS.map(function(src){ return '<script src="'+src+'"><\/script>'; }).join('');
     html=html.replace('</body>', inject+'</body>');
     document.open(); document.write(html); document.close();
   }catch(e){

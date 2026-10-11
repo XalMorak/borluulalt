@@ -90,43 +90,7 @@ function onStockLocChange(){buildStockTableLoc();}
   wrap();setInterval(wrap,400);
 })();
 
-(function(){
-  function wrapSave(){
-    if(window._stockDeductWrapped||typeof window.saveSubmission!=="function")return;
-    window._stockDeductWrapped=true;
-    var _s=window.saveSubmission;
-    window.saveSubmission=async function(){
-      var _gfd=window.getFormData;
-      var captured=null;
-      if(typeof _gfd==="function"){
-        window.getFormData=function(){
-          captured=_gfd.apply(this,arguments);
-          return captured;
-        };
-      }
-      var result=await _s.apply(this,arguments);
-      window.getFormData=_gfd;
-      if(false&&captured&&captured.items){   /* stock is deducted on the server by the supervisor (stock_ledger.js) */
-        var loc=captured.location||"Оюут бар";
-        if(STOCK_LOCS.indexOf(loc)<0)loc="Оюут бар";
-        var products=getProducts();
-        captured.items.forEach(function(it){
-          if(!it.sold)return;
-          var idx=products.findIndex(function(p){return p.id===it.id;});
-          if(idx<0)return;
-          ensureStockByLoc(products[idx]);
-          var sold=it.sold||0;
-          products[idx].stockByLoc[loc]=Math.max(0,(Number(products[idx].stockByLoc[loc])||0)-sold);
-          products[idx].stock=STOCK_LOCS.reduce(function(s,l){return s+(Number(products[idx].stockByLoc[l])||0);},0);
-        });
-        setProducts(products);
-        if(typeof cloudPush==="function")await cloudPush();
-      }
-      return result;
-    };
-  }
-  wrapSave();setInterval(wrapSave,500);
-})();
+/* (employee-side stock deduction removed: the server ledger does it — js/stock/stock_ledger.js) */
 
 (function(){
   function wrapPull(){

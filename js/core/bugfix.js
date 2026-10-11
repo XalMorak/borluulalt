@@ -56,25 +56,8 @@
       migrate();
       var before=JSON.parse(JSON.stringify(typeof getProducts==="function"?getProducts():[]));
       var result=await _s.apply(this,arguments);
-      try{
-        if(typeof setProducts==="function")setProducts(before);
-        var data=typeof getFormData==="function"?getFormData():null;
-        if(false&&data&&data.items&&typeof getProducts==="function"){   /* server-side now: stock_ledger.js */
-          var loc=data.location||"Оюут бар";
-          if(STOCK_LOCS.indexOf(loc)<0)loc="Оюут бар";
-          var products=getProducts();
-          data.items.forEach(function(it){
-            if(!(it.sold>0))return;
-            var idx=products.findIndex(function(p){return p.id===it.id;});
-            if(idx<0)return;
-            ensureLoc(products[idx]);
-            products[idx].stockByLoc[loc]=Math.max(0,(Number(products[idx].stockByLoc[loc])||0)-it.sold);
-            products[idx].stock=STOCK_LOCS.reduce(function(s,l){return s+(Number(products[idx].stockByLoc[l])||0);},0);
-          });
-          setProducts(products);
-          if(typeof cloudPush==="function")await cloudPush();
-        }
-      }catch(e){console.warn("stock fix",e);}
+      /* an employee save never changes stock on this device (server ledger: js/stock/stock_ledger.js) */
+      try{ if(typeof setProducts==="function")setProducts(before); }catch(e){}
       return result;
     };
   }

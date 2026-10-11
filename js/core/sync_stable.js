@@ -134,25 +134,6 @@
     if(typeof ensureFirebaseAuth==="function") ensureFirebaseAuth().then(go, go); else go();
   }
 
-  function restoreStock(s){
-    return;   /* stock comes back on the server via stock_ledger.js (tombstone -> ledger) */
-    try{
-      if(!s.items || typeof getProducts!=="function" || typeof setProducts!=="function") return;
-      var products=getProducts();
-      var LOCS=(window.STOCK_LOCS&&window.STOCK_LOCS.length)?window.STOCK_LOCS:["Оюут бар","Манлай бар","VIP","POWER"];
-      var loc=LOCS.indexOf(s.location)>=0?s.location:"Оюут бар";
-      s.items.forEach(function(it){
-        if(!(Number(it&&it.sold)>0)) return;
-        var pi=products.findIndex(function(p){ return p.id===it.id; });
-        if(pi<0) return;
-        if(!products[pi].stockByLoc) products[pi].stockByLoc={};
-        LOCS.forEach(function(l){ if(products[pi].stockByLoc[l]==null) products[pi].stockByLoc[l]=0; });
-        products[pi].stockByLoc[loc]=(Number(products[pi].stockByLoc[loc])||0)+(Number(it.sold)||0);
-        products[pi].stock=LOCS.reduce(function(a,l){ return a+(Number(products[pi].stockByLoc[l])||0); },0);
-      });
-      setProducts(products);
-    }catch(e){ console.warn("restoreStock", e); }
-  }
 
   async function stickyDelete(idx){
     var s=(window._sortedSubs||[])[idx];
@@ -186,7 +167,6 @@
         await live.ref("borluulalt/inbox/"+ik).remove();
       }
     }catch(e){}
-    restoreStock(s);
     if(typeof setSubs==="function") setSubs(dropTombed(rawSubs()));
     try{ await window.cloudPush(); }catch(e){}
     var det=document.getElementById("selectedSubmissionDetail");

@@ -284,12 +284,6 @@
       + '<div id="acctReportBody"></div>'
       + "</div>";
     root.appendChild(pane);
-    if (!document.getElementById("acctReportPrintCss")) {
-      var st = document.createElement("style");
-      st.id = "acctReportPrintCss";
-      st.textContent = "@media print{body *{visibility:hidden}#acctPrintArea,#acctPrintArea *{visibility:visible}#acctPrintArea{position:absolute;left:0;top:0;width:100%;background:#fff;color:#111}}";
-      document.head.appendChild(st);
-    }
     document.getElementById("acctReportViews").onclick = function (ev) {
       var b = ev.target.closest("button[data-rv]");
       if (!b) return;

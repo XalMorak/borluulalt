@@ -175,34 +175,8 @@
     if(btn) btn.onclick=addWineProduct;
   }
 
-  /* 5) dark mode fonts */
-  function mountDark(){
-    if(document.getElementById("uxDarkCss")) return;
-    var st=document.createElement("style");
-    st.id="uxDarkCss";
-    st.textContent=[
-      "body.dark,.dark{color:#e8e8e8}",
-      "body.dark label,body.dark p,body.dark h1,body.dark h2,body.dark h3,body.dark h4,body.dark .summary-item .label,body.dark #chartTitle,body.dark .header-info label{color:#d5dbe6!important}",
-      "body.dark .summary-item .value,body.dark strong,body.dark .product-name{color:#f4f6fa!important}",
-      "body.dark .summary-box,body.dark .chart-wrap{background:#1a2436!important;color:#e8e8e8}",
-      "body.dark table,body.dark td,body.dark th{color:#e8e8e8}",
-      "body.dark tr:nth-child(even){background:#252532}",
-      "body.dark .alert-info{background:#243044;color:#d0d8e8}",
-      "body.dark .alert-success{background:#1e3d2a;color:#c6f0d0}",
-      "body.dark .alert-warn{background:#3d3420;color:#f0e0b0}",
-      "body.dark [id^=sheetBar_]{background:#1e3a32!important;border-color:#2d5a48!important}",
-      "body.dark [id^=sheetBar_] span{color:#c8e6d4!important}",
-      "body.dark .stock-ok{color:#7dcea0}",
-      "body.dark .stock-low{color:#f5b7b1}",
-      "body.dark .card{color:#e8e8e8}",
-      "body.dark .btn-outline{color:#9ec1ff}",
-      "#chartTitle{color:#666}"
-    ].join("\n");
-    document.head.appendChild(st);
-  }
 
   function boot(){
-    mountDark();
     mountReportDay();
     wrapDetail();
     ensureSangria();

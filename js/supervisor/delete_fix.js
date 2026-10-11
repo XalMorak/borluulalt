@@ -111,24 +111,6 @@
     }
     all[i]=Object.assign({},all[i],{deleted:true,submittedAt:new Date().toISOString()});
 
-    try{
-      if(false&&s.items&&typeof getProducts==="function"){   /* server-side now: stock_ledger.js */
-        var products=getProducts();
-        var loc=s.location||"Оюут бар";
-        var LOCS=["Оюут бар","Манлай бар","POWER"];
-        if(LOCS.indexOf(loc)<0)loc="Оюут бар";
-        s.items.forEach(function(it){
-          if(!(it.sold>0))return;
-          var pi=products.findIndex(function(p){return p.id===it.id;});
-          if(pi<0)return;
-          if(!products[pi].stockByLoc)products[pi].stockByLoc={};
-          LOCS.forEach(function(l){if(products[pi].stockByLoc[l]==null)products[pi].stockByLoc[l]=0;});
-          products[pi].stockByLoc[loc]=(Number(products[pi].stockByLoc[loc])||0)+(it.sold||0);
-          products[pi].stock=LOCS.reduce(function(a,l){return a+(Number(products[pi].stockByLoc[l])||0);},0);
-        });
-        setProducts(products);
-      }
-    }catch(e){console.warn(e);}
 
     setSubs(all);
     try{if(typeof cloudPush==="function")await cloudPush();}

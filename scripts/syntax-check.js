@@ -9,7 +9,7 @@ function jsIn(dir, deep) {
     return d.name.endsWith(".js") ? [p] : [];
   });
 }
-const files = [...jsIn(".", false), ...jsIn("api", true), ...jsIn("scripts", false), ...jsIn("security", false), ...jsIn("tests", true)];
+const files = [...jsIn(".", false), ...jsIn("js", true), ...jsIn("api", true), ...jsIn("scripts", false), ...jsIn("security", false), ...jsIn("tests", true)];
 if (!files.length) {
   console.error("no js files");
   process.exit(1);
@@ -18,7 +18,7 @@ for (const f of files) {
   console.log("check", f);
   execFileSync("node", ["--check", f], { stdio: "inherit" });
 }
-const required = ["index.html", "ui.html", "vercel.json", "app.js", "package.json", "api/login.js", "api/pin.js", "api/config.js",
+const required = ["index.html", "ui.html", "css/app.css", "vercel.json", "js/core/app.js", "js/core/net_gate.js", "package.json", "api/login.js", "api/pin.js", "api/config.js",
   "security/database.rules.transition.json", "security/database.rules.strict.json"];
 for (const f of required) {
   if (!fs.existsSync(f)) {

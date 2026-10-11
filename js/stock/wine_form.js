@@ -129,14 +129,6 @@
       }
     });
   }
-  function styleNames(){
-    if(document.getElementById("wine_form_css")) return;
-    var s=document.createElement("style");
-    s.id="wine_form_css";
-    s.textContent="#employeeView td.product-name,#employeeView td:nth-child(2){max-width:42vw;white-space:normal;word-break:break-word;font-size:12px}#employeeView .wine-sec td{font-size:13px}";
-    document.head.appendChild(s);
-  }
-  styleNames();
   lockWinePrevNext();
   setInterval(function(){ lockWinePrevNext(); },800);
 })();

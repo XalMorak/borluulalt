@@ -49,37 +49,11 @@
     return false;
   }
 
-  function ensureStyle(){
-    if(document.getElementById("smStyle")) return;
-    var st=document.createElement("style");
-    st.id="smStyle";
-    st.textContent=
-      ".sm-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:10px}"
-      +".sm-bar label{display:block;font-weight:600;color:#555;font-size:.85rem}"
-      +".sm-bar select,.sm-bar input{padding:8px;border:1px solid #ccc;border-radius:6px;font-size:16px;margin-top:3px}"
-      +".sm-seg{display:inline-flex;border:1px solid #0f3460;border-radius:8px;overflow:hidden;margin-top:3px}"
-      +".sm-seg button{border:0;background:#fff;color:#0f3460;padding:8px 14px;font-size:.9rem;cursor:pointer}"
-      +".sm-seg button+button{border-left:1px solid #0f3460}.sm-seg button.on{background:#0f3460;color:#fff}"
-      +".sm-actions{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:6px 0}"
-      +"#smDirty{color:#d35400;font-size:.85rem;font-weight:600}"
-      +".sm-table{min-width:560px}.sm-table td{vertical-align:middle}"
-      +".sm-table input{width:100%;min-width:64px;padding:6px;border:1px solid #ccc;border-radius:6px;font-size:16px;text-align:center}"
-      +".sm-table input.sm-name{text-align:left;min-width:120px}"
-      +".sm-table tr.sm-sec td{background:#1e3a5f;color:#fff;font-weight:700;text-align:left;padding:7px 8px}"
-      +".sm-table tr.sm-sec.sm-beer td{background:#0f3460}"
-      +".sm-table tr.sm-chg td{background:#fffbe6}"
-      +".sm-table td.stock-low input{border-color:#c0392b;color:#c0392b;font-weight:700}"
-      +".sm-tag{display:inline-block;font-size:.7rem;padding:1px 6px;border-radius:10px;background:#eef2f7;color:#555}"
-      +"#smAdd summary{cursor:pointer;font-weight:600;color:#0f3460;margin:4px 0 8px}"
-      +"@media(max-width:700px){.sm-table{min-width:440px}.sm-table th:first-child,.sm-table td:first-child:not([colspan]){display:none}.sm-table input.sm-name{min-width:100px}.sm-bar>div{flex:1 1 45%}.sm-bar select,.sm-bar input{width:100%}.sm-seg{display:flex}.sm-seg button{flex:1}}";
-    document.head.appendChild(st);
-  }
 
   function mount(){
     var pane=document.getElementById("tabStock");
     if(!pane) return null;
     if(document.getElementById("smBody")) return pane;
-    ensureStyle();
     // keep the legacy markup (ids used by older scripts) but hidden
     var legacy=document.createElement("div");
     legacy.id="stockLegacy"; legacy.className="hidden";
