@@ -596,11 +596,11 @@
   wrapList("renderSubmissionsListEnhanced");
   wrapList("renderOverview");
   wrapHeader();
-  setInterval(function(){
+  App.keep(function(){
     patchRole();
     wrapList("renderSubmissionsList");
     wrapList("renderSubmissionsListEnhanced");
     wrapHeader();
-  }, 1500);
+  });
   /* no auto-refresh: data is read only on login and on "Шинэчлэх" / "Мэдээлэл шинэчлэх" (delta, see net_gate.js) */
 })();

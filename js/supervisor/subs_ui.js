@@ -97,7 +97,7 @@ function clearSubFilter(){
     if(typeof window.renderSubmissionsList!=="function")return;
     window.renderSubmissionsList=function(all){renderSubmissionsListEnhanced(all);};
   }
-  wrap();setInterval(function(){wrap();ensureTekFilter();},400);
+  wrap();App.keep(function(){wrap();ensureTekFilter();});
 
   function wrapDetail(){
     if(window._detTek||typeof window.renderDetailView!=="function")return;
@@ -115,5 +115,5 @@ function clearSubFilter(){
       else box.insertAdjacentHTML("afterbegin",'<p><strong>Тек: '+tek+'</strong></p>');
     };
   }
-  wrapDetail();setInterval(wrapDetail,500);
+  wrapDetail();App.keep(wrapDetail);
 })();

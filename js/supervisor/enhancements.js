@@ -53,7 +53,7 @@ function exportCSVEnhanced(){
     window._csvWrap=true;
     window.exportCSV=exportCSVEnhanced;
   }
-  wrap();setInterval(wrap,400);
+  wrap();App.keep(wrap);
 })();
 
 function archiveCutoffDate(){
@@ -95,7 +95,7 @@ function runArchiveCleanup(){
       return _l.apply(this,arguments);
     };
   }
-  wrapLoad();setInterval(wrapLoad,500);
+  wrapLoad();App.keep(wrapLoad);
   setTimeout(function(){try{runArchiveCleanup();}catch(e){}},3000);
 })();
 
@@ -167,5 +167,5 @@ function showChartLines(days){
     if(typeof window.showChart!=="function")return;
     window.showChart=showChartLines;
   }
-  wrapChart();setInterval(wrapChart,400);
+  wrapChart();App.keep(wrapChart);
 })();

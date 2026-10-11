@@ -176,5 +176,5 @@ async function refreshData(){
     window.showTab=function(name){orig.apply(this,arguments);if(name==="reports"){onReportLocChange();setTimeout(function(){showChart(7);},80);}};
   }
   function tick(){wrapIncome();wrapRecon();wrapReport();wrapTab();}
-  tick();setInterval(tick,400);
+  tick();App.keep(tick);
 })();

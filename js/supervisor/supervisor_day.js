@@ -218,7 +218,7 @@
 
   tick();
   wrapReportDays();
-  setInterval(function(){ wrapClear(); wrapReportDays(); tick(); }, 1000);
+  App.keep(function(){ wrapClear(); wrapReportDays(); tick(); });
   /* re-lock right after any click inside Тайлан (period buttons set dates programmatically) */
   document.addEventListener("click", function(ev){
     if(!isSup() || !ev.target || !ev.target.closest || !ev.target.closest("#tabReports")) return;

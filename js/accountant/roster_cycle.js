@@ -475,6 +475,6 @@
     ensureUi();
   }
   hook();
-  setInterval(hook, 800);
+  App.keep(hook);
   loadCfg();
 })();

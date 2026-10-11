@@ -39,7 +39,7 @@
     window.showTab = fn;
   }
   cut();
-  setInterval(function () {
+  App.keep(function () {
     cut();
     if (typeof window.showTab === "function" && !window.showTab._supCut) {
       var orig2 = window.showTab;
@@ -51,5 +51,5 @@
       fn2._supCut = true;
       window.showTab = fn2;
     }
-  }, 800);
+  });
 })();

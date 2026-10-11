@@ -118,6 +118,6 @@
   }
   function tick(){ensureBar();wrapOverview();}
   tick();
-  setInterval(tick,800);
+  App.keep(tick);
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",tick);
 })();

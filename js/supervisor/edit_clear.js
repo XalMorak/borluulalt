@@ -31,5 +31,5 @@
     window.resetForm = fn;
   }
   hookReset();
-  setInterval(hookReset, 700);
+  App.keep(hookReset);
 })();

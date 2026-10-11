@@ -41,8 +41,8 @@
     });
   }
   bind();
-  setInterval(function () {
+  App.keep(function () {
     window.showAcctTab = show;
     bind();
-  }, 1000);
+  });
 })();

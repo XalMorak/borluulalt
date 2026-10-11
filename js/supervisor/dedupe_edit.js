@@ -39,5 +39,5 @@
     window.renderSubmissionsList = fn;
   }
   hookList();
-  setInterval(hookList, 700);
+  App.keep(hookList);
 })();

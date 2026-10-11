@@ -101,5 +101,5 @@
     wrapReports();
   }
   tick();
-  setInterval(tick,300);
+  App.keep(tick);
 })();
