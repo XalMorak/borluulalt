@@ -19,27 +19,29 @@
 
 JavaScript · Firebase Realtime Database · Vercel
 
-## Гол файлууд
+## Код зохион байгуулалт
 
-| Файл | Зорилго |
-|------|---------|
-| `index.html` | Ачаалагч — `ui.html` + JS |
-| `ui.html` | Хуудасны HTML/CSS |
-| `app.js`, `app2.js`, `app3.js` | Үндсэн логик |
-| `compat_fix.js` | XSS-safe alert, илгээлтийн түлхүүр |
-| `wine.js` | Вино каталог, тек, ангилал |
-| `wine_stock.js` | Виноны нөөц байршлаар |
-| `accountant.js` | Эрхийн чиглүүлэлт, Нягтлан хуудас |
-| `sync_stable.js` | Тогтвортой `cloudPush`, tombstone |
-| `supervisor_day.js` | Ахлахын өнөөдрийн самбар |
-| `acct_users.js` | Нягтлангийн хэрэглэгч удирдлага |
-| `acct_report.js` | Тайлан, хэвлэх, Excel |
-| `roster_cycle.js` | 4 ростерийн 28 хоногийн мөчлөг |
-| `acct_pay.js` | Төлөлтийн тэмдэглэл |
-| `stock_merged.js` | Нэгдсэн нөөц |
-| `net_gate.js` | Firebase уншилтын хаалга, delta синк |
-| `sync_delta.js` | Нэвтрэх / шинэчлэх-д delta |
-| `vercel.json` | Хостинг |
+Build алхамгүй статик сайт: `index.html` нь `ui.html`-ийг ачаалаад `js/` доторх скриптүүдийг **жагсаасан дарааллаар** (`SCRIPTS` массив) оруулна. Дараа нь ачаалагдсан файл өмнөхөө өргөтгөдөг тул дараалал чухал.
+
+| Хавтас | Агуулга |
+|---|---|
+| `css/app.css` | Цорын ганц stylesheet (өмнө `ui.html` + 7 скрипт runtime-д CSS оруулдаг байсан) |
+| `js/core/` | Үндсэн апп (`app.js`, `app2.js`, `app3.js`), Firebase уншилтын хаалга + delta синк (`net_gate.js`, `sync_delta.js`), push/merge/tombstone (`sync_stable.js`, `sync_merge.js`, `keep_sync.js`, `guard.js` …) |
+| `js/auth/` | Нэвтрэлт: legacy / transition / secure (`sec_login.js`), Firebase auth, хэрэглэгчийн кэш |
+| `js/employee/` | Ажилтны маягт: огноо, талбар, түр хадгалах, илгээх, үнэ түгжих |
+| `js/supervisor/` | Ахлах: өнөөдрийн самбар (илүү/дутуу), илгээлт харах/засах/устгах, давхардал |
+| `js/reports/` | Тайлан, пиво/вино хуудас |
+| `js/stock/` | Нөөц: байршлаар, вино, нэгдсэн нөөцийн таб, серверийн нөөц хасалтын ledger (`stock_ledger.js`) |
+| `js/accountant/` | Нягтлан: бүх илгээлт, шүүлт, Excel, хэрэглэгч, ростер, төлөлт |
+| `js/ui/` | Мөнгөний фонт, гар утасны UX, dark mode |
+
+**Нөхөөсүүдийг байршуулах (`js/core/hooks.js`)** — файл бүр өөрийн `setInterval` давталтаар глобал функцийг дахин ороох биш, `App.keep(fn)`-ээр бүртгүүлнэ. `App.settle()` бүх бүртгэлтэй алхмыг ачааллын дарааллаар, глобал функц өөрчлөгдөхөө болих хүртэл (fixpoint) ажиллуулна; ачаалал дуусахад (`js/core/boot.js`), DOM өөрчлөгдөх, click/input/change, focus үед дуудагдана. Ороосон функц доторх функцийнхээ `_туг`-уудыг өвлөнө — тиймээс дахин ороолт үүсэхгүй. Үлдсэн цорын ганц энгийн таймерууд: ноорог автоматаар хадгалах (5 сек, `temp_save.js`), локал tombstone цэвэрлэх (3 сек, `sync_stable.js`), Firebase SDK-г хүлээх эхлэлийн давталт (`net_gate.js`, дуусаад зогсдог).
+| `api/` | Vercel функц: `/api/login`, `/api/pin`, `/api/config` |
+| `security/` | Database rules (transition/strict) ба тэдгээрийг үүсгэгч |
+| `tests/security/` | Emulator тест: rules, login, e2e (бүх горим), flows, stock, DOM/behaviour gate |
+
+Тест: `npm run check`; `cd tests/security && npx firebase emulators:exec --only database,auth --project demo-borluulalt "npm test && npm run e2e"`.
+`tests/security/dom-baseline.json` нь цэгцлэхээс өмнөх DOM + computed style; `node e2e-dom.js` түүнтэй харьцуулна.
 
 ## Локал
 

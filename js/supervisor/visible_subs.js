@@ -1,0 +1,105 @@
+/* delete_fix v2: delete only ONE submission; hide deleted in reports */
+(function(){
+  function visibleSubs(all){
+    return (all||[]).filter(function(s){return s&&!s.deleted;});
+  }
+
+  function findIndexExact(all, s){
+    if(!s||!all)return -1;
+    if(s.id){
+      for(var i=0;i<all.length;i++){
+        if(all[i]&&all[i].id===s.id)return i;
+      }
+    }
+    if(s.submittedAt){
+      for(var i=0;i<all.length;i++){
+        var x=all[i];
+        if(!x||x.deleted)continue;
+        if(x.submittedAt===s.submittedAt&&x.employeeId===s.employeeId&&x.date===s.date)return i;
+      }
+    }
+    for(var i=0;i<all.length;i++){
+      var x=all[i];
+      if(!x||x.deleted)continue;
+      if(x.employeeId===s.employeeId&&x.date===s.date&&
+         (x.shift||"")===(s.shift||"")&&
+         (x.location||"")===(s.location||"")&&
+         (x.receiverName||x.receiver||"")===(s.receiverName||s.receiver||"")){
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  function wrapListRenders(){
+    if(typeof window.renderSubmissionsListEnhanced==="function"&&!window.renderSubmissionsListEnhanced._del2){
+      var _r=window.renderSubmissionsListEnhanced;
+      window.renderSubmissionsListEnhanced=function(all){
+        return _r(visibleSubs(all||(typeof getSubs==="function"?getSubs():[])));
+      };
+      window.renderSubmissionsListEnhanced._del2=true;
+    }
+    if(typeof window.renderSubmissionsList==="function"&&!window.renderSubmissionsList._del2){
+      var _rs=window.renderSubmissionsList;
+      window.renderSubmissionsList=function(all){
+        return _rs(visibleSubs(all||(typeof getSubs==="function"?getSubs():[])));
+      };
+      window.renderSubmissionsList._del2=true;
+    }
+    if(typeof window.renderOverview==="function"&&!window.renderOverview._del2){
+      var _o=window.renderOverview;
+      window.renderOverview=function(all){return _o(visibleSubs(all));};
+      window.renderOverview._del2=true;
+    }
+  }
+
+  function wrapReports(){
+    if(typeof window.runReport==="function"&&!window.runReport._del2){
+      var _rr=window.runReport;
+      window.runReport=function(){
+        if(typeof window.getSubs==="function"){
+          var _g=window.getSubs;
+          window.getSubs=function(){return visibleSubs(_g());};
+          try{return _rr.apply(this,arguments);}
+          finally{window.getSubs=_g;}
+        }
+        return _rr.apply(this,arguments);
+      };
+      window.runReport._del2=true;
+    }
+    if(typeof window.showChart==="function"&&!window.showChart._del2){
+      var _sc=window.showChart;
+      window.showChart=function(){
+        if(typeof window.getSubs==="function"){
+          var _g=window.getSubs;
+          window.getSubs=function(){return visibleSubs(_g());};
+          try{return _sc.apply(this,arguments);}
+          finally{window.getSubs=_g;}
+        }
+        return _sc.apply(this,arguments);
+      };
+      window.showChart._del2=true;
+    }
+    if(typeof window.exportCSV==="function"&&!window.exportCSV._del2){
+      var _ex=window.exportCSV;
+      window.exportCSV=function(){
+        if(typeof window.getSubs==="function"){
+          var _g=window.getSubs;
+          window.getSubs=function(){return visibleSubs(_g());};
+          try{return _ex.apply(this,arguments);}
+          finally{window.getSubs=_g;}
+        }
+        return _ex.apply(this,arguments);
+      };
+      window.exportCSV._del2=true;
+    }
+  }
+
+
+  function tick(){
+    wrapListRenders();
+    wrapReports();
+  }
+  tick();
+  App.keep(tick);
+})();
