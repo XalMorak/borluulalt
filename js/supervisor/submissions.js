@@ -1,5 +1,13 @@
-/* edit_fix: supervisor can unlock and edit submissions */
+/* submissions.js — supervisor: lock / edit / delete one submission.
+   One definition each, installed once (was: edit_fix.js pinning its versions every 300 ms while
+   guard.js, delete_fix.js, dedupe_edit.js, edit_clear.js, edit_select.js and edit_income.js wrapped or
+   replaced them on their own timers, so which version ran on a click was random — e.g. guard's
+   save used a different cash formula).
+   saveEdit = the edit_fix save + the edit_clear follow-up (keep the id, editedAt, one inbox row,
+   bump _meta/inbox); delete = sync_stable's sticky delete (tombstone). */
 (function(){
+  if(window._submissionsJs) return; window._submissionsJs=true;
+
   function findIdx(all, s){
     if(!s||!all)return -1;
     if(s.id){
@@ -85,7 +93,7 @@
     if(det){det.classList.remove("hidden");det.style.display="block";det.innerHTML=html;}
   }
 
-  async function saveEditFixed(idx){
+  async function saveEditBase(idx){
     var s=window._sortedSubs&&window._sortedSubs[idx];
     if(!s){alert("Илгээлт олдсонгүй");return;}
     if(typeof getSubs!=="function"||typeof setSubs!=="function")return;
@@ -131,11 +139,67 @@
     else if(typeof loadSupervisorData==="function")loadSupervisorData();
   }
 
-  function tick(){
-    window.toggleLock=toggleLockFixed;
-    window.startEditSubmission=startEditFixed;
-    window.saveEditSubmission=saveEditFixed;
+
+  function sid(s) {
+    if (!s) return "";
+    var tek = String((s.receiverName || s.tek || s.receiver) || "").trim();
+    var kind = s.kind === "wine" || s.sheet === "wine" ? "wine" : "bar";
+    return ["s", s.employeeId || "", s.date || "", s.shift || "", s.location || "", tek, kind].join("_").replace(/[.#$\[\]\/]/g, "_");
   }
-  tick();
-  setInterval(tick,300);
+  function realDb(){
+    try{ if(typeof window._realDb==="function" && window._realDb()) return window._realDb(); }catch(e){}
+    try{ if(typeof initFirebase==="function") initFirebase(); }catch(e2){}
+    return window._fbDb||null;
+  }
+
+  /* after the base save: same id, editedAt, one inbox row for it (no duplicate on other devices) */
+  async function saveEdit(idx){
+    var before=(window._sortedSubs && window._sortedSubs[idx]) || null;
+    var oldId=before && before.id, oldKey=sid(before);
+    var r=await saveEditBase(idx);
+    var after=(window._sortedSubs && window._sortedSubs[idx]) || null;
+    if(!after) return r;
+    var keep=oldId || oldKey || after.id || sid(after);
+    after.id=keep;
+    after.editedAt=new Date().toISOString();
+    var all=(typeof getSubs==="function"?getSubs():[]).filter(function(s){
+      if(!s) return false;
+      if(keep && s.id===keep) return false;
+      if(oldKey && (s.id===oldKey || sid(s)===oldKey)) return false;
+      if(sid(s)===sid(after)) return false;
+      return true;
+    });
+    all.push(after);
+    if(typeof setSubs==="function") setSubs(all);
+    if(window._sortedSubs) window._sortedSubs[idx]=after;
+    try{
+      var base=realDb();
+      if(base){
+        await base.ref("borluulalt/inbox/"+keep).set(after);
+        if(oldKey && oldKey!==keep) await base.ref("borluulalt/inbox/"+oldKey).remove();
+        await base.ref("borluulalt/_meta/inbox").set(Date.now()+"-edit");
+      }
+    }catch(e){}
+    if(typeof loadSupervisorData==="function") loadSupervisorData();
+    return r;
+  }
+
+  function startEdit(idx){
+    var r=startEditFixed(idx);
+    /* location / tek / shift as dropdowns, and the income cascade on the edit form */
+    if(typeof window._editConvertFields==="function") window._editConvertFields();
+    if(typeof window._editIncomeBind==="function") window._editIncomeBind();
+    return r;
+  }
+
+  function deleteSub(idx){
+    var u=window.currentUser||{};
+    if(u.role!=="supervisor"){ alert("Зөвхөн ахлах устгана"); return; }
+    return window.stickyDeleteSubmission(idx);
+  }
+
+  window.toggleLock=toggleLockFixed;
+  window.startEditSubmission=startEdit;
+  window.saveEditSubmission=saveEdit;
+  window.deleteSubmission=deleteSub;
 })();

@@ -95,42 +95,10 @@
     }
   }
 
-  async function deleteSubmissionFixed(idx){
-    var s=window._sortedSubs&&window._sortedSubs[idx];
-    if(!s){alert("Илгээлт олдсонгүй");return;}
-    if(s.locked){alert("Түгжигдсэн илгээлтийг устгахын тулд эхлээд түгжээг тайлана уу");return;}
-    var label=(s.employeeName||"")+" — "+(s.date||"")+(s.shift?" ("+s.shift+")":"")+(s.location?" · "+s.location:"");
-    if(!confirm(label+"\nустгах уу? (зөвхөн энэ нэг илгээлт)"))return;
-    if(typeof getSubs!=="function"||typeof setSubs!=="function")return;
-
-    var all=getSubs().slice();
-    var i=findIndexExact(all,s);
-    if(i<0){
-      alert("Илгээлт өгөгдлөөс олдсонгүй");
-      return;
-    }
-    all[i]=Object.assign({},all[i],{deleted:true,submittedAt:new Date().toISOString()});
-
-
-    setSubs(all);
-    try{if(typeof cloudPush==="function")await cloudPush();}
-    catch(e){console.warn(e);}
-
-    var det=document.getElementById("selectedSubmissionDetail");
-    if(det){det.classList.add("hidden");det.innerHTML="";}
-
-    if(typeof loadSupervisorData==="function")loadSupervisorData();
-    if(typeof runReport==="function"){try{runReport();}catch(e){}}
-
-    alert("1 илгээлт устгагдлаа");
-  }
-
-  function wrapDelete(){window.deleteSubmission=deleteSubmissionFixed;}
 
   function tick(){
     wrapListRenders();
     wrapReports();
-    wrapDelete();
   }
   tick();
   setInterval(tick,300);

@@ -24,7 +24,7 @@ const check = (name, ok, info) => { console.log((ok ? "ok   " : "FAIL ") + name 
 
   /* wrapper chains: no global keeps being re-wrapped (it grew every tick before) */
   const churn = await B.evaluate(async () => {
-    const names = ["refreshData", "showApp", "saveSubmission", "buildSalesTable", "showTab", "doLogin", "cloudPull", "cloudPush"];
+    const names = ["refreshData", "showApp", "saveSubmission", "buildSalesTable", "showTab", "doLogin", "cloudPull", "cloudPush", "saveEditSubmission", "startEditSubmission", "toggleLock", "deleteSubmission"];
     const a = {}; names.forEach((n) => (a[n] = window[n])); const ch = {};
     for (let i = 0; i < 6; i++) { await new Promise((r) => setTimeout(r, 1000)); names.forEach((n) => { if (window[n] !== a[n]) { ch[n] = (ch[n] || 0) + 1; a[n] = window[n]; } }); }
     return ch;
@@ -36,10 +36,14 @@ const check = (name, ok, info) => { console.log((ok ? "ok   " : "FAIL ") + name 
     const idx = window._sortedSubs.findIndex((s) => s.employeeId === "emp001");
     showSubmissionDetail(idx); await new Promise((r) => setTimeout(r, 300));
     startEditSubmission(idx); await new Promise((r) => setTimeout(r, 500));
+    window.__editForm = ["edit_location", "edit_receiver", "edit_shift"].map((id) => (document.getElementById(id) || {}).tagName).join(",");
     document.getElementById("edit_cash").value = 20000;
     await saveEditSubmission(idx); await new Promise((r) => setTimeout(r, 2500));
   });
+  check("edit form: location / tek / shift are dropdowns", (await A.evaluate(() => window.__editForm)) === "SELECT,SELECT,SELECT", await A.evaluate(() => window.__editForm));
   check("A sees its edit once", (await subs(A)) === "emp001|20000,emp002|17500", await subs(A));
+  const ed = await A.evaluate(() => { const x = getSubs().find((s) => s.employeeId === "emp001"); return { collected: x.collected, start: x.cashBalance || 0, card: x.cardTotal || 0, diff: x.diff, calc: x.calcTotal, editedAt: !!x.editedAt }; });
+  check("edit uses the cash formula collected = max(0, cash - start) + card, and marks editedAt", ed.collected === Math.max(0, 20000 - ed.start) + ed.card && ed.diff === ed.collected - ed.calc && ed.editedAt, ed);
   net.q = 0; await B.evaluate(() => refreshData()); await H.wait(3500);
   check("B sees A's edit after refresh", (await subs(B)) === "emp001|20000,emp002|17500", await subs(B));
   check("refresh is a small delta read", net.q <= 30, net.q);

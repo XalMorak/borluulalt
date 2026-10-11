@@ -58,23 +58,5 @@
       replaceInput("edit_shift", opts(SHIFTS, shVal));
     }
   }
-  function wrap(name){
-    var fn=window[name];
-    if(typeof fn!=="function"||fn._editSel)return;
-    window[name]=function(){
-      var r=fn.apply(this, arguments);
-      setTimeout(convertFields, 0);
-      setTimeout(convertFields, 50);
-      return r;
-    };
-    window[name]._editSel=true;
-  }
-  function tick(){
-    wrap("startEditFixed");
-    wrap("startEditSubmission");
-    wrap("startEdit");
-    convertFields();
-  }
-  tick();
-  setInterval(tick, 800);
+  window._editConvertFields=convertFields;   /* called by submissions.js after the edit form is drawn */
 })();

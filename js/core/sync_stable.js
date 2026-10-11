@@ -176,16 +176,6 @@
     alert("1 илгээлт устгагдлаа");
   }
   window.stickyDeleteSubmission=stickyDelete;
-  /* delete_fix and guard keep swapping window.deleteSubmission on timers, so intercept the button. */
-  document.addEventListener("click", function(ev){
-    var el=ev.target && ev.target.closest && ev.target.closest("[onclick]");
-    if(!el) return;
-    var m=String(el.getAttribute("onclick")||"").match(/deleteSubmission\(\s*(\d+)\s*\)/);
-    if(!m) return;
-    ev.preventDefault(); ev.stopPropagation(); ev.stopImmediatePropagation();
-    if(role()!=="supervisor"){ alert("Зөвхөн ахлах устгана"); return; }
-    stickyDelete(Number(m[1]));
-  }, true);
 
   async function stablePush(){
     if(role()!=="supervisor") return true;

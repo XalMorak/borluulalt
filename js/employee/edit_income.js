@@ -225,15 +225,8 @@
     window.calcIncome._cascade=true;
   }
 
-  var _start=window.startEditSubmission;
-  if(typeof _start==="function" && !_start._cascade){
-    window.startEditSubmission=function(){
-      var r=_start.apply(this, arguments);
-      setTimeout(function(){ bindEdit(); unlockIncome(); paintEditTotals(); }, 40);
-      return r;
-    };
-    window.startEditSubmission._cascade=true;
-  }
+  /* called by submissions.js after the edit form is drawn */
+  window._editIncomeBind=function(){ bindEdit(); unlockIncome(); paintEditTotals(); };
 
   document.addEventListener("input", function(ev){
     var id=ev.target && ev.target.id || "";

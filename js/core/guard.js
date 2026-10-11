@@ -130,85 +130,12 @@
 
   function sameRow(a,b){ return sid(a)===sid(b); }
 
-  function wrapRowOps(){
-    if(typeof window.deleteSubmission==="function" && !window.deleteSubmission._guard){
-      window.deleteSubmission=async function(idx){
-        var s=(window._sortedSubs||[])[idx];
-        if(!s) return;
-        var label=(s.employeeName||"")+" \u2014 "+(s.date||"")+" "+(tekOf(s)||"");
-        if(!confirm(label+" \u0443\u0441\u0442\u0433\u0430\u0445 \u0443\u0443?")) return;
-        markDeleted(sid(s));
-        if(s.id) markDeleted("id:"+s.id);
-        /* stock comes back on the server (stock_ledger.js) */
-        if(typeof setSubs==="function") setSubs(rawSubs().filter(function(sub){ return !sameRow(sub,s); }));
-        await window.cloudPush();
-        var det=document.getElementById("selectedSubmissionDetail");
-        if(det) det.classList.add("hidden");
-        if(typeof loadSupervisorData==="function") loadSupervisorData();
-      };
-      window.deleteSubmission._guard=true;
-    }
-    if(typeof window.toggleLock==="function" && !window.toggleLock._guard){
-      window.toggleLock=async function(idx){
-        var s=(window._sortedSubs||[])[idx];
-        if(!s) return;
-        var all=rawSubs();
-        var i=all.findIndex(function(sub){ return sameRow(sub,s); });
-        if(i>=0){ all[i].locked=!all[i].locked; if(typeof setSubs==="function") setSubs(all); await window.cloudPush(); if(typeof loadSupervisorData==="function") loadSupervisorData(); }
-      };
-      window.toggleLock._guard=true;
-    }
-    if(typeof window.saveEditSubmission==="function" && !window.saveEditSubmission._guard){
-      window.saveEditSubmission=async function(idx){
-        var s=(window._sortedSubs||[])[idx];
-        if(!s) return;
-        var oldKey=sid(s);
-        var oldSold={};
-        (s.items||[]).forEach(function(it){ oldSold[it.id]=it.sold||0; });
-        var items=(s.items||[]).map(function(it,i){
-          return Object.assign({}, it, {
-            prev:Number((document.getElementById("edit_prev_"+i)||{}).value)||0,
-            next:Number((document.getElementById("edit_next_"+i)||{}).value)||0,
-            sold:Number((document.getElementById("edit_sold_"+i)||{}).value)||0,
-            income:Number((document.getElementById("edit_income_"+i)||{}).value)||0
-          });
-        });
-        /* the sold difference is applied on the server (stock_ledger.js) */
-        var calcTotal=items.reduce(function(a,it){ return a+(it.income||0); },0);
-        var cashAmount=Number((document.getElementById("edit_cash")||{}).value)||0;
-        var cardTotal=Number((document.getElementById("edit_card")||{}).value)||0;
-        var updated=Object.assign({}, s, {
-          date:(document.getElementById("edit_date")||{}).value||s.date,
-          shift:(document.getElementById("edit_shift")||{}).value||s.shift,
-          checkerName:(document.getElementById("edit_checker")||{}).value,
-          receiverName:(document.getElementById("edit_receiver")||{}).value,
-          items:items,
-          cashAmount:cashAmount,
-          cardTotal:cardTotal,
-          posNumber:(document.getElementById("edit_pos")||{}).value,
-          cashBalance:Number((document.getElementById("edit_balance")||{}).value)||0,
-          calcTotal:calcTotal,
-          collected:cashAmount+cardTotal,
-          diff:(cashAmount+cardTotal)-calcTotal,
-          submittedAt:new Date().toISOString()
-        });
-        if(window.currentUser) updated.editedBy=window.currentUser.id;
-        if(sid(updated)!==oldKey) markDeleted(oldKey);
-        if(typeof setSubs==="function") setSubs(rawSubs().map(function(sub){ return sameRow(sub,s)?updated:sub; }));
-        await window.cloudPush();
-        if(typeof showAlert==="function") showAlert("editAlert","\u0417\u0430\u0441\u0430\u0433\u0434\u043b\u0430\u0430!","success");
-        setTimeout(function(){ if(typeof loadSupervisorData==="function") loadSupervisorData(); },400);
-      };
-      window.saveEditSubmission._guard=true;
-    }
-  }
 
   function install(){
     window.filterReportRows=filtered;
     if(window.runReport!==safeRun) window.runReport=safeRun;
     window.runReport._sheetSafe=true;
     pushGuard();
-    wrapRowOps();
   }
   install();
   setInterval(install, 700);
