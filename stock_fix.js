@@ -106,7 +106,7 @@ function onStockLocChange(){buildStockTableLoc();}
       }
       var result=await _s.apply(this,arguments);
       window.getFormData=_gfd;
-      if(captured&&captured.items){
+      if(false&&captured&&captured.items){   /* stock is deducted on the server by the supervisor (stock_ledger.js) */
         var loc=captured.location||"Оюут бар";
         if(STOCK_LOCS.indexOf(loc)<0)loc="Оюут бар";
         var products=getProducts();

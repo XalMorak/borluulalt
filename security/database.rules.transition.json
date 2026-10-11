@@ -41,6 +41,12 @@
           "at"
         ]
       },
+      "stockLedger": {
+        ".write": "auth != null",
+        ".indexOn": [
+          "at"
+        ]
+      },
       "$other": {
         ".write": "auth != null"
       }

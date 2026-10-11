@@ -139,14 +139,7 @@
         if(!confirm(label+" \u0443\u0441\u0442\u0433\u0430\u0445 \u0443\u0443?")) return;
         markDeleted(sid(s));
         if(s.id) markDeleted("id:"+s.id);
-        try{
-          var products=(typeof getProducts==="function")?getProducts():[];
-          (s.items||[]).forEach(function(it){
-            var pi=products.findIndex(function(p){ return p.id===it.id; });
-            if(pi>=0) products[pi].stock=(products[pi].stock||0)+(it.sold||0);
-          });
-          if(typeof setProducts==="function") setProducts(products);
-        }catch(e){}
+        /* stock comes back on the server (stock_ledger.js) */
         if(typeof setSubs==="function") setSubs(rawSubs().filter(function(sub){ return !sameRow(sub,s); }));
         await window.cloudPush();
         var det=document.getElementById("selectedSubmissionDetail");
@@ -180,13 +173,7 @@
             income:Number((document.getElementById("edit_income_"+i)||{}).value)||0
           });
         });
-        var products=(typeof getProducts==="function")?getProducts():[];
-        items.forEach(function(it){
-          var d=(oldSold[it.id]||0)-(it.sold||0);
-          var pi=products.findIndex(function(p){ return p.id===it.id; });
-          if(pi>=0) products[pi].stock=Math.max(0,(products[pi].stock||0)+d);
-        });
-        if(typeof setProducts==="function") setProducts(products);
+        /* the sold difference is applied on the server (stock_ledger.js) */
         var calcTotal=items.reduce(function(a,it){ return a+(it.income||0); },0);
         var cashAmount=Number((document.getElementById("edit_cash")||{}).value)||0;
         var cardTotal=Number((document.getElementById("edit_card")||{}).value)||0;
