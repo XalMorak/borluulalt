@@ -105,6 +105,27 @@ test("strict rules", async (t) => {
       await assertFails(set(ref(sup, "borluulalt/newnode"), 1));
     });
 
+    await t.test("supervisor users: may only create a new pending, disabled employee without PIN", async () => {
+      const P = { name: "Шинэ", role: "employee", disabled: true, pending: true, createdBy: "sup1", createdAt: T };
+      await assertSucceeds(set(ref(sup, "borluulalt/users/new1"), P));
+      await assertFails(set(ref(sup, "borluulalt/users/new1"), { ...P, name: "Дахин" }));               // exists now: no edit
+      await assertFails(set(ref(sup, "borluulalt/users/new1"), null));                                   // no delete
+      await assertFails(set(ref(sup, "borluulalt/users/new2"), { ...P, role: "supervisor" }));           // no other role
+      await assertFails(set(ref(sup, "borluulalt/users/new2"), { ...P, role: "accountant" }));
+      await assertFails(set(ref(sup, "borluulalt/users/new2"), { ...P, disabled: false }));              // must be disabled
+      await assertFails(set(ref(sup, "borluulalt/users/new2"), { name: "A", role: "employee" }));        // must be pending
+      await assertFails(set(ref(sup, "borluulalt/users/new2"), { ...P, pin: "1234" }));                  // no PIN
+      await assertFails(set(ref(sup, "borluulalt/users/new2"), { ...P, pinSet: true }));
+      await assertFails(remove(ref(sup, "borluulalt/users/emp2")));                                     // no delete of existing
+      await assertFails(update(ref(sup, "borluulalt/users/emp2"), { disabled: true }));                  // no disable
+      await assertFails(update(ref(sup, "borluulalt/users/dis1"), { disabled: null }));                  // no enable
+      await assertFails(update(ref(sup, "borluulalt/users/sup1"), { role: "accountant" }));              // no self-promotion
+      await assertFails(update(ref(sup, "borluulalt/users"), { new3: P, emp1: null }));                  // batch can't sneak a delete
+      await assertFails(get(ref(sup, "borluulalt_secret")));
+      /* accountant activates it */
+      await assertSucceeds(set(ref(acc, "borluulalt/users/new1"), { name: "Шинэ", role: "employee", pinSet: true }));
+    });
+
     await t.test("accountant: users (no pin), rosters, payments; not stock/submissions", async () => {
       await reseed();
       for (const p of ["users", "submissions", "inbox", "deleted", "payments", "rosters", "products", "wines"]) await assertSucceeds(get(ref(acc, "borluulalt/" + p)));

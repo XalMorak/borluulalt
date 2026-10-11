@@ -142,23 +142,6 @@
 
   /* supervisor "Хэрэглэгч" tab: in secure mode users are managed by the accountant
      (the strict rules refuse supervisor writes to users) */
-  function guardSupervisorUsers(){
-    ["addUser","saveUserRow","deleteUser"].forEach(function(name){
-      var prev=window[name];
-      if(typeof prev!=="function" || prev._sec) return;
-      var fn=async function(){
-        if(mode()==="secure"){
-          if(typeof showAlert==="function") showAlert("userAlert","Хэрэглэгч, PIN-ийг Нягтлан удирдана (Нягтлан → Хэрэглэгч).","error");
-          return;
-        }
-        return prev.apply(this, arguments);
-      };
-      Object.keys(prev).forEach(function(k){ if(k.charAt(0)==="_") fn[k]=prev[k]; });
-      fn._sec=true;
-      window[name]=fn;
-    });
-  }
 
-  wrapLogout(); guardSupervisorUsers();
-  App.keep(function(){ wrapLogout(); guardSupervisorUsers(); });   // local only
+  wrapLogout(); App.keep(function(){ wrapLogout(); });   // local only
 })();

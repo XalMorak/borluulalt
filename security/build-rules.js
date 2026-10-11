@@ -14,6 +14,7 @@ const ACTIVE = `auth != null && auth.token.eid === auth.uid && ${U}.child('name'
 const role = (...rs) => `(${ACTIVE} && (${rs.map((r) => `${U}.child('role').val() === '${r}'`).join(" || ")}))`;
 const ACT = `(${ACTIVE})`, SUP = role("supervisor"), ACC = role("accountant"), SA = role("supervisor", "accountant");
 const EMP = role("employee");
+const SUP_ADD = `(${SUP} && !data.exists() && newData.child('role').val() === 'employee' && newData.child('disabled').val() === true && newData.child('pending').val() === true && !newData.hasChild('pin') && !newData.hasChild('pinSet'))`;
 const EMP_OWN = `(${EMP} && newData.exists() && newData.child('employeeId').val() === auth.uid && (!data.exists() || data.child('employeeId').val() === auth.uid))`;
 
 const strict = { rules: {
@@ -22,7 +23,9 @@ const strict = { rules: {
        (keep_sync.js), supervisors after an edit (edit_clear.js / dedupe_edit.js) */
     _meta: { ".read": ACT, inbox: { ".write": ACT, ".validate": "newData.isString() && newData.val().length <= 64" }, $n: { ".write": SA } },
     updatedAt: { ".read": ACT, ".write": SUP },
-    users: { ".read": ACT, $uid: { ".write": ACC,
+    /* accountant: full control. supervisor: may only CREATE a new, pending, disabled employee
+       without any PIN (sup_users.js); never edit, delete, enable or promote anyone. */
+    users: { ".read": ACT, $uid: { ".write": `${ACC} || ${SUP_ADD}`,
       ".validate": "!newData.exists() || (newData.child('name').isString() && newData.child('name').val().length > 0 && newData.child('name').val().length <= 80 && newData.child('role').isString() && newData.child('role').val().matches(/^(employee|supervisor|accountant)$/) && !newData.hasChild('pin'))" } },
     products: { ".read": ACT, ".write": SUP },
     wines: { ".read": ACT, ".write": SUP },

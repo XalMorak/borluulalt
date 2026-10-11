@@ -61,6 +61,8 @@
     return _cloud;
   }
   function supervisors(users){ return Object.keys(users).filter(function(k){ return (users[k].role||"")==="supervisor" && !users[k].disabled; }); }
+  /* would changing / removing <id> leave no active supervisor? (only if <id> is one now) */
+  function lastSup(users, id){ var u=users[id]||{}; return (u.role||"")==="supervisor" && !u.disabled && supervisors(users).filter(function(k){ return k!==id; }).length<1; }
 
   /* the only write primitive: one key under borluulalt/users */
   async function writeOne(id, rec){
@@ -126,6 +128,7 @@
     var name=(tr.querySelector(".au-name").value||"").trim();
     var role=tr.querySelector(".au-role").value||"employee";
     var pin=(tr.querySelector(".au-pin").value||"").trim();
+    var actEl=tr.querySelector(".au-active"), active=!actEl || actEl.checked;
     if(!name) return alertMsg("Нэр хоосон байж болохгүй","error");
     try{
       var cloud=await readCloud();
@@ -133,9 +136,14 @@
       var pe=validPin(pin, role, cur); if(pe) return alertMsg(pe,"error");
       if(!cur) return alertMsg("Энэ хэрэглэгч серверт алга (өөр төхөөрөмжөөс устгагдсан байж магадгүй)","error"), draw();
       if(id===me().id && role!==(cur.role||"")) return alertMsg("Өөрийн эрхийг өөрчлөх боломжгүй","error");
-      if((cur.role||"")==="supervisor" && role!=="supervisor" && supervisors(cloud).length<=1)
+      if(role!=="supervisor" && lastSup(cloud, id))
         return alertMsg("Сүүлийн Ахлахын эрхийг өөрчлөх боломжгүй. Эхлээд өөр Ахлах нэмнэ үү.","error");
+      if(id===me().id && !active) return alertMsg("Өөрийгөө идэвхгүй болгох боломжгүй","error");
+      if(!active && lastSup(cloud, id))
+        return alertMsg("Сүүлийн Ахлахыг идэвхгүй болгох боломжгүй.","error");
       var rec=Object.assign({}, cur, {name:name, role:role, pin:pin, updatedAt:new Date().toISOString(), updatedBy:me().id});
+      /* enable / disable; enabling a supervisor-added employee clears "pending" */
+      if(active){ delete rec.disabled; delete rec.pending; } else rec.disabled=true;
       if(secure()){
         delete rec.pin;
         if(pin){   // hash first: the record write below removes any old plain-text PIN
@@ -164,7 +172,7 @@
       var cloud=await readCloud();
       var cur=cloud[id];
       if(!cur){ setLocal(id, null); draw(); return alertMsg("Серверт аль хэдийн алга байсан","success"); }
-      if((cur.role||"")==="supervisor" && supervisors(cloud).length<=1)
+      if(lastSup(cloud, id))
         return alertMsg("Сүүлийн Ахлахыг устгах боломжгүй. Эхлээд өөр Ахлах нэмнэ үү.","error");
       if(!confirm((cur.name||id)+" ("+id+", "+roleLabel(cur.role)+")\nхэрэглэгчийг устгах уу? Энэ хэрэглэгч дахин нэвтэрч чадахгүй.")) return;
       await writeOne(id, null);
@@ -198,11 +206,11 @@
       +'<h3 style="margin:6px 0 4px">Хэрэглэгчид <small id="auCount" style="font-weight:400;color:#666"></small></h3>'
       +'<div class="au-toolbar">'
       +'<input id="auSearch" placeholder="Хайх (ID / нэр)">'
-      +'<select id="auRoleFilter"><option value="">Бүх эрх</option>'+opts+'</select>'
+      +'<select id="auRoleFilter"><option value="">Бүх эрх</option>'+opts+'<option value="pending">Хүлээгдэж буй (ахлах нэмсэн)</option><option value="disabled">Идэвхгүй</option></select>'
       +'<label style="font-size:.85rem" id="auShowPinLbl"><input type="checkbox" id="auShowPin"> PIN харуулах</label>'
       +'<button type="button" class="btn btn-outline btn-sm" id="auReload">Шинэчлэх</button>'
       +'</div>'
-      +'<div class="table-wrap"><table class="au-table"><thead><tr><th>ID</th><th>Нэр</th><th>Эрх</th><th>PIN</th><th></th></tr></thead><tbody id="auBody"></tbody></table></div>';
+      +'<div class="table-wrap"><table class="au-table"><thead><tr><th>ID</th><th>Нэр</th><th>Эрх</th><th>PIN</th><th>Идэвхтэй</th><th></th></tr></thead><tbody id="auBody"></tbody></table></div>';
     document.getElementById("auAdd").onclick=function(){ window.acctAddUser(); };
     document.getElementById("auReload").onclick=function(){ window.renderAcctUsers(); };
     document.getElementById("auSearch").oninput=draw;
@@ -246,23 +254,26 @@
     var shown=0;
     tb.innerHTML=ids.map(function(id){
       var u=users[id], r=u.role||"employee";
-      if(rf && r!==rf) return "";
+      if(rf==="pending"){ if(!u.pending) return ""; }
+      else if(rf==="disabled"){ if(!u.disabled) return ""; }
+      else if(rf && r!==rf) return "";
       if(q && (id+" "+(u.name||"")).toLowerCase().indexOf(q)<0) return "";
       shown++;
-      var self=id===myId, lastSup=r==="supervisor" && sups<=1;
+      var self=id===myId, isLast=r==="supervisor" && !u.disabled && sups<=1;
       var opts=ROLES.map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===r?" selected":"")+'>'+x[1]+'</option>'; }).join("");
-      var why=self?"Өөрийгөө устгах боломжгүй":(lastSup?"Сүүлийн Ахлах":"");
+      var why=self?"Өөрийгөө устгах боломжгүй":(isLast?"Сүүлийн Ахлах":"");
       return '<tr data-uid="'+esc(id)+'">'
-        +'<td style="text-align:left"><b class="au-role-'+esc(r)+'">'+esc(id)+'</b>'+(self?'<span class="au-me">та</span>':'')+(u.disabled?' <small style="color:#999">(идэвхгүй)</small>':'')+'</td>'
+        +'<td style="text-align:left"><b class="au-role-'+esc(r)+'">'+esc(id)+'</b>'+(self?'<span class="au-me">та</span>':'')+(u.pending?' <span class="au-pending" title="Ахлах '+esc(u.createdBy||"")+' нэмсэн — идэвхжүүлж, PIN тохируулна уу">хүлээгдэж буй</span>':(u.disabled?' <small style="color:#999">(идэвхгүй)</small>':''))+'</td>'
         +'<td><input class="au-name" value="'+esc(u.name||"")+'"></td>'
         +'<td><select class="au-role"'+(self?' disabled title="Өөрийн эрхийг өөрчлөх боломжгүй"':'')+'>'+opts+'</select></td>'
         +(sec
           ? '<td><input class="au-pin" type="password" inputmode="numeric" autocomplete="new-password" value="" placeholder="'+(u.pinSet?"•••• тохируулсан":"PIN алга")+'"></td>'
           : '<td><input class="au-pin" type="'+(show?"text":"password")+'" inputmode="numeric" autocomplete="new-password" value="'+esc(u.pin||"")+'" placeholder="'+(u.pinSet&&!u.pin?"(серверт)":"—")+'"></td>')
+        +'<td><input type="checkbox" class="au-active"'+(u.disabled?'':' checked')+(self?' disabled title="Өөрийгөө идэвхгүй болгох боломжгүй"':'')+'></td>'
         +'<td class="au-act"><button type="button" class="btn btn-success btn-sm" data-act="save">Хадгалах</button>'
         +'<button type="button" class="btn btn-danger btn-sm" data-act="del"'+(why?' disabled title="'+why+'" style="opacity:.45;cursor:not-allowed"':'')+'>Устгах</button></td>'
         +'</tr>';
-    }).join("") || '<tr><td colspan="5" style="color:#888">Хэрэглэгч олдсонгүй</td></tr>';
+    }).join("") || '<tr><td colspan="6" style="color:#888">Хэрэглэгч олдсонгүй</td></tr>';
     var c=document.getElementById("auCount");
     if(c) c.textContent="("+shown+" / "+ids.length+")";
   }
