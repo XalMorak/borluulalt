@@ -101,5 +101,5 @@
   window.saveWineStock=save;
   window.drawWineStock=draw;
   ensureTab(); migrate();
-  setInterval(ensureTab,1500);
+  App.keep(ensureTab);
 })();

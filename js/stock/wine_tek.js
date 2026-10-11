@@ -38,5 +38,5 @@
     window.onLocationChange._wineTek=true;
   }
   ensureMap(); fill();
-  setInterval(function(){ ensureMap(); fill(); },800);
+  App.keep(function(){ ensureMap(); fill(); });
 })();

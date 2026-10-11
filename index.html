@@ -17,6 +17,7 @@
     /* load order matters (later files build on earlier ones); see README → Код зохион байгуулалт */
     var SCRIPTS=[
       "js/core/net_gate.js",
+      "js/core/hooks.js",
       "js/ui/money_font.js",
       "js/core/app.js",
       "js/core/app2.js",
@@ -75,7 +76,8 @@
       "js/stock/stock_ledger.js",
       "js/stock/stock_sync.js",
       "js/supervisor/dedupe_edit.js",
-      "js/supervisor/submissions.js"
+      "js/supervisor/submissions.js",
+      "js/core/boot.js"
     ];
     var inject=''
       + '<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"><\/script>'

@@ -205,5 +205,5 @@
     ensureKindBar("tabReports");
   }
   tick();
-  setInterval(tick,1000);
+  App.keep(tick);
 })();

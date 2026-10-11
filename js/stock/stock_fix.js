@@ -87,7 +87,7 @@ function onStockLocChange(){buildStockTableLoc();}
     window.buildStockTable=function(){buildStockTableLoc();};
     window.saveProductRow=function(id){saveAllStock();};
   }
-  wrap();setInterval(wrap,400);
+  wrap();App.keep(wrap);
 })();
 
 /* (employee-side stock deduction removed: the server ledger does it — js/stock/stock_ledger.js) */
@@ -103,5 +103,5 @@ function onStockLocChange(){buildStockTableLoc();}
       return ok;
     };
   }
-  wrapPull();setInterval(wrapPull,500);
+  wrapPull();App.keep(wrapPull);
 })();

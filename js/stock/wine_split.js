@@ -71,5 +71,5 @@
     regroup(document.getElementById("wineBody"),4);
   }
   tick();
-  setInterval(tick,900);
+  App.keep(tick);
 })();

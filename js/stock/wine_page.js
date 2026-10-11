@@ -60,5 +60,5 @@
     sel.addEventListener("change", applyMode);
   }
   wrapGap(); bind(); applyMode();
-  setInterval(function(){ wrapGap(); bind(); applyMode(); }, 600);
+  App.keep(function(){ wrapGap(); bind(); applyMode(); });
 })();

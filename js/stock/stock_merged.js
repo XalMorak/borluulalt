@@ -286,5 +286,5 @@
   }
   window.drawMergedStock=draw;
   tick();
-  setInterval(tick, 1500);
+  App.keep(tick);
 })();

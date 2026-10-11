@@ -130,5 +130,5 @@
     });
   }
   lockWinePrevNext();
-  setInterval(function(){ lockWinePrevNext(); },800);
+  App.keep(function(){ lockWinePrevNext(); });
 })();
