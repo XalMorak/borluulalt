@@ -89,7 +89,14 @@ async function empSubmit(page) {
 }
 async function logout(page) { await page.evaluate(() => doLogout()); await wait(800); return page.evaluate(() => { var u = firebase.auth().currentUser; return u ? (u.isAnonymous ? "anonymous" : "token") : "none"; }); }
 
-(async () => {
+async function launch() {
+  await new Promise((r) => server.listen(PORT, "127.0.0.1", r));
+  return puppeteer.launch({ executablePath: process.env.CHROME || "/usr/bin/google-chrome", headless: "new",
+    args: ["--no-sandbox", '--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1'] });
+}
+module.exports = { launch, newPage, login, logout, empSubmit, seed, dbPut, dbGet, setRules, wait, T, setApiDown: (v) => { API_DOWN = v; }, server };
+
+if (require.main === module) (async () => {
   await new Promise((r) => server.listen(PORT, "127.0.0.1", r));
   const browser = await puppeteer.launch({ executablePath: process.env.CHROME || "/usr/bin/google-chrome", headless: "new",
     args: ["--no-sandbox", '--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1'] });

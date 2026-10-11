@@ -34,6 +34,7 @@
       if (DROP[name]) name = "submissions";
       return orig.apply(this, arguments);
     };
+    Object.keys(orig).forEach(function (k) { if (k.charAt(0) === "_" && !(k in fn)) fn[k] = orig[k]; });
     fn._supCut = true;
     window.showTab = fn;
   }
@@ -46,6 +47,7 @@
         if (DROP[name]) name = "submissions";
         return orig2.apply(this, arguments);
       };
+      Object.keys(orig2).forEach(function (k) { if (k.charAt(0) === "_" && !(k in fn2)) fn2[k] = orig2[k]; });   // keep others' flags: no endless re-wrapping
       fn2._supCut = true;
       window.showTab = fn2;
     }

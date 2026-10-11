@@ -21,6 +21,20 @@
     return null;
   }
 
+  function mirrorHasUsers(){
+    var M=window._mirror?window._mirror():null;
+    var users=M && M.tree && M.tree.borluulalt && M.tree.borluulalt.users;
+    return !!(users && typeof users==="object" && Object.keys(users).length);
+  }
+  function forgetLocalUser(id){
+    try{
+      if(typeof getUsers!=="function" || typeof setUsers!=="function") return;
+      var u=Object.assign({}, getUsers()||{}), hit=false;
+      Object.keys(u).forEach(function(k){ if(String(k).toLowerCase()===id){ delete u[k]; hit=true; } });
+      if(hit) setUsers(u);
+    }catch(e){}
+  }
+
   function wrapLogin(){
     var prev=window.doLogin;
     if(typeof prev!=="function" || prev._delta) return;
@@ -44,6 +58,14 @@
         try{
           await window._deltaSync({nodes:["users"], reason:"login-users"});
           var u=mirrorUser(id);
+          /* the fresh server users list is authoritative: a user deleted on another device must not
+             log in from this device's old local copy (app.js merges the local users cache) */
+          if(!u && !(sec && sec.ok) && mirrorHasUsers()){
+            badge("ok");
+            forgetLocalUser(id);
+            if(typeof showAlert==="function") showAlert("loginAlert","Ийм ID алга: "+id,"error");
+            return;
+          }
           if(u && !u.disabled && (!u.pin || String(u.pin)===pin)){
             stamp(await window._deltaSync({nodes:window._deltaNodesFor(u.role||"employee"), reason:"login", reuseMeta:true}));
             /* same as the old page-load pull, but from the fresh local mirror (0 network reads) */

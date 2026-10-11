@@ -49,9 +49,14 @@
 
   /* token modes never create anonymous sessions (strict rules give them nothing);
      the old helper is still used in legacy mode and after a transition fallback */
-  var legacyEnsure=window.ensureFirebaseAuth;
+  var legacyEnsure=window.ensureFirebaseAuth, cfgWaited=false;
   if(typeof legacyEnsure==="function" && !legacyEnsure._sec){
     var secEnsure=function(cb){
+      /* first visit on a device: the mode is not known yet — wait for /api/config instead of
+         signing in anonymously (that happened on every fresh device in transition/secure mode) */
+      if(!cfgWaited && !cfg.loaded && !localStorage.getItem("sec_mode_cache") && !MODES[localStorage.getItem("sec_mode")]){
+        return Promise.race([cfgPromise, timeout(6000)]).catch(function(){}).then(function(){ cfgWaited=true; return secEnsure(cb); });
+      }
       if(mode()==="legacy" || window._secFallback) return legacyEnsure(cb);
       var fb=app(), u=fb && fb.auth().currentUser, ok=!!(u && !u.isAnonymous);
       if(cb) cb(ok);

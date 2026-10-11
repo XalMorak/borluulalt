@@ -74,6 +74,8 @@ test("strict rules", async (t) => {
       await assertFails(update(ref(emp, "borluulalt/users/emp1"), { role: "supervisor" }));                  // self-promotion
       await assertFails(set(ref(emp, "borluulalt/deleted/t2"), { at: T }));
       await assertFails(set(ref(emp, "borluulalt/_meta/users"), "x"));
+      await assertSucceeds(set(ref(emp, "borluulalt/_meta/inbox"), "1791700000000-abc123"));   // keep_sync marker
+      await assertFails(set(ref(emp, "borluulalt/_meta/inbox"), { x: 1 }));
       await assertFails(set(ref(emp, "borluulalt_secret/pins/emp1"), "x"));
       await assertFails(set(ref(emp, "borluulalt"), {}));
     });
@@ -92,7 +94,8 @@ test("strict rules", async (t) => {
       await assertFails(update(ref(sup, "borluulalt/users/emp1"), { name: "X", role: "employee" }));
       await assertFails(set(ref(sup, "borluulalt/payments/p2"), { paid: true }));
       await assertFails(set(ref(sup, "borluulalt/rosters/r2"), { name: "R" }));
-      await assertFails(set(ref(sup, "borluulalt/inbox/s_sup1"), { employeeId: "sup1", submittedAt: T }));
+      await assertSucceeds(set(ref(sup, "borluulalt/inbox/s_emp2"), { id: "s_emp2", employeeId: "emp2", submittedAt: T, cashAmount: 5 }));   // supervisor edit
+      await assertSucceeds(set(ref(sup, "borluulalt/_meta/inbox"), "1791700000000-edit"));
       await assertFails(set(ref(sup, "borluulalt"), {}));
       await assertFails(get(ref(sup, "borluulalt_secret")));
       await assertFails(set(ref(sup, "borluulalt/newnode"), 1));
