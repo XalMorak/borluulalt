@@ -18,7 +18,7 @@
       "users": {
         ".read": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true)",
         "$uid": {
-          ".write": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'accountant'))",
+          ".write": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'accountant')) || ((auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'supervisor')) && !data.exists() && newData.child('role').val() === 'employee' && newData.child('disabled').val() === true && newData.child('pending').val() === true && !newData.hasChild('pin') && !newData.hasChild('pinSet'))",
           ".validate": "!newData.exists() || (newData.child('name').isString() && newData.child('name').val().length > 0 && newData.child('name').val().length <= 80 && newData.child('role').isString() && newData.child('role').val().matches(/^(employee|supervisor|accountant)$/) && !newData.hasChild('pin'))"
         }
       },

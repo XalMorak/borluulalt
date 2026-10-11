@@ -817,3 +817,11 @@ body.dark tr.acct-row-paid td { background: #14301f; }
   .acct-table-wrap tr { display: table-row !important; }
   #acctTabs, #acctPeriod, #acctTools, #acctPager { display: none !important; }
 }
+
+/* ---------- user permissions (sup_users.js / acct_users.js) ---------- */
+.sup-users-note { font-size: 0.8rem; color: #5b6570; margin: 4px 0 8px; }
+.sup-user-st.pending, .au-pending { color: #b45309; font-weight: 600; }
+.au-pending { font-size: 0.75rem; background: #fffbeb; border: 1px solid #f59e0b; border-radius: 8px; padding: 0 6px; margin-left: 4px; }
+.sup-user-st.off { color: #9ca3af; }
+body.dark .sup-users-note { color: #9ca3af; }
+body.dark .au-pending { background: #3b2f12; }

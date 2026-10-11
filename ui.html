@@ -150,10 +150,10 @@
       <table><thead><tr><th>#</th><th>Нэр</th><th>Үнэ</th><th>Нөөц</th><th></th></tr></thead><tbody id="stockBody"></tbody></table>
     </div>
     <div id="tabUsers" class="hidden">
-      <div class="header-info"><div><label>ID</label><input id="newUserId"></div><div><label>Нэр</label><input id="newUserName"></div>
-      <div><label>Эрх</label><select id="newUserRole"><option value="employee">Ажилтан</option><option value="supervisor">Ахлах</option></select></div>
-      <button class="btn btn-success btn-sm" onclick="addUser()">Нэмэх</button></div>
-      <div id="userAlert"></div><table><thead><tr><th>ID</th><th>Нэр</th><th>Эрх</th><th>PIN</th><th></th></tr></thead><tbody id="usersBody"></tbody></table>
+      <div class="header-info"><div><label>ID</label><input id="newUserId" autocomplete="off" autocapitalize="none" placeholder="emp010"></div><div><label>Нэр</label><input id="newUserName" placeholder="Овог нэр"></div>
+      <button class="btn btn-success btn-sm" id="supAddUser" onclick="addUser()">Ажилтан нэмэх</button></div>
+      <p class="sup-users-note">Ахлах зөвхөн шинэ <b>ажилтан</b> нэмнэ. Шинэ ажилтан <b>хүлээгдэж буй</b> төлөвтэй үүснэ — Нягтлан идэвхжүүлж, PIN тохируулсны дараа нэвтэрнэ. Эрх, PIN, засах, устгахыг Нягтлан хийнэ.</p>
+      <div id="userAlert"></div><table><thead><tr><th>ID</th><th>Нэр</th><th>Эрх</th><th>Төлөв</th></tr></thead><tbody id="usersBody"></tbody></table>
     </div>
   </div>
 </div>

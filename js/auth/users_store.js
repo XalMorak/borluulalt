@@ -1,4 +1,4 @@
-/* user_fix: save one user at a time. Never replace the whole user list. */
+/* users_store: read / merge the users list (local cache + server). Writes live in js/accountant/acct_users.js (accountant: full control) and js/supervisor/sup_users.js (supervisor: add employee only). */
 (function(){
   if(window._userFix) return; window._userFix=true;
   var DEL="deleted_user_ids";
@@ -21,21 +21,6 @@
     var o={};
     try{ (JSON.parse(localStorage.getItem(DEL)||"[]")||[]).forEach(function(id){ if(id) o[String(id)]=1; }); }catch(e){}
     return o;
-  }
-  function rememberDeleted(ids){
-    var arr=[];
-    try{ arr=JSON.parse(localStorage.getItem(DEL)||"[]")||[]; }catch(e){}
-    (ids||[]).forEach(function(id){
-      id=String(id||"");
-      if(id && arr.indexOf(id)<0) arr.push(id);
-    });
-    localStorage.setItem(DEL, JSON.stringify(arr.slice(-400)));
-  }
-  function forgetDeleted(id){
-    var arr=[];
-    try{ arr=JSON.parse(localStorage.getItem(DEL)||"[]")||[]; }catch(e){}
-    id=String(id||"");
-    localStorage.setItem(DEL, JSON.stringify(arr.filter(function(x){ return String(x)!==id; })));
   }
   function mergeUsers(local, cloud){
     var gone=deleted();
@@ -94,15 +79,6 @@
     }catch(e){}
     return (window._fbDb && window._fbDb.ref) ? window._fbDb : null;
   }
-  async function writeUser(id, rec){
-    var base=db();
-    if(!base) throw new Error("db");
-    await base.ref("borluulalt/users/"+id).set(clean(rec));
-    var snap=await base.ref("borluulalt/users/"+id).once("value");
-    var got=snap.val();
-    if(!got || got.name!==rec.name) throw new Error("readback");
-    return got;
-  }
 
 
   function installApply(){
@@ -155,78 +131,11 @@
     window.getUser._userFix=true;
   }
 
-  function installSave(){
-    if(window.saveUserRow && window.saveUserRow._userFix) return;
-    window.saveUserRow=async function(id){
-      id=String(id||"").trim();
-      var nameEl=document.getElementById("usr_name_"+id);
-      var roleEl=document.getElementById("usr_role_"+id);
-      var pinEl=document.getElementById("usr_pin_"+id);
-      var name=(nameEl&&nameEl.value||"").trim();
-      var role=(roleEl&&roleEl.value)||"employee";
-      var pin=(pinEl&&pinEl.value||"").trim();
-      if(!name){ showAlert("userAlert","Нэр хоосон","error"); return; }
-      var rec={name:name, role:role, pin:pin};
-      var users=asUsers(typeof getUsers==="function"?getUsers():{});
-      users[id]=rec;
-      if(typeof setUsers==="function") setUsers(users);
-      try{
-        await writeUser(id, rec);
-        showAlert("userAlert","Хадгаллаа: "+name,"success");
-      }catch(e){
-        showAlert("userAlert","Нэр серверт хадгалагдсангүй. Дахин дар.","error");
-      }
-      if(typeof buildUsersTable==="function") buildUsersTable();
-    };
-    window.saveUserRow._userFix=true;
-  }
 
-  function installAdd(){
-    if(window.addUser && window.addUser._userFix) return;
-    window.addUser=async function(){
-      var id=(document.getElementById("newUserId").value||"").trim().toLowerCase();
-      var name=(document.getElementById("newUserName").value||"").trim();
-      var role=document.getElementById("newUserRole").value||"employee";
-      if(!id||!name){ showAlert("userAlert","ID болон нэр","error"); return; }
-      if(/[.#$\[\]\/\s]/.test(id)){ showAlert("userAlert","ID-д зай, цэг болохгүй","error"); return; }
-      var users=asUsers(getUsers());
-      if(users[id]){ showAlert("userAlert","ID давхцаж байна","error"); return; }
-      forgetDeleted(id);
-      var rec={name:name, role:role, pin:""};
-      users[id]=rec;
-      setUsers(users);
-      try{
-        await writeUser(id, rec);
-        document.getElementById("newUserId").value="";
-        document.getElementById("newUserName").value="";
-        showAlert("userAlert","Нэмэгдлээ. Нэвтрэх ID: "+id,"success");
-      }catch(e){
-        showAlert("userAlert","Серверт нэмэгдсэнгүй. Дахин Нэмэх дар.","error");
-      }
-      if(typeof buildUsersTable==="function") buildUsersTable();
-      if(typeof updateLoginHint==="function") updateLoginHint();
-    };
-    window.addUser._userFix=true;
-  }
 
-  function installDelete(){
-    if(typeof window.deleteUser!=="function" || window.deleteUser._userFix) return;
-    var prev=window.deleteUser;
-    window.deleteUser=async function(id){
-      id=String(id||"").trim();
-      rememberDeleted([id]);
-      var r=prev.apply(this, arguments);
-      try{
-        var base=db();
-        if(base) await base.ref("borluulalt/users/"+id).remove();
-      }catch(e){}
-      return r;
-    };
-    window.deleteUser._userFix=true;
-  }
 
   function install(){
-    installApply(); installPull(); installGet(); installSave(); installAdd(); installDelete();
+    installApply(); installPull(); installGet();
   }
   install();
   App.keep(install);
