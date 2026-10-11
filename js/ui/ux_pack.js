@@ -183,5 +183,5 @@
     mountWineAdd();
   }
   boot();
-  setInterval(boot,800);
+  App.keep(boot);
 })();

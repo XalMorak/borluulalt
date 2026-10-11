@@ -126,8 +126,8 @@
     Object.keys(o).forEach(function(k){ if(k.charAt(0)==="_"&&!(k in window.saveSubmission)) window.saveSubmission[k]=o[k]; });
     window.saveSubmission._ts=1;
   }
-  setInterval(function(){bind();wrap();wrapSave();},400);
-  setInterval(autoSave,5000);
+  App.keep(function(){bind();wrap();wrapSave();});
+  setInterval(autoSave,5000);   /* keep-timer: periodic draft autosave to localStorage (not a re-wrap) */
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",bind);
   else bind();
 })();

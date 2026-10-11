@@ -158,5 +158,5 @@
     mount("tabOverview"); mount("tabSubmissions"); mount("tabReports");
   }
   boot();
-  setInterval(boot,800);
+  App.keep(boot);
 })();

@@ -39,5 +39,5 @@
   }
   document.addEventListener("visibilitychange",function(){ if(document.hidden) persist(); });
   window.addEventListener("pagehide",persist);
-  ensureBtn(); setInterval(ensureBtn,1500);
+  ensureBtn(); App.keep(ensureBtn);
 })();

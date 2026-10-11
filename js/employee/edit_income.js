@@ -233,12 +233,12 @@
     if(id==="cashAmount"||id==="cardTotal"||id==="cashBalance"||id==="edit_cash"||id==="edit_card"||id==="edit_start") paintTotals();
   });
 
-  setInterval(function(){
+  App.keep(function(){
     if(document.hidden) return;
     bindEmp();
     bindEdit();
     unlockIncome();
-  }, 2000);
+  });
 
   if(document.readyState==="complete"){ bindEmp(); bindEdit(); }
   else window.addEventListener("load", function(){ bindEmp(); bindEdit(); });

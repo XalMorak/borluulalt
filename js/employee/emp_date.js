@@ -38,7 +38,7 @@
     };
     window.getFormData._empDate=true;
   }
-  setInterval(lock, 1500);
+  App.keep(lock);
   if(document.readyState==="complete") lock();
   else window.addEventListener("load", lock);
 })();

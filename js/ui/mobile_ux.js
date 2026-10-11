@@ -51,5 +51,5 @@
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",tick);
   else tick();
-  setInterval(tick,500);
+  App.keep(tick);
 })();

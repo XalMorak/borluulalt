@@ -78,12 +78,12 @@
     });
   }
   bind();
-  setInterval(function(){
+  App.keep(function(){
     bind();
     var pane=document.getElementById("tabReports");
     if(pane && !pane.classList.contains("hidden")){
       var tb=document.getElementById("reportBody");
       if(tb && !tb.querySelector("tr")) window.runReport();
     }
-  }, 800);
+  });
 })();

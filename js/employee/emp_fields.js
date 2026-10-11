@@ -59,5 +59,5 @@
     });
   }
   ensure();
-  setInterval(ensure, 1000);
+  App.keep(ensure);
 })();
