@@ -112,6 +112,7 @@
       setTimeout(autoLoad,60);
       return r;
     };
+    Object.keys(o).forEach(function(k){ if(k.charAt(0)==="_"&&!(k in window.buildSalesTable)) window.buildSalesTable[k]=o[k]; });   /* keep others' flags: no endless re-wrapping */
     window.buildSalesTable._ts=1;
   }
   function wrapSave(){
@@ -122,6 +123,7 @@
       try{localStorage.removeItem(key());}catch(e){}
       return r;
     };
+    Object.keys(o).forEach(function(k){ if(k.charAt(0)==="_"&&!(k in window.saveSubmission)) window.saveSubmission[k]=o[k]; });
     window.saveSubmission._ts=1;
   }
   setInterval(function(){bind();wrap();wrapSave();},400);

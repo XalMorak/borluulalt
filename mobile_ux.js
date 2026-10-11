@@ -65,6 +65,7 @@
       setTimeout(enhanceAll,0);
       return r;
     };
+    Object.keys(_b).forEach(function(k){ if(k.charAt(0)==="_"&&!(k in window.buildSalesTable)) window.buildSalesTable[k]=_b[k]; });   /* keep others' flags */
     window.buildSalesTable._mux=true;
   }
 

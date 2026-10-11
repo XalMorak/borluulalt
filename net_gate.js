@@ -370,8 +370,17 @@
       Object.keys(tombs).forEach(function(k){ var t=tombs[k]; if(t && t.id) tombIds[t.id]=String(t.at||""); });
       Object.keys(inbox).forEach(function(k){ var s=inbox[k]; if(s && s.id && tombIds[s.id]!=null && String(s.submittedAt||"")<=tombIds[s.id]){ delete inbox[k]; if(changed.indexOf("inbox")<0) changed.push("inbox"); } });
     }
-    putIn([ROOT,"_meta"], meta);
-    if(serverUpd!=null) putIn([ROOT,"updatedAt"], serverUpd);
+    /* record the server markers only for the nodes pulled in THIS sync. Copying the whole
+       _meta after a partial sync (stock_sync pulls products/wines only) marked submissions etc.
+       as "seen" without fetching them, so the next refresh skipped real changes. */
+    var newMeta=Object.assign({}, getIn(M.tree,[ROOT,"_meta"])||{});
+    nodes.forEach(function(n){ if(meta[n]!==undefined) newMeta[n]=meta[n]; else delete newMeta[n]; });
+    var allStamped=Object.keys(ROOT_STAMPED).every(function(n){ return nodes.indexOf(n)>=0; });
+    if(allStamped){
+      if(meta.updatedAt!==undefined) newMeta.updatedAt=meta.updatedAt;
+      if(serverUpd!=null) putIn([ROOT,"updatedAt"], serverUpd);
+    }
+    putIn([ROOT,"_meta"], newMeta);
     M.lastSync=now;
     saveSoon();
     changed.forEach(function(n){ fire(ROOT+"/"+n); });

@@ -18,7 +18,9 @@ const EMP_OWN = `(${EMP} && newData.exists() && newData.child('employeeId').val(
 
 const strict = { rules: {
   borluulalt: {
-    _meta: { ".read": ACT, ".write": SA },
+    /* _meta/inbox is a "something in the inbox changed" marker: employees bump it after a save
+       (keep_sync.js), supervisors after an edit (edit_clear.js / dedupe_edit.js) */
+    _meta: { ".read": ACT, inbox: { ".write": ACT, ".validate": "newData.isString() && newData.val().length <= 64" }, $n: { ".write": SA } },
     updatedAt: { ".read": ACT, ".write": SUP },
     users: { ".read": ACT, $uid: { ".write": ACC,
       ".validate": "!newData.exists() || (newData.child('name').isString() && newData.child('name').val().length > 0 && newData.child('name').val().length <= 80 && newData.child('role').isString() && newData.child('role').val().matches(/^(employee|supervisor|accountant)$/) && !newData.hasChild('pin'))" } },
@@ -26,8 +28,9 @@ const strict = { rules: {
     wines: { ".read": ACT, ".write": SUP },
     submissions: { ".read": SA, ".write": SUP },
     logs: { ".read": SA, ".write": SUP },
-    /* employees create/update their own entries; the supervisor only removes merged ones (sync_stable) */
-    inbox: { ".read": ACT, ".indexOn": ["submittedAt"], $sid: { ".write": `(${SUP} && !newData.exists()) || ${EMP_OWN}`,
+    /* employees create/update their own entries; the supervisor edits them (edit_clear.js /
+       dedupe_edit.js) and removes merged ones (sync_stable) */
+    inbox: { ".read": ACT, ".indexOn": ["submittedAt"], $sid: { ".write": `${SUP} || ${EMP_OWN}`,
       ".validate": "!newData.exists() || (newData.child('employeeId').isString() && newData.child('submittedAt').isString())" } },
     deleted: { ".read": ACT, ".indexOn": ["at"], $k: { ".write": SUP } },
     rosters: { ".read": SA, $id: { ".write": ACC } },
