@@ -731,3 +731,89 @@ td.income {
   font-weight: 700;
   letter-spacing: 0.01em;
 }
+
+/* ---------- Нягтлан v2 (js/accountant/acct_v2.js) ---------- */
+.acct-period {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 10px;
+}
+.acct-period-label { font-weight: 700; font-size: 0.85rem; }
+.acct-period-hint { font-size: 0.75rem; color: #6b7280; }
+.acct-period .btn.active { background: #0f3460; color: #fff; border-color: #0f3460; }
+.acct-summary-old { display: none !important; }
+.acct-kpi {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 10px 0;
+}
+.acct-kpi-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #fff;
+}
+.acct-kpi-card .k { font-size: 0.75rem; color: #6b7280; }
+.acct-kpi-card .v { font-size: 1.15rem; font-weight: 700; margin-top: 2px; white-space: nowrap; }
+.acct-kpi-card .s { font-size: 0.7rem; color: #9ca3af; }
+.acct-kpi-card.diff-over .v { color: #15803d; }
+.acct-kpi-card.diff-short .v { color: #b91c1c; }
+.acct-kpi-card.acct-kpi-warn { border-color: #f59e0b; background: #fffbeb; }
+.acct-breakdown {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 8px 0 4px;
+}
+.acct-break-card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 10px; min-width: 0; }
+.acct-break-card h4 { margin: 0 0 6px; }
+.acct-mini th, .acct-mini td { padding: 4px 6px; font-size: 0.8rem; }
+.acct-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 150px;
+  overflow-x: auto;
+  padding-bottom: 18px;
+}
+.acct-bar { flex: 1 0 18px; height: 100%; position: relative; display: flex; align-items: flex-end; }
+.acct-bar-fill { width: 100%; background: #3b82f6; border-radius: 4px 4px 0 0; }
+.acct-bar-fill.short { background: #ef4444; }
+.acct-bar-l { position: absolute; bottom: -16px; left: 0; right: 0; text-align: center; font-size: 0.6rem; color: #6b7280; }
+.acct-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+}
+.acct-tools input[type="search"] { flex: 1 1 220px; min-width: 0; padding: 7px 10px; border: 1px solid #d1d5db; border-radius: 8px; }
+.acct-chk { display: flex; align-items: center; gap: 4px; font-size: 0.85rem; margin: 0; }
+.acct-count { font-size: 0.75rem; color: #6b7280; }
+.acct-table-wrap { max-height: 70vh; overflow: auto; }
+.acct-table-wrap thead th { position: sticky; top: 0; z-index: 1; }
+th.acct-sortable { cursor: pointer; user-select: none; }
+th[data-sort="asc"]::after { content: " ▲"; font-size: 0.7em; }
+th[data-sort="desc"]::after { content: " ▼"; font-size: 0.7em; }
+tr.acct-row-short td { background: #fef2f2; }
+tr.acct-row-paid td { background: #f0fdf4; }
+.acct-pager { display: flex; gap: 8px; align-items: center; justify-content: center; margin: 6px 0; }
+body.dark .acct-kpi-card, body.dark .acct-break-card { background: #1f2937; border-color: #374151; }
+body.dark .acct-kpi-card .k, body.dark .acct-period-hint, body.dark .acct-count { color: #9ca3af; }
+body.dark .acct-kpi-card.acct-kpi-warn { background: #3b2f12; border-color: #b45309; }
+body.dark tr.acct-row-short td { background: #3b1d1d; }
+body.dark tr.acct-row-paid td { background: #14301f; }
+@media (max-width: 700px) {
+  .acct-breakdown { grid-template-columns: 1fr; }
+  .acct-kpi { grid-template-columns: repeat(2, 1fr); }
+  .acct-kpi-card .v { font-size: 1rem; }
+  .acct-period-hint { display: none; }
+}
+@media print {
+  .acct-table-wrap { max-height: none; overflow: visible; }
+  .acct-table-wrap tr { display: table-row !important; }
+  #acctTabs, #acctPeriod, #acctTools, #acctPager { display: none !important; }
+}
