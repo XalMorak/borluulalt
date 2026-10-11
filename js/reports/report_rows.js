@@ -5,6 +5,7 @@
   function tekOf(s){ return String((s&&(s.receiverName||s.tek||s.receiver))||"").trim(); }
   function kindOf(s){
     if(!s) return "bar";
+    if(s.kind==="vip"||s.sheet==="vip") return "bar";   /* VIP нэгдсэн counts on the Пиво (bar) sheet */
     if(s.kind==="wine"||s.sheet==="wine") return "wine";
     if(nrm(tekOf(s)).indexOf("\u0432\u0438\u043d\u043e")>=0) return "wine";
     var items=s.items||[];

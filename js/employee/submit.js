@@ -63,8 +63,8 @@
     if(typeof getFormData!=="function"){ alert("Форм алга"); return; }
     var data=getFormData();
     if(!data || !data.date){ if(typeof showAlert==="function") showAlert("empAlert","Огноо алга","error"); return; }
-    data.kind=data.kind||(window._wineMode?"wine":"bar");
-    data.sheet=data.kind==="wine"?"wine":"bar";
+    data.kind=data.kind||(window._vipMode?"vip":(window._wineMode?"wine":"bar"));
+    data.sheet=data.kind==="wine"||data.kind==="vip"?data.kind:"bar";
     data.submittedAt=new Date().toISOString();
     data.locked=false;
     var key=sid(data);

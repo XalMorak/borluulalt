@@ -30,12 +30,14 @@
   function tekOf(s){ return String((s&&(s.receiverName||s.tek||s.receiver))||"").trim(); }
   function kindOf(s){
     if(!s) return "bar";
+    if(s.kind==="vip"||s.sheet==="vip") return "vip";
     if(s.kind==="wine"||s.sheet==="wine") return "wine";
     if(tekOf(s).toLowerCase().indexOf("вино")>=0) return "wine";
     var items=s.items||[];
     for(var i=0;i<items.length;i++) if(Number(items[i]&&items[i].id)>=100) return "wine";
     return "bar";
   }
+  function kindLabel(k){ return k==="wine"?"Вино":(k==="vip"?"VIP нэгдсэн":"Пиво"); }
   function biz(s){
     if(window._bizKey){ var k=window._bizKey(s); if(k) return k; }
     return [s.employeeId||"", s.date||"", s.shift||"", s.location||"", tekOf(s), kindOf(s)].join("|").toLowerCase();
@@ -77,7 +79,7 @@
     Object.keys(from).forEach(function(k){ if(k.charAt(0)==="_") to[k]=from[k]; });
     return to;
   }
-  window._acctUtil={num:num,money:money,signed:signed,esc:esc,tekOf:tekOf,kindOf:kindOf,biz:biz,calcOf:calcOf,
+  window._acctUtil={kindLabel:kindLabel,num:num,money:money,signed:signed,esc:esc,tekOf:tekOf,kindOf:kindOf,biz:biz,calcOf:calcOf,
     collectedOf:collectedOf,diffOf:diffOf,diffCls:diffCls,ymd:ymd,today:today,addDays:addDays,me:me,role:role,listOf:listOf,copyFlags:copyFlags};
 
   /* ---------- Ахлах: today only ---------- */
@@ -199,7 +201,7 @@
       +'<div><label>Ажилтан</label><select id="acctEmp"><option value="">Бүгд</option></select></div>'
       +'<div><label>Байршил</label><select id="acctLoc"><option value="">Бүгд</option></select></div>'
       +'<div><label>Тек</label><select id="acctTek"><option value="">Бүгд</option></select></div>'
-      +'<div><label>Төрөл</label><select id="acctKind"><option value="all">Бүгд</option><option value="bar">Пиво</option><option value="wine">Вино</option></select></div>'
+      +'<div><label>Төрөл</label><select id="acctKind"><option value="all">Бүгд</option><option value="bar">Пиво</option><option value="wine">Вино</option><option value="vip">VIP нэгдсэн</option></select></div>'
       +'</div>'
       +'<div class="no-print" style="margin-bottom:8px">'
       +'<button type="button" class="btn btn-sm" id="acctReload">Шинэчлэх</button>'
@@ -337,7 +339,7 @@
       if(f.emp && s.employeeId!==f.emp) return false;
       if(f.loc && (s.location||"")!==f.loc) return false;
       if(f.tek && tekOf(s)!==f.tek) return false;
-      if(f.kind!=="all" && kindOf(s)!==f.kind) return false;
+      if(f.kind!=="all" && kindOf(s)!==f.kind && !(f.kind==="bar" && kindOf(s)==="vip")) return false;   /* Пиво includes VIP нэгдсэн */
       return true;
     });
   }
@@ -396,7 +398,7 @@
       var e=emp[s.employeeId||"?"]||(emp[s.employeeId||"?"]={name:s.employeeName||s.employeeId||"?", id:s.employeeId||"", n:0, calc:0, col:0, over:0, short:0, paid:0});
       e.n++; e.calc+=c; e.col+=col; if(d<0) e.short+=d; else e.over+=d; e.paid+=paidAmt;
       return '<tr data-i="'+i+'" style="cursor:pointer">'
-        +'<td>'+esc(s.date)+'</td><td>'+esc(s.shift||"—")+'</td><td>'+esc(s.employeeName||s.employeeId||"")+'</td><td>'+esc(s.location||"—")+'</td><td>'+esc(tekOf(s)||"—")+'</td><td>'+(kindOf(s)==="wine"?"Вино":"Пиво")+'</td>'
+        +'<td>'+esc(s.date)+'</td><td>'+esc(s.shift||"—")+'</td><td>'+esc(s.employeeName||s.employeeId||"")+'</td><td>'+esc(s.location||"—")+'</td><td>'+esc(tekOf(s)||"—")+'</td><td>'+kindLabel(kindOf(s))+'</td>'
         +'<td>'+money(c)+'</td><td>'+money(col)+'</td>'
         +'<td class="'+diffCls(d)+'">'+signed(d)+'</td>'
         +'<td><input type="checkbox" class="acct-paid" data-k="'+esc(k)+'"'+(p.paid?' checked':'')+'></td>'
@@ -458,7 +460,7 @@
   window._acct={
     rows:function(){ return _rows; }, all:function(){ return _all; }, pays:function(){ return _pays; },
     setPay:function(k, rec){ _pays[k]=rec; }, authed:authed, me:me,
-    kindOf:kindOf, diffOf:diffOf, calcOf:calcOf, collectedOf:collectedOf, tekOf:tekOf, keySafe:keySafe,
+    kindOf:kindOf, kindLabel:kindLabel, diffOf:diffOf, calcOf:calcOf, collectedOf:collectedOf, tekOf:tekOf, keySafe:keySafe,
     num:num, money:money, signed:signed, esc:esc, diffCls:diffCls, today:today, addDays:addDays, ymd:ymd
   };
 
@@ -505,7 +507,7 @@
     var csv="Огноо,Ээлж,Ажилтан,ID,Байршил,Тек,Төрөл,Бэлэн,Карт,Эхлэл дүн,POS,Бодолт,Цуглуулсан,Зөрүү,Төлөв,Төлсөн,Төлсөн дүн,Илгээсэн\n";
     rows.forEach(function(s){
       var d=diffOf(s), p=_pays[keySafe(s)]||{};
-      csv+=[s.date,s.shift,s.employeeName,s.employeeId,s.location,tekOf(s),kindOf(s)==="wine"?"Вино":"Пиво",
+      csv+=[s.date,s.shift,s.employeeName,s.employeeId,s.location,tekOf(s),kindLabel(kindOf(s)),
         num(s.cashAmount),num(s.cardTotal),num(s.cashBalance),s.posNumber||"",Math.round(calcOf(s)),Math.round(collectedOf(s)),Math.round(d),
         Math.abs(d)<0.01?"Тохирсон":(d>0?"Илүү":"Дутуу"), p.paid?"Тийм":"", p.paid?num(p.amount):"", s.submittedAt||""].map(q).join(",")+"\n";
     });

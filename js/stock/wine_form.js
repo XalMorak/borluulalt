@@ -34,6 +34,7 @@
     var name=(tr.cells[1]&&tr.cells[1].textContent)||"";
     var inp=tr.querySelector("input[id^='prev_'],input[id^='sold_']");
     var id=0; if(inp){ var m=String(inp.id).match(/_(\d+)$/); if(m) id=Number(m[1]); }
+    if(id && id<100) return "beer";                      /* VIP нэгдсэн: beer rows keep prev/next */
     var w=wineById(id);
     var c=nrm(w&&w.cat);
     if(isSnack(name) || c.indexOf("busad")>=0 || c.indexOf("\u0431\u0443\u0441\u0430\u0434")>=0) return "busad";
@@ -64,7 +65,7 @@
   if(typeof window.calcIncome==="function" && !window.calcIncome._wine){
     var _ci=window.calcIncome;
     window.calcIncome=function(id){
-      if(window._wineMode){
+      if(window._wineMode||window._vipMode){
         applyIncome(id);
         if(typeof updateRecon==="function") updateRecon();
         return;
@@ -76,7 +77,7 @@
   if(typeof window.calcRow==="function" && !window.calcRow._wine){
     var _cr=window.calcRow;
     window.calcRow=function(id){
-      if(window._wineMode){
+      if(window._wineMode||window._vipMode){
         var tr=document.getElementById("prev_"+id);
         tr=tr && tr.closest("tr");
         if(tr && catRow(tr)==="wine"){ applyIncome(id); if(typeof updateRecon==="function") updateRecon(); return; }
@@ -88,7 +89,7 @@
   if(typeof window.getCalcTotal==="function" && !window.getCalcTotal._wine){
     var _gt=window.getCalcTotal;
     window.getCalcTotal=function(){
-      if(!window._wineMode) return _gt.apply(this,arguments);
+      if(!window._wineMode&&!window._vipMode) return _gt.apply(this,arguments);
       var sum=0;
       document.querySelectorAll("#salesBody input[id^='sold_']").forEach(function(el){
         var m=String(el.id).match(/_(\d+)$/); if(!m) return;
@@ -99,7 +100,7 @@
     window.getCalcTotal._wine=true;
   }
   function lockWinePrevNext(){
-    if(!window._wineMode) return;
+    if(!window._wineMode&&!window._vipMode) return;
     var tb=document.getElementById("salesBody"); if(!tb) return;
     tb.querySelectorAll("tr").forEach(function(tr){
       if(tr.classList.contains("wine-sec")) return;

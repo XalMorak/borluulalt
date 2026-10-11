@@ -67,9 +67,9 @@
     var inc=document.getElementById("edit_income_"+i);
     if(!prev||!next||!sold) return;
     var a=num(prev.value), b=num(next.value);
-    sold.value=Math.max(0, a-b);
+    if(a>0 || b>0) sold.value=Math.max(0, a-b);   /* wine rows (sold only, prev=next=0) keep the typed sold */
     if(inc){
-      var price=num(inc.dataset.price);
+      var price=editPrice(i);
       if(!price){
         var nameCell=sold.closest("tr") && sold.closest("tr").cells[0];
         var name=nameCell?nameCell.textContent.trim():"";
@@ -87,12 +87,27 @@
     paintTotals();
   }
 
+  /* unit price of edit row i: the submitted item's price, else the catalog by id (wine ids >= 100 too) */
+  function editPrice(i){
+    var inc=document.getElementById("edit_income_"+i);
+    if(inc && num(inc.dataset.price)) return num(inc.dataset.price);
+    var s=window._sortedSubs && window._editingIdx!=null ? window._sortedSubs[window._editingIdx] : null;
+    var it=s && s.items && s.items[i], pr=0;
+    if(it){
+      pr=num(it.price);
+      if(!pr && num(it.sold)) pr=num(it.income)/num(it.sold);
+      if(!pr) pr=priceOf(it.id);
+    }
+    if(inc && pr) inc.dataset.price=String(pr);
+    return pr;
+  }
+  function seedPrices(){ var i=0; while(document.getElementById("edit_sold_"+i)){ editPrice(i); i++; } }
   window.editCalc=function(i){ cascadeEdit(i); };
   window.editCalcIncome=function(i){
     var sold=document.getElementById("edit_sold_"+i);
     var inc=document.getElementById("edit_income_"+i);
     if(sold && inc && inc.dataset.manual!=="1"){
-      var price=num(inc.dataset.price);
+      var price=editPrice(i);
       if(price) inc.value=Math.round(num(sold.value)*price);
     }
     paintTotals();
@@ -226,7 +241,7 @@
   }
 
   /* called by submissions.js after the edit form is drawn */
-  window._editIncomeBind=function(){ bindEdit(); unlockIncome(); paintEditTotals(); };
+  window._editIncomeBind=function(){ seedPrices(); bindEdit(); unlockIncome(); paintEditTotals(); };
 
   document.addEventListener("input", function(ev){
     var id=ev.target && ev.target.id || "";

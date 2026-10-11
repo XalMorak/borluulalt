@@ -25,6 +25,7 @@
   }
   function isWineSub(s){
     if(!s) return false;
+    if(s.kind==="vip"||s.sheet==="vip") return false;
     if(s.kind==="wine"||s.sheet==="wine") return true;
     var tek=nrm(s.receiverName||s.tek||s.receiver||"");
     if(tek.indexOf("\u0432\u0438\u043d\u043e")>=0) return true;
