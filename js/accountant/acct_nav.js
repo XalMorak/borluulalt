@@ -3,7 +3,7 @@
 (function () {
   if (window._acctNav) return;
   window._acctNav = true;
-  var PANES = { subs: "acctPaneSubs", users: "acctPaneUsers", roster: "acctPaneRoster", report: "acctPaneReport", pay: "acctPanePay" };
+  var PANES = { subs: "acctPaneSubs", users: "acctPaneUsers", roster: "acctPaneRoster", report: "acctPaneReport", pay: "acctPanePay", bugs: "acctPaneBugs" };
 
   function show(name) {
     if (!PANES[name]) name = "subs";
@@ -21,6 +21,7 @@
     if (name === "roster" && typeof window._cycleRefresh === "function") window._cycleRefresh();
     if (name === "report" && typeof window.renderAcctReport === "function") window.renderAcctReport();
     if (name === "pay" && typeof window.openAcctPay === "function") window.openAcctPay();
+    if (name === "bugs" && typeof window.renderAcctBugs === "function") window.renderAcctBugs();
   }
   show._ar = true;
   show._pay = true;

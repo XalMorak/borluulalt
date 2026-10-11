@@ -78,6 +78,58 @@
           ".write": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'accountant'))"
         }
       },
+      "reports": {
+        ".read": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'accountant'))",
+        ".indexOn": [
+          "at",
+          "status"
+        ],
+        "$rid": {
+          ".write": "((auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true) && !data.exists() && newData.child('by').val() === auth.uid) || ((auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'accountant')) && data.exists() && newData.exists())",
+          ".validate": "newData.hasChildren(['at', 'by', 'role', 'kind', 'text', 'status'])",
+          "at": {
+            ".validate": "newData.isString() && newData.val().length <= 40"
+          },
+          "by": {
+            ".validate": "newData.isString() && newData.val().length <= 64"
+          },
+          "role": {
+            ".validate": "newData.isString() && newData.val().length <= 20"
+          },
+          "category": {
+            ".validate": "newData.isString() && newData.val().length <= 30"
+          },
+          "statusAt": {
+            ".validate": "newData.isString() && newData.val().length <= 40"
+          },
+          "statusBy": {
+            ".validate": "newData.isString() && newData.val().length <= 64"
+          },
+          "fixNote": {
+            ".validate": "newData.isString() && newData.val().length <= 1000"
+          },
+          "kind": {
+            ".validate": "newData.isString() && newData.val().matches(/^(user|auto)$/)"
+          },
+          "text": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 2000"
+          },
+          "status": {
+            ".validate": "newData.isString() && newData.val().matches(/^(new|fixing|fixed)$/) && (data.exists() || newData.val() === 'new')"
+          },
+          "shot": {
+            ".validate": "newData.isString() && newData.val().length <= 420000 && newData.val().beginsWith('data:image/')"
+          },
+          "ctx": {
+            "$k": {
+              ".validate": "newData.isString() ? newData.val().length <= 8000 : (newData.isNumber() || newData.isBoolean())"
+            }
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      },
       "$other": {
         ".read": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'supervisor' || root.child('borluulalt/users/'+auth.uid).child('role').val() === 'accountant'))",
         ".write": false

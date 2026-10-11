@@ -61,7 +61,10 @@ test.after(async () => { await A.app.delete(); });
 test("config", async () => {
   const r = await call(config, { method: "GET" });
   assert.equal(r.status, 200);
-  assert.deepEqual(r.body, { mode: "transition", requirePin: "staff", configured: true });
+  assert.deepEqual(r.body, { mode: "transition", requirePin: "staff", configured: true, version: null });
+  process.env.VERCEL_GIT_COMMIT_SHA = "abcdef1234567";
+  assert.equal((await call(config, { method: "GET" })).body.version, "abcdef1");
+  delete process.env.VERCEL_GIT_COMMIT_SHA;
   assert.equal(r.headers["cache-control"], "no-store");
 });
 
