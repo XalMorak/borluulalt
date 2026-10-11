@@ -122,7 +122,7 @@ function wrap(){
   saveSubmission=async function(){try{if(typeof cloudPull==="function")await cloudPull();}catch(e){}return await _s.apply(this,arguments);};
  }
 }
-wrap();setInterval(wrap,300);
+wrap();App.keep(wrap);
 window._mergeSubs=_mergeSubs;
 window._mergeProducts=_mergeProducts;
 })();

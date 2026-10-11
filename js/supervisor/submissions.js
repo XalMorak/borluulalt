@@ -1,6 +1,6 @@
 /* submissions.js — supervisor: lock / edit / delete one submission.
    One definition each, installed once (was: edit_fix.js pinning its versions every 300 ms while
-   guard.js, delete_fix.js, dedupe_edit.js, edit_clear.js, edit_select.js and edit_income.js wrapped or
+   guard.js, visible_subs.js, dedupe_edit.js, edit_clear.js, edit_select.js and edit_income.js wrapped or
    replaced them on their own timers, so which version ran on a click was random — e.g. guard's
    save used a different cash formula).
    saveEdit = the edit_fix save + the edit_clear follow-up (keep the id, editedAt, one inbox row,

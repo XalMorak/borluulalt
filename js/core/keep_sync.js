@@ -117,5 +117,5 @@
     window.refreshData = fn;
   }
   hookSave(); hookShow(); hookRefresh();
-  setInterval(function () { hookSave(); hookShow(); hookRefresh(); }, 800);
+  App.keep(function () { hookSave(); hookShow(); hookRefresh(); });
 })();

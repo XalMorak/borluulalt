@@ -162,10 +162,3 @@ function showChartLines(days){
   if(toEl)toEl.value=new Date().toISOString().slice(0,10);
   if(typeof runReport==="function")runReport();
 }
-(function(){
-  function wrapChart(){
-    if(typeof window.showChart!=="function")return;
-    window.showChart=showChartLines;
-  }
-  wrapChart();App.keep(wrapChart);
-})();

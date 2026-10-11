@@ -94,7 +94,8 @@ function clearSubFilter(){
     fillSubTekOptions();
   }
   function wrap(){
-    if(typeof window.renderSubmissionsList!=="function")return;
+    if(window._subsUiList||typeof window.renderSubmissionsList!=="function")return;
+    window._subsUiList=true;   /* base list: installed once */
     window.renderSubmissionsList=function(all){renderSubmissionsListEnhanced(all);};
   }
   wrap();App.keep(function(){wrap();ensureTekFilter();});

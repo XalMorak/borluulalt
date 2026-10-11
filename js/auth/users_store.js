@@ -104,50 +104,6 @@
     return got;
   }
 
-  function installPush(){
-    if(window.cloudPush && window.cloudPush._userFix) return;
-    window.cloudPush=async function(){
-      if(window._syncBusy) return false;
-      window._syncBusy=true;
-      if(typeof updateSyncBadge==="function") updateSyncBadge("busy");
-      try{
-        var base=db();
-        if(!base){ window._syncBusy=false; return false; }
-        var local=(typeof packAll==="function")?(packAll()||{}):{};
-        var disk=rawSubs();
-        if(disk.length>listOf(local.submissions).length) local.submissions=disk;
-        var snap=await base.ref("borluulalt").once("value");
-        var cloud=snap.val()||{};
-        local.submissions=mergeSubs(local.submissions, cloud.submissions);
-        local.users=mergeUsers(local.users, cloud.users);
-        if(!local.products||!listOf(local.products).length) local.products=cloud.products;
-        if(!local.wines||listOf(local.wines).length<listOf(cloud.wines).length) local.wines=cloud.wines;
-        if(typeof setUsers==="function") setUsers(local.users);
-        var patch=clean({
-          products: local.products||[],
-          submissions: local.submissions||[],
-          wines: local.wines||[],
-          logs: local.logs||[],
-          updatedAt: new Date().toISOString()
-        });
-        await base.ref("borluulalt").update(patch);
-        if(local.users && Object.keys(local.users).length){
-          await base.ref("borluulalt/users").update(clean(local.users));
-        }
-        window._lastCloudAt=patch.updatedAt;
-        if(typeof updateSyncBadge==="function") updateSyncBadge("ok");
-        window._syncBusy=false;
-        return true;
-      }catch(e){
-        if(typeof updateSyncBadge==="function") updateSyncBadge("err");
-        window._syncBusy=false;
-        return false;
-      }
-    };
-    window.cloudPush._guard=true;
-    window.cloudPush._safe=true;
-    window.cloudPush._userFix=true;
-  }
 
   function installApply(){
     if(typeof window.applyAll!=="function" || window.applyAll._userFix) return;
@@ -270,8 +226,8 @@
   }
 
   function install(){
-    installPush(); installApply(); installPull(); installGet(); installSave(); installAdd(); installDelete();
+    installApply(); installPull(); installGet(); installSave(); installAdd(); installDelete();
   }
   install();
-  setInterval(install, 700);
+  App.keep(install);
 })();

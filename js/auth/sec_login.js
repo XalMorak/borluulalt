@@ -160,5 +160,5 @@
   }
 
   wrapLogout(); guardSupervisorUsers();
-  setInterval(function(){ wrapLogout(); guardSupervisorUsers(); }, 700);   // local only
+  App.keep(function(){ wrapLogout(); guardSupervisorUsers(); });   // local only
 })();

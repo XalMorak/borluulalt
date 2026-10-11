@@ -34,6 +34,8 @@ Build алхамгүй статик сайт: `index.html` нь `ui.html`-ийг
 | `js/stock/` | Нөөц: байршлаар, вино, нэгдсэн нөөцийн таб, серверийн нөөц хасалтын ledger (`stock_ledger.js`) |
 | `js/accountant/` | Нягтлан: бүх илгээлт, шүүлт, Excel, хэрэглэгч, ростер, төлөлт |
 | `js/ui/` | Мөнгөний фонт, гар утасны UX, dark mode |
+
+**Нөхөөсүүдийг байршуулах (`js/core/hooks.js`)** — файл бүр өөрийн `setInterval` давталтаар глобал функцийг дахин ороох биш, `App.keep(fn)`-ээр бүртгүүлнэ. `App.settle()` бүх бүртгэлтэй алхмыг ачааллын дарааллаар, глобал функц өөрчлөгдөхөө болих хүртэл (fixpoint) ажиллуулна; ачаалал дуусахад (`js/core/boot.js`), DOM өөрчлөгдөх, click/input/change, focus үед дуудагдана. Ороосон функц доторх функцийнхээ `_туг`-уудыг өвлөнө — тиймээс дахин ороолт үүсэхгүй. Үлдсэн цорын ганц энгийн таймерууд: ноорог автоматаар хадгалах (5 сек, `temp_save.js`), локал tombstone цэвэрлэх (3 сек, `sync_stable.js`), Firebase SDK-г хүлээх эхлэлийн давталт (`net_gate.js`, дуусаад зогсдог).
 | `api/` | Vercel функц: `/api/login`, `/api/pin`, `/api/config` |
 | `security/` | Database rules (transition/strict) ба тэдгээрийг үүсгэгч |
 | `tests/security/` | Emulator тест: rules, login, e2e (бүх горим), flows, stock, DOM/behaviour gate |

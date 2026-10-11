@@ -18,34 +18,6 @@
   function thinList(arr){ return !arr || !Array.isArray(arr) || arr.length===0; }
   function thinUsers(u){ return !u || typeof u!=="object" || Object.keys(u).length===0; }
 
-  function wrapPush(){
-    if(typeof window.cloudPush!=="function" || window.cloudPush._safe) return;
-    var orig=window.cloudPush;
-    window.cloudPush=async function(){
-      try{
-        if(typeof initFirebase==="function") initFirebase();
-        if(!window._fbDb) return orig.apply(this,arguments);
-        var local=(typeof packAll==="function")?packAll():{};
-        var snap=await _fbDb.ref("borluulalt").once("value");
-        var cloud=snap.val()||{};
-        if(thinList(local.products) && !thinList(cloud.products)) local.products=cloud.products;
-        if(thinList(local.submissions) && !thinList(cloud.submissions)) local.submissions=cloud.submissions;
-        if(thinList(local.wines) && !thinList(cloud.wines)) local.wines=cloud.wines;
-        if(thinUsers(local.users) && !thinUsers(cloud.users)) local.users=cloud.users;
-        if(thinList(local.logs) && !thinList(cloud.logs)) local.logs=cloud.logs;
-        local.updatedAt=new Date().toISOString();
-        if(typeof applyAll==="function") applyAll(local);
-        await _fbDb.ref("borluulalt").set(local);
-        window._lastCloudAt=local.updatedAt;
-        if(typeof updateSyncBadge==="function") updateSyncBadge("ok");
-        return true;
-      }catch(e){
-        console.warn(e);
-        return orig.apply(this,arguments);
-      }
-    };
-    window.cloudPush._safe=true;
-  }
 
   function ymd(d){
     var y=d.getFullYear(),m=d.getMonth()+1,day=d.getDate();
@@ -99,6 +71,5 @@
     if(m){ ev.preventDefault(); drawChart(Number(m[1])); }
   },true);
 
-  hidePrices(); wrapPush();
-  setInterval(function(){ hidePrices(); wrapPush(); window.showChart=drawChart; },1200);
+  hidePrices(); App.keep(hidePrices);   /* showChart = drawChart is set once above; ux_pack adds the day-range wrapper on top */
 })();

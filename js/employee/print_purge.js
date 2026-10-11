@@ -1,5 +1,5 @@
 /* iOS draft.
-   (The old "live extras" loader that injected pinned jsDelivr copies of wine.js, runtime_fix.js,
+   (The old "live extras" loader that injected pinned jsDelivr copies of wine.js, safe_sync.js,
    wine_stock.js, wine_split.js and wine_form.js was removed: index.html already loads the current
    files, and whichever copy ran first won — the stale CDN wine_stock.js has no VIP location,
    the stale wine.js the old Айраг price.) */

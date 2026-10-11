@@ -80,10 +80,10 @@
     var m=String(t.id).match(/^(prev|next|sold)_(\d+)$/); if(!m) return;
     if(m[1]!=="sold") window.calcRow(m[2]); else window.calcIncome(m[2]);
   },true);
-  setInterval(function(){
+  App.keep(function(){
     var emp=document.getElementById("employeeView");
     if(emp && !emp.classList.contains("hidden")) recalcAll();
-  },1500);
+  });
 
   function cleanWines(){
     if(typeof getWines!=="function"||typeof setWines!=="function") return [];
@@ -123,11 +123,11 @@
   }
   pullWines();
   setTimeout(pullWines,1200);
-  setInterval(function(){
+  App.keep(function(){
     var pane=document.getElementById("tabWine");
     if(pane && !pane.classList.contains("hidden") && typeof drawWineStock==="function"){
       var tb=document.getElementById("wineBody");
       if(tb && !tb.querySelector("tr")) drawWineStock();
     }
-  },1000);
+  });
 })();

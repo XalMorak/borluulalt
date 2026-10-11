@@ -102,5 +102,5 @@
   }
 
   wrapLogin(); wrapRefresh();
-  setInterval(function(){ wrapLogin(); wrapRefresh(); }, 700);   // local only: keeps wrappers outermost
+  App.keep(function(){ wrapLogin(); wrapRefresh(); });   // local only: keeps wrappers outermost
 })();

@@ -23,8 +23,26 @@
     for(var i=0;i<a.length;i++) if(a[i]!==b[i]) return false;
     return true;
   }
+  /* A step that wraps a global must not hide the flags ("_xyz") of the wrappers below it, or their
+     installers would wrap again on the next pass (the old endless-wrapper bug). So whenever a step
+     replaces a watched global, the new function inherits the old one's flags it does not set itself. */
+  var watched={};
+  function inherit(from, to){
+    if(typeof from!=="function" || typeof to!=="function" || from===to) return;
+    Object.keys(from).forEach(function(k){ if(k.charAt(0)==="_" && !(k in to)) { try{ to[k]=from[k]; }catch(e){} } });
+  }
   function runAll(){
-    for(var i=0;i<steps.length;i++){ try{ steps[i](); }catch(e){ console.warn("[App.keep]", e); } }
+    var names=Object.keys(watched);
+    for(var i=0;i<steps.length;i++){
+      var pre={};
+      for(var n=0;n<names.length;n++){ try{ pre[names[n]]=window[names[n]]; }catch(e){} }
+      try{ steps[i](); }catch(e){ console.warn("[App.keep]", e); }
+      for(n=0;n<names.length;n++){ var cur; try{ cur=window[names[n]]; }catch(e){ continue; } if(cur!==pre[names[n]]) inherit(pre[names[n]], cur); }
+    }
+  }
+  function learn(before, after){
+    var bm={}; for(var i=0;i<before.length;i+=2) bm[before[i]]=before[i+1];
+    for(var j=0;j<after.length;j+=2) if(bm[after[j]]!==after[j+1]){ watched[after[j]]=1; inherit(bm[after[j]], after[j+1]); }
   }
   App.settle=function(){
     if(busy) return;
@@ -34,7 +52,14 @@
       for(var pass=0; pass<6; pass++){
         var before=fnSnapshot();
         runAll();
-        if(same(before, fnSnapshot())) break;
+        var after=fnSnapshot();
+        if(same(before, after)){ App._unstable=[]; break; }
+        learn(before, after);
+        if(pass===5){   /* still changing: someone keeps replacing a global — list who, for tests */
+          var bm={}; for(var i=0;i<before.length;i+=2) bm[before[i]]=before[i+1];
+          var u=[]; for(var j=0;j<after.length;j+=2) if(bm[after[j]]!==after[j+1]) u.push(after[j]);
+          App._unstable=u;
+        }
       }
     } finally {
       busy=false;

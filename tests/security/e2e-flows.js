@@ -30,6 +30,8 @@ const check = (name, ok, info) => { console.log((ok ? "ok   " : "FAIL ") + name 
     return ch;
   });
   check("wrapper chains are stable", Object.keys(churn).length === 0, churn);
+  const uns = await A.evaluate(() => { App.settle(); App.settle(); return { unstable: App._unstable, started: !!App.keep }; });
+  check("App.settle reaches a fixpoint (no global keeps being replaced)", uns.started && Array.isArray(uns.unstable) && uns.unstable.length === 0, uns);
 
   await A.evaluate(async () => {
     loadSupervisorData(); await new Promise((r) => setTimeout(r, 500));

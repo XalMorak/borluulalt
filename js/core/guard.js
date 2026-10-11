@@ -93,40 +93,6 @@
   safeRun._reportFix=true;
   safeRun._guard=true;
 
-  function pushGuard(){
-    if(window.cloudPush && window.cloudPush._guard) return;
-    window.cloudPush=async function(){
-      if(window._syncBusy) return false;
-      window._syncBusy=true;
-      if(typeof updateSyncBadge==="function") updateSyncBadge("busy");
-      try{
-        if(typeof initFirebase==="function") initFirebase();
-        if(!window._fbDb){ window._syncBusy=false; return false; }
-        var local=(typeof packAll==="function")? (packAll()||{}) : {};
-        var disk=rawSubs();
-        if(disk.length>(listOf(local.submissions).length)) local.submissions=disk;
-        var snap=await window._fbDb.ref("borluulalt").once("value");
-        var cloud=snap.val()||{};
-        local.submissions=mergeSubs(local.submissions, cloud.submissions);
-        if(!local.products || !listOf(local.products).length) local.products=cloud.products;
-        if(!local.wines || listOf(local.wines).length < listOf(cloud.wines).length) local.wines=cloud.wines;
-        if(!local.users || !Object.keys(local.users||{}).length) local.users=cloud.users;
-        local.updatedAt=new Date().toISOString();
-        if(typeof applyAll==="function") applyAll(local);
-        await window._fbDb.ref("borluulalt").set(local);
-        window._lastCloudAt=local.updatedAt;
-        if(typeof updateSyncBadge==="function") updateSyncBadge("ok");
-        window._syncBusy=false;
-        return true;
-      }catch(e){
-        if(typeof updateSyncBadge==="function") updateSyncBadge("err");
-        window._syncBusy=false;
-        return false;
-      }
-    };
-    window.cloudPush._guard=true;
-    window.cloudPush._safe=true;
-  }
 
   function sameRow(a,b){ return sid(a)===sid(b); }
 
@@ -135,8 +101,7 @@
     window.filterReportRows=filtered;
     if(window.runReport!==safeRun) window.runReport=safeRun;
     window.runReport._sheetSafe=true;
-    pushGuard();
   }
   install();
-  setInterval(install, 700);
+  App.keep(install);
 })();

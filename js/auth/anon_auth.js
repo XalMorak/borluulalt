@@ -31,7 +31,7 @@ function ensureFirebaseAuth(cb){
       return true;
     };
   }
-  apply();setInterval(apply,300);
+  apply();App.keep(apply);
 })();
 
 (function(){
@@ -55,5 +55,5 @@ function ensureFirebaseAuth(cb){
       };
     }
   }
-  tick();setInterval(tick,400);
+  tick();App.keep(tick);
 })();

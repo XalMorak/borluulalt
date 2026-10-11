@@ -124,7 +124,9 @@
       "</div><div id=\"editAlert\"></div></div>";
     try{det.scrollIntoView({behavior:"smooth",block:"nearest"});}catch(e){}
   }
+  /* base detail view: installed once (it used to be re-installed every 400 ms, dropping the wrappers above it) */
   function wrapDetail(){
+    if(window._bugfixDetail) return; window._bugfixDetail=true;
     window.showSubmissionDetail=function(idx){
       var s=window._sortedSubs&&window._sortedSubs[idx];
       if(!s){console.warn("no sub",idx);return;}
@@ -138,5 +140,5 @@
     wrapForm();wrapSave();wrapArchive();wrapCSV();wrapDetail();
   }
   tick();
-  setInterval(tick,400);
+  App.keep(tick);
 })();

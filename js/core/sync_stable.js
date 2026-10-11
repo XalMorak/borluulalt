@@ -245,6 +245,6 @@
   pin();
   wrapGetSubs();
   listenTombs();
-  setInterval(function(){ pin(); wrapGetSubs(); listenTombs(); pinOverview(); }, 250);
-  setInterval(purgeLocal, 3000);
+  App.keep(function(){ pin(); wrapGetSubs(); listenTombs(); pinOverview(); });
+  setInterval(purgeLocal, 3000);   /* keep-timer: periodic local tombstone cleanup (not a re-wrap) */
 })();

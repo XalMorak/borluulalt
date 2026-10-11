@@ -92,5 +92,5 @@
     window.doLogin._loginFix=true;
   }
   wrap();
-  setInterval(wrap, 400);
+  App.keep(wrap);
 })();

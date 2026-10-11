@@ -45,22 +45,6 @@
 
   window._sheetKind = "all";
 
-  function wrapPush(){
-    if(typeof window.cloudPush!=="function" || window.cloudPush._mergeSubs) return;
-    var orig=window.cloudPush;
-    window.cloudPush=async function(){
-      try{
-        if(typeof initFirebase==="function") initFirebase();
-        if(window._fbDb && typeof getSubs==="function" && typeof setSubs==="function"){
-          var snap=await window._fbDb.ref("borluulalt/submissions").once("value");
-          var merged=mergeSubs(snap.val(), getSubs());
-          setSubs(merged);
-        }
-      }catch(e){ console.warn("sync_merge", e); }
-      return orig.apply(this, arguments);
-    };
-    window.cloudPush._mergeSubs=true;
-  }
 
   function wrapPull(){
     if(typeof window.cloudPull!=="function" || window.cloudPull._mergeSubs) return;
@@ -94,10 +78,9 @@
   }
 
   function tick(){
-    wrapPush();
     wrapPull();
     wrapLoad();
   }
   tick();
-  setInterval(tick, 500);
+  App.keep(tick);
 })();

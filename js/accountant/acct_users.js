@@ -12,7 +12,7 @@
   window._acctUsers=true;
 
   var ROLES=[["employee","Ажилтан"],["supervisor","Ахлах"],["accountant","Нягтлан"]];
-  var DEL="deleted_user_ids";      // shared with user_fix.js mergeUsers()
+  var DEL="deleted_user_ids";      // shared with users_store.js mergeUsers()
   var _cloud=null;                 // last fresh read of borluulalt/users
 
   function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
