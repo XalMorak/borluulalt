@@ -112,7 +112,7 @@
     all[i]=Object.assign({},all[i],{deleted:true,submittedAt:new Date().toISOString()});
 
     try{
-      if(s.items&&typeof getProducts==="function"){
+      if(false&&s.items&&typeof getProducts==="function"){   /* server-side now: stock_ledger.js */
         var products=getProducts();
         var loc=s.location||"Оюут бар";
         var LOCS=["Оюут бар","Манлай бар","POWER"];

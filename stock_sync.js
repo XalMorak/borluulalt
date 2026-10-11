@@ -22,16 +22,13 @@
   async function writeStock() {
     var base = real();
     if (!base) return false;
-    var products = typeof getProducts === "function" ? getProducts() : [];
-    var wines = typeof getWines === "function" ? getWines() : [];
-    var tk = Date.now() + "-" + Math.random().toString(36).slice(2, 7);
-    await base.ref("borluulalt").update({
-      products: products,
-      wines: wines,
-      "_meta/products": tk,
-      "_meta/wines": tk,
-      updatedAt: new Date().toISOString()
-    });
+    /* only the counted values, one transaction per item: a whole-array write would wipe
+       sales deducted meanwhile by another supervisor (stock_ledger.js) */
+    var edits = window._stockEdits || [];
+    window._stockEdits = [];
+    if (typeof window._stockSetCounts === "function") await window._stockSetCounts(edits);
+    if (typeof window._deltaSync === "function") { try { await window._deltaSync({ nodes: ["products", "wines"], reason: "stock-count" }); } catch (e) {} }
+    if (typeof window._stockShowServer === "function") window._stockShowServer();
     return true;
   }
   async function pullStock() {

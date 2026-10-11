@@ -201,7 +201,7 @@
 
   window.saveMergedStock=async function(){
     if(role()!=="supervisor") return;
-    var loc=_loc, nb=0, nw=0;
+    var loc=_loc, nb=0, nw=0, edits=[];
     var P=prods(), W=(typeof getWines==="function"?getWines():[])||[];
     P.forEach(function(p){
       if(!p || p.deleted) return;
@@ -209,6 +209,7 @@
       ensureLoc(p);
       if(r.name) p.name=r.name;
       p.price=r.price;
+      if(num(p.stockByLoc[loc])!==r.stock || (r.name && r.name!==p.name) || r.price!==num(p.price)) edits.push({kind:"p", id:p.id, loc:loc, stock:r.stock, name:r.name, price:r.price});
       p.stockByLoc[loc]=r.stock;
       p.stock=total(p); nb++;
     });
@@ -218,11 +219,14 @@
       ensureLoc(w);
       if(r.name) w.name=r.name;
       if(r.price>0) w.price=r.price;
+      if(num(w.stockByLoc[loc])!==r.stock || (r.name && r.name!==w.name) || (r.price>0 && r.price!==num(w.price))) edits.push({kind:"w", id:w.id, loc:loc, stock:r.stock, name:r.name, price:r.price});
       w.stockByLoc[loc]=r.stock;
       w.stock=total(w); nw++;
     });
     if(typeof setProducts==="function") setProducts(P);
     if(typeof setWines==="function") setWines(W);
+    /* counted values go to the server item by item (stock_ledger.js); the push carries no stock */
+    window._stockEdits=edits;
     var ok=await push();
     draw();
     if(ok) alertMsg("Нөөц хадгалагдлаа — "+loc+": пиво "+nb+", вино/бусад "+nw,"success");

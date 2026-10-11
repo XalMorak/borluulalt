@@ -33,6 +33,8 @@ const strict = { rules: {
     inbox: { ".read": ACT, ".indexOn": ["submittedAt"], $sid: { ".write": `${SUP} || ${EMP_OWN}`,
       ".validate": "!newData.exists() || (newData.child('employeeId').isString() && newData.child('submittedAt').isString())" } },
     deleted: { ".read": ACT, ".indexOn": ["at"], $k: { ".write": SUP } },
+    /* server-side stock deduction ledger (stock_ledger.js), written by supervisors only */
+    stockLedger: { ".read": SA, ".indexOn": ["at"], $k: { ".write": SUP } },
     rosters: { ".read": SA, $id: { ".write": ACC } },
     payments: { ".read": SA, $k: { ".write": ACC } },
     $other: { ".read": SA, ".write": false },
@@ -45,6 +47,7 @@ const tb = { ".read": A };
 ["_meta", "updatedAt", "users", "products", "wines", "submissions", "logs", "rosters", "payments"].forEach((n) => { tb[n] = { ".write": A }; });
 tb.inbox = { ".write": A, ".indexOn": ["submittedAt"] };
 tb.deleted = { ".write": A, ".indexOn": ["at"] };
+tb.stockLedger = { ".write": A, ".indexOn": ["at"] };
 tb.$other = { ".write": A };
 /* same access as today (auth != null) except: whole-node set() of borluulalt is refused,
    PIN hashes are server-only, and the delta-sync indexes exist */

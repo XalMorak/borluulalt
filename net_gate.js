@@ -25,7 +25,7 @@
   window._netGate=true;
 
   var ROOT="borluulalt";
-  var KEYED={ inbox:"submittedAt", deleted:"at" };              // delta by child timestamp
+  var KEYED={ inbox:"submittedAt", deleted:"at", stockLedger:"at" };              // delta by child timestamp
   var VERSIONED=["users","products","wines","submissions","logs","rosters","payments"];
   var ROOT_STAMPED={ submissions:1, products:1, wines:1, logs:1 }; // written together with root updatedAt
   var ALL_NODES=VERSIONED.concat(Object.keys(KEYED));
@@ -396,7 +396,7 @@
     return p;
   };
   window._deltaNodesFor=function(role){
-    if(role==="supervisor") return ["users","products","wines","submissions","inbox","deleted","logs","rosters"];
+    if(role==="supervisor") return ["users","products","wines","submissions","inbox","deleted","logs","rosters","stockLedger"];
     if(role==="accountant") return ["users","products","wines","submissions","inbox","deleted","payments","rosters"];
     return ["users","products","wines","inbox","deleted"];
   };

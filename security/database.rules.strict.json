@@ -57,6 +57,15 @@
           ".write": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'supervisor'))"
         }
       },
+      "stockLedger": {
+        ".read": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'supervisor' || root.child('borluulalt/users/'+auth.uid).child('role').val() === 'accountant'))",
+        ".indexOn": [
+          "at"
+        ],
+        "$k": {
+          ".write": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'supervisor'))"
+        }
+      },
       "rosters": {
         ".read": "(auth != null && auth.token.eid === auth.uid && root.child('borluulalt/users/'+auth.uid).child('name').exists() && root.child('borluulalt/users/'+auth.uid).child('disabled').val() !== true && (root.child('borluulalt/users/'+auth.uid).child('role').val() === 'supervisor' || root.child('borluulalt/users/'+auth.uid).child('role').val() === 'accountant'))",
         "$id": {

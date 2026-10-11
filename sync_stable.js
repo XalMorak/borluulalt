@@ -135,6 +135,7 @@
   }
 
   function restoreStock(s){
+    return;   /* stock comes back on the server via stock_ledger.js (tombstone -> ledger) */
     try{
       if(!s.items || typeof getProducts!=="function" || typeof setProducts!=="function") return;
       var products=getProducts();
@@ -224,12 +225,24 @@
       var tombs=Object.assign({}, cloud.deleted||{}, window._tombs||{});
       var subs=dropTombed(mergeSubs([cloud.submissions, cloud.inbox, rawSubs(), local.submissions]), tombs);
       var patch={ submissions: subs, updatedAt: new Date().toISOString() };
-      if(listOf(local.products).length) patch.products=local.products;
-      if(Array.isArray(local.wines) && local.wines.length && local.wines.length>=listOf(cloud.wines).length) patch.wines=local.wines;
+      /* stock numbers are server-side (stock_ledger.js): the push only carries catalog changes */
+      if(typeof window._stockCatalogPatch==="function"){
+        var cp=window._stockCatalogPatch(local.products, cloud.products);
+        if(cp) patch.products=cp;
+        if(Array.isArray(local.wines) && local.wines.length>=listOf(cloud.wines).length){
+          var cw=window._stockCatalogPatch(local.wines, cloud.wines);
+          if(cw) patch.wines=cw;
+        }
+      } else {
+        if(listOf(local.products).length) patch.products=local.products;
+        if(Array.isArray(local.wines) && local.wines.length && local.wines.length>=listOf(cloud.wines).length) patch.wines=local.wines;
+      }
       if(Array.isArray(local.logs)) patch.logs=local.logs.slice(-500);
       await base.ref("borluulalt").update(clean(patch));
       if(typeof setSubs==="function") setSubs(subs);
       window._lastCloudAt=patch.updatedAt;
+      /* not awaited: the stock transactions must not hold _syncBusy (other pushes would fail) */
+      if(typeof window._stockReconcile==="function") window._stockLast=window._stockReconcile(subs, tombs);
       if(typeof updateSyncBadge==="function") updateSyncBadge("ok");
       return true;
     }catch(e){

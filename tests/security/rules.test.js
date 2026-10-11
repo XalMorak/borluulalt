@@ -74,6 +74,8 @@ test("strict rules", async (t) => {
       await assertFails(update(ref(emp, "borluulalt/users/emp1"), { role: "supervisor" }));                  // self-promotion
       await assertFails(set(ref(emp, "borluulalt/deleted/t2"), { at: T }));
       await assertFails(set(ref(emp, "borluulalt/_meta/users"), "x"));
+      await assertFails(set(ref(emp, "borluulalt/stockLedger/k_x"), { applied: {} }));
+      await assertFails(get(ref(emp, "borluulalt/stockLedger")));
       await assertSucceeds(set(ref(emp, "borluulalt/_meta/inbox"), "1791700000000-abc123"));   // keep_sync marker
       await assertFails(set(ref(emp, "borluulalt/_meta/inbox"), { x: 1 }));
       await assertFails(set(ref(emp, "borluulalt_secret/pins/emp1"), "x"));
@@ -96,6 +98,8 @@ test("strict rules", async (t) => {
       await assertFails(set(ref(sup, "borluulalt/rosters/r2"), { name: "R" }));
       await assertSucceeds(set(ref(sup, "borluulalt/inbox/s_emp2"), { id: "s_emp2", employeeId: "emp2", submittedAt: T, cashAmount: 5 }));   // supervisor edit
       await assertSucceeds(set(ref(sup, "borluulalt/_meta/inbox"), "1791700000000-edit"));
+      await assertSucceeds(set(ref(sup, "borluulalt/stockLedger/k_x"), { applied: { "p1@VIP": 2 }, ver: 1, at: T }));   // stock ledger
+      await assertSucceeds(get(query(ref(sup, "borluulalt/stockLedger"), orderByChild("at"), startAt(T))));
       await assertFails(set(ref(sup, "borluulalt"), {}));
       await assertFails(get(ref(sup, "borluulalt_secret")));
       await assertFails(set(ref(sup, "borluulalt/newnode"), 1));

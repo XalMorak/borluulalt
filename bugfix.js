@@ -59,7 +59,7 @@
       try{
         if(typeof setProducts==="function")setProducts(before);
         var data=typeof getFormData==="function"?getFormData():null;
-        if(data&&data.items&&typeof getProducts==="function"){
+        if(false&&data&&data.items&&typeof getProducts==="function"){   /* server-side now: stock_ledger.js */
           var loc=data.location||"Оюут бар";
           if(STOCK_LOCS.indexOf(loc)<0)loc="Оюут бар";
           var products=getProducts();
