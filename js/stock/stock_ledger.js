@@ -46,7 +46,8 @@
     (s.items||[]).forEach(function(it){
       var q=Number(it&&it.sold)||0, id=Number(it&&it.id);
       if(!q || !id) return;
-      var k=(isWineId(id)?"w":"p")+id+"@"+loc;
+      var link=isWineId(id) && window._stockLinkOf ? window._stockLinkOf(id) : 0;   // shared stock (stock_link.js)
+      var k=(link ? "p"+link : (isWineId(id)?"w":"p")+id)+"@"+loc;
       m[k]=(m[k]||0)+q;
     });
     return m;

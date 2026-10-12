@@ -19,6 +19,7 @@
     if(typeof window.getActiveProducts!=="function" || window.getActiveProducts._page) return;
     var orig=window.getActiveProducts;
     window.getActiveProducts=function(){
+      if(window._vipMode && window._vipProducts) return window._vipProducts();
       if(window._wineMode) return wines();
       var list=[];
       try{ list=orig.apply(this,arguments)||[]; }catch(e){}

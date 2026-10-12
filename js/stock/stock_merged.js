@@ -135,7 +135,7 @@
     var h=document.getElementById("smLocHead"); if(h) h.textContent="Нөөц ("+_loc+")";
     var beer=prods().filter(function(p){ return p && !p.deleted && num(p.id)<100; });
     var g={busad:[],ulaan:[],tsagaan:[]};
-    wines().filter(function(w){ return !w.hidden; }).forEach(function(w){ g[catOf(w)].push(w); });
+    wines().filter(function(w){ return !w.hidden && !(window._stockLinkOf && window._stockLinkOf(w)); }).forEach(function(w){ g[catOf(w)].push(w); });
     var html=sec("beer","Пиво / бар бараа",beer.length)+beer.map(function(p){ return row("beer",p); }).join("");
     CATS.forEach(function(c){
       if(!g[c[0]].length) return;

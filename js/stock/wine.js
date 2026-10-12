@@ -82,6 +82,7 @@
   if(typeof window.getActiveProducts==="function" && !window.getActiveProducts._w){
     var _gap=window.getActiveProducts;
     window.getActiveProducts=function(){
+      if(window._vipMode && window._vipProducts) return window._vipProducts();
       if(window._wineMode) return getWines().filter(function(w){ return w && !w.hidden; });
       return (_gap.apply(this,arguments)||[]).filter(function(p){ return p && (p.id||0)<100; });
     };
@@ -91,7 +92,7 @@
     var _gf=window.getFormData;
     window.getFormData=function(){
       var d=_gf.apply(this,arguments);
-      if(d){ d.kind=window._wineMode?"wine":"bar"; if(window._wineMode) d.sheet="wine"; }
+      if(d){ d.kind=window._vipMode?"vip":(window._wineMode?"wine":"bar"); if(d.kind!=="bar") d.sheet=d.kind; }
       return d;
     };
     window.getFormData._w=true;

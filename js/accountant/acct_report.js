@@ -169,7 +169,7 @@
         var sold = num(it.sold), inc = num(it.income);
         if (!sold && !inc) return;
         var name = String(it.name || it.id || "Бараа");
-        var kind = kindOf(s) === "wine" ? "Вино" : "Пиво";
+        var kind = U().kindLabel ? U().kindLabel(kindOf(s)) : (kindOf(s) === "wine" ? "Вино" : "Пиво");
         var k = kind + "|" + name;
         if (!map[k]) map[k] = { name: name, kind: kind, qty: 0, income: 0, price: num(it.price) };
         map[k].qty += sold;

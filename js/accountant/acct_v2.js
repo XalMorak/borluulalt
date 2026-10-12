@@ -108,7 +108,7 @@
     8:function(s){ return A().diffOf(s); }
   };
   function paidOf(s){ var p=A().pays()[A().keySafe(s)]; return !!(p && p.paid); }
-  function text(s){ var a=A(); return [s.date,s.shift,s.employeeName,s.employeeId,s.location,a.tekOf(s),a.kindOf(s)==="wine"?"вино":"пиво"].join(" ").toLowerCase(); }
+  function text(s){ var a=A(); return [s.date,s.shift,s.employeeName,s.employeeId,s.location,a.tekOf(s),(a.kindOf(s)==="wine"?"вино":(a.kindOf(s)==="vip"?"vip нэгдсэн пиво вино":"пиво"))].join(" ").toLowerCase(); }
 
   function applyTable(){
     var a=A(), rows=a.rows(), body=$("acctBody");
