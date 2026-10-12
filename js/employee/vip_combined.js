@@ -1,4 +1,4 @@
-/* vip_combined.js — Байршил VIP: whatever тек номер, beer + wine are listed together in ONE section of
+/* vip_combined.js — Байршил VIP + тек номер "VIP-PW" (only that тек; other VIP теки stay normal beer): beer + wine are listed together in ONE section of
    ONE form (one cash/card, one илүү/дутуу).
    Sets window._vipMode; getActiveProducts (wine.js / wine_page.js) then returns beer + wines,
    getFormData/submit.js store kind/sheet "vip". Beer rows: prev/next → sold; wine rows: sold only
@@ -8,7 +8,7 @@
   window._vipMode=false;
   function want(){
     var loc=document.getElementById("locationName"), tek=document.getElementById("receiverName");
-    return !!(loc && loc.value==="VIP");
+    return !!(loc && tek && loc.value==="VIP" && tek.value==="VIP-PW");
   }
   function sec(label){
     var tr=document.createElement("tr"); tr.className="wine-sec vip-sec";
@@ -31,7 +31,7 @@
     headers();
     var t=document.getElementById("empSheetHint");
     if(!t){ var tb=document.getElementById("salesBody"), tbl=tb && tb.closest("table"); if(tbl){ t=document.createElement("p"); t.id="empSheetHint"; t.className="vip-hint"; tbl.parentNode.insertBefore(t, tbl); } }
-    if(t){ t.textContent=on?"VIP: пиво ба вино нэг хэсэгт, нэг илгээлт, нэг тооцоо.":""; t.style.display=on?"":"none"; }
+    if(t){ t.textContent=on?"VIP-PW: пиво ба вино нэг хэсэгт, нэг илгээлт, нэг тооцоо.":""; t.style.display=on?"":"none"; }
   }
   document.addEventListener("change", function(ev){ var id=ev.target && ev.target.id; if(id==="locationName"||id==="receiverName") setTimeout(apply,0); });
   apply();

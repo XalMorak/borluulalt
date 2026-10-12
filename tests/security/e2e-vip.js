@@ -29,9 +29,15 @@ const L = () => ({ "Оюут бар": 30, "Манлай бар": 0, VIP: 20, POW
     await new Promise((r) => setTimeout(r, 600));
     return [...document.getElementById("receiverName").options].map((o) => o.value);
   });
-  check("VIP keeps its normal тек list (no extra option needed)", tekOpts.includes("VIP") && !tekOpts.some((t) => /нэгдсэн/.test(t)), tekOpts);
-  const form = await E.evaluate(async () => {
+  check("VIP тек list has VIP and VIP-PW", tekOpts.includes("VIP") && tekOpts.includes("VIP-PW"), tekOpts);
+  const plain = await E.evaluate(async () => {
     const tek = document.getElementById("receiverName"); tek.value = "VIP"; tek.dispatchEvent(new Event("change", { bubbles: true }));
+    await new Promise((r) => setTimeout(r, 1000));
+    return { vip: window._vipMode, wine: [...document.querySelectorAll("#salesBody input[id^='sold_']")].some((x) => x.id === "sold_101"), secs: document.querySelectorAll("#salesBody tr.vip-sec").length };
+  });
+  check("тек 'VIP' stays normal beer (no combined mode, no wines)", !plain.vip && !plain.wine && plain.secs === 0, plain);
+  const form = await E.evaluate(async () => {
+    const tek = document.getElementById("receiverName"); tek.value = "VIP-PW"; tek.dispatchEvent(new Event("change", { bubbles: true }));
     await new Promise((r) => setTimeout(r, 1200));
     const ids = [...document.querySelectorAll("#salesBody input[id^='sold_']")].map((x) => Number(x.id.slice(5)));
     const secs = [...document.querySelectorAll("#salesBody tr.vip-sec")].map((x) => x.textContent);
@@ -55,7 +61,7 @@ const L = () => ({ "Оюут бар": 30, "Манлай бар": 0, VIP: 20, POW
   check("submitted", /✓/.test(form.msg), form.msg);
   const inbox = Object.values((await H.dbGet("borluulalt/inbox")) || {});
   const vs = inbox.find((s) => s.kind === "vip");
-  check("stored kind/sheet 'vip', one calcTotal/diff", vs && vs.sheet === "vip" && vs.calcTotal === 38000 && vs.diff === 0 && vs.location === "VIP" && vs.items.some((i) => i.id === 101 && i.sold === 2), vs && { kind: vs.kind, sheet: vs.sheet, calc: vs.calcTotal, diff: vs.diff });
+  check("stored kind/sheet 'vip', one calcTotal/diff", vs && vs.sheet === "vip" && vs.calcTotal === 38000 && vs.diff === 0 && vs.location === "VIP" && vs.receiverName === "VIP-PW" && vs.items.some((i) => i.id === 101 && i.sold === 2), vs && { kind: vs.kind, sheet: vs.sheet, calc: vs.calcTotal, diff: vs.diff });
 
   /* a wine-sheet submission that sells the wine-catalog Ерөө (id 102) at Оюут бар */
   const now = new Date().toISOString();
